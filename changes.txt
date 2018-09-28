@@ -1,0 +1,593 @@
+Sep 28, 2018  v.1.5.50
+  moved from subversion to github
+
+Aug 20, 2018  v.1.5.49
+  OboFileGenerator: fix to skip exporting xrefs without value (to avoid NullPointerException)
+
+Aug 20, 2018  v.1.5.49
+  OboFileGenerator: fix to skip exporting xrefs without value (to avoid NullPointerException)
+
+Jul 11, 2018  v.1.5.47
+  OboFileGenerator: properly emits synonymtypedef DISPLAY_SYNONYM
+
+Jun 12, 2018  v.1.5.46
+  TermStatGenerator: fixed issue with 'child_term_count' and 'parent_term_count'
+
+Jun 4, 2018  v.1.5.45
+  OboFileGenerator: fixed potential date conversion issue when running in multi-thread environment
+
+May 31, 2018  v.1.5.44
+  RDO ontology can be exported to FTP site
+
+May 30, 2018  v.1.5.43
+  PW,CMO,MMO and XCO ontologies can be exported to FTP site (logic and script fixes)
+
+May 29, 2018  v.1.5.42
+  Term xrefs are no longer loaded into ONT_XREFs table -- they are loaded as synonyms with type 'xref' instead
+
+May 25, 2018  v.1.5.41
+  PW,CMO,MMO and XCO ontologies can be exported to FTP site
+
+Apr 30, 2018  v.1.5.40
+  removed CMO,MMO and XCO ontologies from automatic processing; these ontologies can be live edited as of now
+
+Mar 28, 2018  v.1.5.39
+  removed PW ontology from automatic processing: PW ontology can be live edited as of now
+
+Jan 3, 2018  v.1.5.38
+  OboFileGenerator: fixed for DO+ ontology
+
+Dec 29, 2017  v.1.5.37
+  transition from RDO to DO+ ontology
+
+Oct 25, 2017  v.1.5.36
+  RDO ontology: synonyms from CTD OBO file (source='OBO') are no longer inserted/deleted for RDO terms
+
+Sep 26, 2017  v.1.5.34
+  fixed source of CL ontology
+  improved parsing of created_by fields for MP,HP ontologies
+
+Sep 21, 2017  v.1.5.33
+  gviewer stats loader: bumped up limit of max-annot-count-per-term from 1000 to 2500
+
+Sep 12, 2017  v.1.5.32
+  term stats loader for term with filter: rewritten for performance (100x faster)
+  split gviewer stats computation to another file
+
+Sep 5, 2017  v.1.5.31
+  term stats loader: optimized for better performance
+
+Sep 1, 2017  v.1.5.30
+  file parser: extended to allow loading of custom term relations for DO ontology
+
+Aug 30, 2017  v.1.5.29
+  DOID mapper: enforced a rule to always map DOID terms to RDO terms
+    if a DOID term cannot be mapped by MESH/OMIM id, nor by synonym,
+    then it will be mapped to parent terms
+
+Aug 22, 2017  v.1.5.28
+  parser: commented out setting comment for custom root terms
+        'created by OntologyLoad pipeline to enforce single root for ontology'
+
+Aug 2, 2017  v.1.5.27
+  added new banned synonyms
+
+Jul 5, 2017  v.1.5.26
+  term stat loader: added CS to list of phenominer ontologies
+
+Jul 3, 2017  v.1.5.25
+  doid mapper: fixed bug when deleting stale synonyms
+  added chinchilla-species-sources ontology to list of supported ontologies
+
+Jun 30, 2017  v.1.5.24
+  term stats loader: added computation of counts for variants
+  obo file creator: fixed conversion of 'primary_id' to 'alt_id' synonyms to prevent emission of duplicate synonym lines
+
+
+Jun 23, 2017  v.1.5.23
+----------------------
+term stats loader: added computation of counts for variants
+
+
+Jun 8, 2017  v.1.5.22
+----------------------
+term stats loader: added computation of annotation counts for terms for all species (species_type_key=0)
+
+
+May 26, 2017  v.1.5.21
+----------------------
+term stats loader: added computation of counts of phenominer annotations for male and female strains
+
+
+Mar 16, 2017  v. 1.5.20
+---------------------------
+parser: incoming synonyms for CHEBI ontology
+   incoming synonyms like '0', '0.0', '234.433', '-2' are skipped from loading;
+   they were messing up badly search results into OntoMate text mining tool
+
+
+Mar 14, 2017  v. 1.5.19
+---------------------------
+updated download url for HP ontology
+
+
+Mar 1, 2017  v. 1.5.18
+---------------------------
+Jeff updated stat computation module: now filters are possible
+
+
+Jan 10, 2017  v. 1.5.17
+---------------------------
+sped up loading of big ontologies like CHEBI by moving term-cycle-detection code from data-log-thread to qc-threads
+fixed source url for SO and NBO ontology
+
+
+Jan 3, 2017  v. 1.5.16
+---------------------------
+added loading of Zebrafish Anatomy (ZFA) ontology into RGD as nonpublic ontology
+
+
+Dec 20, 2016  v. 1.5.15
+---------------------------
+strip comments from term names
+
+
+Nov 7, 2016  v. 1.5.14
+---------------------------
+fixed NullPointerExceptions in new code dealing with DOIDs
+
+
+Nov 1, 2016  v. 1.5.13
+---------------------------
+fixed matching by MESH ids for DOIDMapper
+
+
+Oct 5, 2016  v. 1.5.11
+---------------------------
+changed MGI download urls -- per RGDD-1287
+
+
+Oct 4, 2016  v. 1.5.10
+---------------------------
+added QC of RS term synonyms: malformed synonyms are reported to curators responsible for RS ontology
+
+
+Sep 12, 2016  v. 1.5.9
+---------------------------
+updated source for MP ontology (the old source was dead for 2 months)
+
+
+Jun 16, 2016  v. 1.5.8
+---------------------------
+QC: fixed handling of term definitions
+DOIDMapper: fixed NullPointerException when handling xrefs with null type
+
+
+Jun 1, 2016  v. 1.5.7
+---------------------------
+updated source for NBO ontology (the old source was dead since 3 weeks)
+
+
+May 17, 2016  v. 1.5.6
+---------------------------
+obo parser: relations that are not supported by the parses are reported in the summary email,
+   and no longer individually, to significantly reduce the size of summary email -- per RGDD-1210
+term stats: added computing of 'diagram_count' for pathways -- per RGDD-1206
+
+
+May 12, 2016  v. 1.5.5
+---------------------------
+DO ontology: changed source to load richer set of relations (inferred parents) -- per RGDD-1208
+
+
+May 09, 2016  v. 1.5.4
+---------------------------
+extended qc: reporting inserted terms that could cause cycles
+RDO ontology: reporting terms without accession id
+
+
+May 05, 2016  v. 1.5.3
+---------------------------
+code enhanced to be able to use the full featured GO file -- per RGDD-719
+1) new relations supported: ends-during, happens-during, starts-during and occurs-in
+2) cross-ontology relations are filtered out during loading
+3) fixed xref parsing for some more complex cases (containing commas in xref descriptions)
+
+
+Apr 11, 2016  v. 1.5.2
+---------------------------
+updated generate_obo_file.sh to use .rgd. instead of .hmgc. domain -- per RGDD-1193
+
+
+Mar 24, 2016  v. 1.5.1
+---------------------------
+added MI (molecular interactions) ontology to RGD -- per RGDD-1178
+
+
+Mar 21, 2016  v. 1.5.0
+---------------------------
+implemented incremental updates strategy for loading term relationships into ONT_DAG table -- per RGDD-1175
+
+
+Feb 21, 2016  v. 1.4.13
+---------------------------
+fixed synonym parsing (skip self-referencing synonyms: where term acc equals to synonym name)
+
+
+Feb 8, 2016  v. 1.4.12
+---------------------------
+updated source URL for SO ontology (for 2+ years SO ontology had not been updated)
+
+
+Feb 7, 2016  v. 1.4.11
+---------------------------
+FileParser: if incoming term name contains ';' in term name it is being split into a term name
+  (the part before semicolon) and synonym(s) (the part after ';')
+
+
+Jan 14, 2016  v. 1.4.10
+---------------------------
+DOID mapper:
+  rdoTermsNotMatchingDo.txt file also exports count of annotations in RGD
+
+
+Dec 16, 2015  v. 1.4.9
+---------------------------
+DOID mapper: now exporting file doTermsMatchingRdo.txt
+  rdoTermsNotMatchingDo.txt file exports associated top level RDO diseases
+
+
+Dec 16, 2015  v. 1.4.8
+---------------------------
+DOID mapper: fixed a bug in implementation of RULE1 for RDO terms matching by term name or synonym
+  rdoTermsNotMatchingDo.txt file exports associated MESH and OMIM ids
+
+
+Dec 15, 2015  v. 1.4.7
+---------------------------
+DOID mapper, improved: implemented RULE1 to avoid redundant assignments  of DOIDs
+  if a given DO terms is matched to multiple RDO terms, we remove the child terms
+  f.e. if DO term matches both [Skin Diseases] and [Skin Diseases Genetic],
+       only synonym to [Skin Diseases] will be made
+       because [Skin Diseases Genetic] is a child term of [Skin Diseases]
+       therefore assignment of this DOID to [Skin Diseases Genetic] is redundant and confusing
+
+
+Dec 9, 2015  v. 1.4.6
+---------------------------
+DOID mapper, initial version, done
+
+
+Nov 18, 2015  v. 1.4.5
+---------------------------
+-FileParser: improved parsing of excluded synonyms:
+   one synonym could be excluded for multiple terms, f.e.
+         <entry key="DFNB18" value="OMIM:602092|MESH:C566580" />
+
+
+Nov 12, 2015  v. 1.4.4
+---------------------------
+-added 'DO' ontology to the list of ontologies processed in 'run_all.sh' script
+
+
+Nov 3, 2015  v. 1.4.3
+---------------------------
+-QC: SynonymManager: fixed a bug in synonym handling causing deletions of synonyms having 2+ same words
+  f.e. due to this bug, terms
+    'Thoracic Aortic Aneurysms and Aortic Dissections' and 'Thoracic Aortic Aneurysms and Dissections'
+    were considered identical (while they weren't) and therefore one of them was being dropped at random
+
+
+Oct 13, 2015  v. 1.4.2
+---------------------------
+-DataLoader: protection against insertions of self-referencing dags
+
+
+Oct 9, 2015  v. 1.4.1
+---------------------------
+-FileParser: fixed code for handling term merges (when one term in RGD has multiple MESH/OMIM ids
+   and there are multiple incoming records to be merged when loading into one)
+
+
+Oct 6, 2015  v. 1.4.0
+---------------------------
+-retired RDO_custom.obo terms file (replaced by RGD term edit tool)
+
+
+Sep 10, 2015  v. 1.3.65
+---------------------------
+-added loading of xref descriptions
+
+
+Sep 1, 2015  v. 1.3.64
+---------------------------
+-fixed run_single.sh script
+-FileParser: added handling of source_atlas field for UBERON ontology
+
+
+Aug 17, 2015  v. 1.3.63
+---------------------------
+TaxonConstraint module: in addition to refreshing 'only_in_taxon' and 'never_in_taxon' synonyms,
+  'Not4Curation' synonyms are generated for those GO terms which violate the above loaded taxon constraints
+  (f.e. if a GO term is tagged as 'only_in_taxon Bacteria', this term and all of its child terms are
+        tagged as 'Not4Curation', because we do not curate bacteria, only Mammals lineage)
+
+
+May 11, 2015  v. 1.3.62
+---------------------------
+FileParser: fixes in handling custom term relationships for RDO ontology
+
+
+May 6, 2015  v. 1.3.61
+---------------------------
+TermStatLoader: computes stats for chinchilla, in addition to rat,mouse and human
+
+
+Apr 15, 2015  v. 1.3.60
+---------------------------
+FileParser: handles custom term relationships for RDO ontology
+
+
+Mar 24, 2015  v. 1.3.59
+---------------------------
+refactored TermStats calculation module
+FileParser: "." synonyms, common for CHEBI, won't be loaded anymore
+
+
+Feb 17, 2015  v. 1.3.58
+---------------------------
+FileParser: improved handling of excluded synonyms (previously, there was a chance that some synonyms
+   that should be excluded, were still loaded)
+
+
+Feb 11, 2015  v. 1.3.57
+---------------------------
+QualityChecker: improved loading of RDO term names
+  (if incoming RDO term name differs in case from term name in database, the term name is left as it is;
+   this rule is to avoid overwriting [Muckle-Wells Syndrome] with [MUCKLE-WELLS SYNDROME]
+
+
+Jan 27, 2015  v. 1.3.56
+---------------------------
+FileParser: ", IGNORED" synonyms when loaded have their synonym type set to NARROW
+
+
+Nov 25, 2014  v. 1.3.55
+---------------------------
+FileParser: HP ontology: HP:0040005 properties are ignored during loading
+  (they are an extended version of definition field)
+
+
+Nov 21, 2014  v. 1.3.54
+---------------------------
+FileParser: removed downloading and parsing of files from MESH -- no longer needed
+
+
+Nov 14, 2014  v. 1.3.53
+---------------------------
+FileParser: implemented excluded term synonyms
+  (incoming synonyms that are present on excluded synonyms list, won't be loaded into database)
+
+
+Nov 10, 2014  v. 1.3.52
+---------------------------
+OboFileCreator v.1.2.2: fixed copying of RDO.obo file via data_release -- per RGDD-1008
+
+
+Oct 29, 2014  v. 1.3.51
+---------------------------
+TermStatLoader v.2.3.0: compute stats for new columns: RAT_GENES_FOR_TERM, RAT_GENES_WITH_CHILDREN
+
+
+Oct 27, 2014  v. 1.3.50
+---------------------------
+OboFileCreator v.1.2.1: no longer duplicate alt_id: lines are emitted (per RGDD-1001); in addition, term synonyms
+   are sorted by type and name
+
+
+Oct 21-22, 2014  v. 1.3.49
+---------------------------
+CtdMapper v.1.6.0: no longer inserts new RDO terms -- per RGDD-998
+MeshDefLoader: merges definitions and synonyms with the incoming CTD terms; called from FileParser
+FileParser: merges incoming CTD terms with RDO custom terms, before passing the data to QC
+  note: early merging of mesh data and RDO custom terms with incoming CTD terms
+      improves quality of loading immensely
+   previously loading of RDO custom terms could overwrite the existing terms resulting in unnecessary term updates
+     and synonyms inserts and deletions
+   previously loading of MESH data could overwrite the existing terms resulting in unnecessary term updates
+     and synonyms inserts and deletions
+   this is no longer the case! loading is now much more stable
+
+Oct 7, 2014  v. 1.3.48
+  QC 1.3.3: SynonymManager can handle terms with null name
+
+Jul 8, 2014  v. 1.3.47
+  FileParser v.1.3.4: can now handle empty 'def:' fields
+
+Jul 8, 2014  v. 1.3.46
+  CtdMapper 1.5.2: turned off sophisticated code for term upgrade: it was producing wrong results
+
+Jul 8, 2014  v. 1.3.45
+  FileParser 1.3.3:
+    HP ontology: source url updated
+    NBO ontology: added handling of fields "property_value: http://purl.org/dc/elements/1.1/date"
+    downloaded OBO files are quick-checked for well-formedness
+  StatLoader
+    fix: stale terms are not dropped for malformed obo files
+  Loader
+    fix: stale synonyms are not dropped for malformed obo files
+
+Jun 23, 2014  v. 1.3.44
+  FileParser 1.3.2: filtering out comments of some well-known comment types, for UBERON ontology;
+    'Not4Curation' synonyms added for GO terms of 'gocheck_do_not_annotate' and 'gocheck_do_not_manual_annotate' subsets;
+    added support for new fields for ontology synonyms
+  QC 1.3.2: added support for new fields for ontology synonyms
+  DL 1.1.1: added support for new fields for ontology synonyms
+
+Jun 18, 2014  v. 1.3.43
+  OboFileGenerator v.1.1.5: copying to staging directory is disabled; script copies RDO.obo to the right directory
+
+May 13, 2014  v. 1.3.42
+  FileParser v.1.3.1: added parsing of dates in format 'yyyy-MM-dd' in addition to the currently supported format
+    yyyy-MM-dd'T'HH:mm:ss'Z' - per RGDD-920
+
+May 5, 2014  v. 1.3.41
+  OboFileGenerator v.1.1.4: RDO.obo file is copied to staging directory upon being generated
+
+Apr 8, 2014  v. 1.3.40
+  TermStatsLoader v.2.2.1: improved logging of orphaned terms that were made obsolete
+
+Mar 6, 2014  v. 1.3.39
+  changed source for HP ontology: now it is using latest stable file
+
+Feb 26, 2014  v. 1.3.38
+  FileParser 1.3.0: added handling of UBERON ontology, subset basic
+
+Feb 20, 2014  v. 1.3.37
+  TermStatLoader v 2.2: improved code to handle loading of ORDO ontology with acc prefix 'Orphanet:'
+  FileParser 1.2.13: added handling of ORDO ontology with acc prefix 'Orphanet:'
+
+Feb 18, 2014  v. 1.3.36
+  Manager: removed AnnotationMapper entirely (it was used one time only during transition to CTD/RDO ontology)
+  FileParser 1.2.12: improved counting of inserted terms (per ontology)
+  QualityChecker 1.3.1: improved counting of inserted terms (per ontology)
+  CTDMapper 1.5.1: improved counting of inserted terms (per ontology)
+
+Jan 20, 2014  v. 1.3.35
+  TaxonConstraints module: added loading of taxon constraints for GO terms
+
+Jan 8, 2014  v. 1.3.34
+  MeshDefLoader module v. 1.2.2: config file updated to use MESH 2014 database instead of MESH 2013 database- per RGDD-866
+
+Dec 3, 2013  v. 1.3.33
+  turned off additivity for meshDef logger (its entries won't go into root.log anymore);
+  changed logging level to info for meshDef logger (only logging stats and changes)
+
+Nov 26, 2013  v. 1.3.32
+  turned off additivity for ctdMapper logger (its entries won't go into root.log anymore)
+
+Nov 4, 2013  v. 1.3.31
+  version 1.2.11 of FileParser module:
+    encoding override could be specified for every ontology
+
+Oct 30, 2013  v. 1.3.30
+  version 1.3 of QualityChecker module:
+    1.improved logging for inserts: no longer inserted regular terms will be logged in without full term information
+    2. rolled back feature 1 -- too much problems in implementing it
+  version 1.5 of CTDMapper module:
+    more relevant logging for OMIM mapped ids
+
+Oct 28, 2013  v. 1.3.29
+  version 1.2 of QualityChecker module:
+    added logging of changed term names into file termNameChanged.log
+
+Oct 22, 2013  v. 1.3.28
+  version 1.2.10 of FileParser module:
+    do not list all terms skipped in the summary email - give only the summary
+    detailed info should go to the log file
+
+Sep 16, 2013  v. 1.3.27
+  version 1.4 of ctdFileMapper module:
+    better matching by OMIM synonyms (elimination of spurious inserts of new terms)
+
+August 22, 2013  v. 1.3.26
+  version 1.2.9 of FileParser module:
+    added parsing of xdbrefs for term definitions
+  version 1.1 of QualityChecker module:
+    added qc of dbxrefs against database
+  version 1.1 of DataLoader module:
+    added loading and logging of dbxrefs (inserts and deletes)
+  version 1.1.3 of oboFileGenerator module:
+    added export of dbxrefs for tem definitions
+
+August 21, 2013  v. 1.3.25
+  version 1.1.2 of oboFileGenerator module:
+    write out fields 'created_by:' and 'creation_date:'
+
+July 23, 2013  v. 1.3.24
+  version 1.2.8 of FileParser module:
+    if ontology id of processed ontology cannot be validated against database, error message is printed out
+    instead of crashing of the entire application
+
+July 18, 2013  v. 1.3.23
+  version 1.1.1 of oboFileGenerator module:
+    generate synonyms conforming to obo file format 1.2 (not uses deprecated synonyms exact_synonym, etc)
+  version 1.2.7 of FileParser module:
+    user can specify in properties file which ontologies should use exact synonym matching when loading synonyms
+    "ISO-8859-1" encoding is used when reading obo files to prevent loading of garbage characters (RS ontology)
+
+July 17, 2013  v. 1.3.22
+  version 1.1.0 of oboFileGenerator module:
+  obo file for any ontology could be generated;
+  obo file header is read from database table ONTOLOGIES field OBO_HEADER
+
+May 22, 2013  v. 1.3.21
+  version 1.2.6 of fileParser module:
+  RDO_custom.obo file processing: new synonyms for non-custom RDO terms could be added
+
+Mar 19, 2013  v. 1.3.20
+  version 1.2.5 of fileParser module:
+  added parsing of 'date' and 'note' fields -- currently present in NBO ontology
+
+Feb 22, 2013  v. 1.3.19
+  RDO ontology: synonyms ending with ', INCLUDED' or ', FORMERLY' will be fixed before loading - per RGDD-679
+   also for 'RDO' ontology synonyms are split into multiple synonyms when ';' character is encountered
+
+Feb 21, 2013  v. 1.3.18
+  orphaned obsoleted terms are logged into file 'obsoletedTerms.log'
+
+Feb 20, 2013  v. 1.3.17
+  omim_gene_assoc synonyms are no longer generated for terms with OMIM IDs - per RGDD-677
+
+Feb 12, 2013  v. 1.3.16
+  CTDMapper module v. 1.2: allows for upgrade of OMIM-only terms into MESH+OMIM terms  - per RGDD-646
+
+Jan 29, 2013  v. 1.3.15
+  Fixed handling of duplicate synonyms
+  MeshDefLoader module v. 1.2.0: updated to avoid insertion of duplicate term synonyms
+
+Jan 23, 2013  v. 1.3.14
+  MeshDefLoader module v. 1.0.1: config file updated to use MESH 2013 database instead of MESH 2012 database- per RGDD-652
+
+Nov 16, 2012  v. 1.3.13
+  TermStats module fixed to compute phenominer data for gviewer properly - per RGDD-594
+
+Nov 12, 2012  v. 1.3.12
+  QC module automatically removed pseudo duplicate synonyms: per RGDD-542
+  'FSGS1 [synonym]' and 'FSGS1 [exact_synonym]' -->  'FSGS1 [exact_synonym]
+  'FSGS1 [synonym]' and '"FSGS1 [synonym]"'     --> 'FSGS1 [synonym]'
+
+Nov 9, 2012  v. 1.3.11
+  TermStats module fixed to compute phenominer data for gviewer properly;
+  (stats for phenominer data must always computed as term-only) - per RGDD-594
+
+October 31, 2012  v. 1.3.10
+  Incoming Reactome xref_analog synonyms are synced with synonyms in RGD. If a Reactome synonym
+  is no longer present in incoming data, it is removed from RGD database.  - per RGDD-599
+
+October 26, 2012
+  Automatic generation of matching gene symbols as synonyms of type 'omim_gene_assoc'
+  for terms having OMIM synonyms (currently applies only to RDO ontology)   - per RGDD-595
+
+October 18, 2012
+  Fixed improper generation of new RDO ids when custom RDO terms are present - per RGDD-589
+
+August 21, 2012
+  Improved script run_all.sh
+
+August 14, 2012
+  Added TermSynonymCleaner module. It is run by specifying command line option "-cleanup_synonyms".
+    It cleans duplicate synonyms from database and logs them into a separate log file "synonym_cleaner.log"
+
+July 30, 2012
+  FileParser module v 1.2.4: custom terms could be loaded from RDO_Custom.obo file.
+    This included also loading of new relationships between existing terms and /or
+    between custom and existing terms. [RGDD-333]
+
+June 21, 2012
+  FileParser module v 1.2.3: changed root term for SO ontology from SO:0000000 to SO:9999999;
+    SO:0000000 appears in official SO.obo file as obsolete term, so we had clash with root term
+    for SO ontology supplied in the config file
+
+May 29, 2012
+  FileParser module v 1.2.2: fixed dropping of old dag for GO ontology
