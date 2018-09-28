@@ -1,0 +1,309 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
+        <property name="version" value="--ONTOLOGY LOAD pipeline -- ver. 1.5.50 -- Aug 28, 2018 --" />
+        <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
+            <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
+                   ...      https://raw.githubusercontent.com/...
+                   -->
+                <entry key="GO" value="http://www.geneontology.org/ontology/gene_ontology.obo"/>
+                <entry key="MP" value="http://ontologies.berkeleybop.org/mp.obo"/>
+                <!--<entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
+                <entry key="CMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/clinical_measurement/clinical_measurement.obo"/>
+                <entry key="MMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/measurement_method/measurement_method.obo"/>
+                <entry key="XCO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/experimental_condition/experimental_condition.obo"/>
+                <entry key="RS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/rat_strain/rat_strain.obo"/>
+                -->
+                <entry key="CS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/chinchilla/CS.obo"/>
+
+                <entry key="SO" value="http://ontologies.berkeleybop.org/so/so-simple.obo"/>
+                <entry key="CL" value="http://ontologies.berkeleybop.org/cl/cl-basic.obo"/>
+
+                <entry key="MA" value="http://www.informatics.jax.org/downloads/reports/adult_mouse_anatomy.obo"/>
+                <!--<entry key="RDO" value="http://ctdbase.org/reports/CTD_diseases.obo.gz"/>-->
+
+                <entry key="NBO" value="http://ontologies.berkeleybop.org/nbo/nbo-simple.obo"/>
+                <entry key="HP" value="https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo"/>
+                <entry key="CHEBI" value="ftp://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.obo"/>
+                <entry key="VT" value="http://data.bioontology.org/ontologies/VT/download/?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb" />
+                <entry key="ORDO" value="http://data.bioontology.org/ontologies/ORDO_OBO/download/?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb" />
+                <entry key="UBERON" value="http://ontologies.berkeleybop.org/uberon/basic.obo"/>
+
+                <!--<entry key="DO" value="http://ontologies.berkeleybop.org/doid/doid.obo" />-->
+                <!--<entry key="DO" value="https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/doid.obo" />-->
+
+                <entry key="EFO" value="https://sourceforge.net/p/efo/code/HEAD/tree/trunk/src/efoinobo/efo.obo?format=raw"/>
+                <entry key="MI" value="http://ontologies.berkeleybop.org/mi/mi.obo"/>
+                <entry key="ZFA" value="http://ontologies.berkeleybop.org/zfa/zfa.obo"/>
+            </map>
+        </property>
+        <property name="qualityChecker" ref="qualityChecker" />
+        <property name="dataLoader" ref="dataLoader" />
+        <property name="malformedRsSynonymsEmailList" value="mtutaj@mcw.edu" />
+	</bean>
+
+    <bean id="fileParser" class="edu.mcw.rgd.dataload.ontologies.FileParser">
+        <property name="ontPrefixes"><!--key: ontology ID; value: term acc id prefix -->
+            <map>
+                <entry key="GO" value="GO:"/>
+                <entry key="MP" value="MP:"/>
+                <entry key="PW" value="PW:"/>
+                <entry key="CMO" value="CMO:"/>
+                <entry key="MMO" value="MMO:"/>
+                <entry key="XCO" value="XCO:"/>
+                <entry key="RS" value="RS:"/>
+                <entry key="SO" value="SO:"/>
+                <entry key="CL" value="CL:"/>
+                <entry key="MA" value="MA:"/>
+                <entry key="RDO" value="*"/>
+                <entry key="NBO" value="NBO:"/>
+                <entry key="HP" value="HP:"/>
+                <entry key="CHEBI" value="CHEBI:"/>
+                <entry key="VT" value="VT:"/>
+                <entry key="ORDO" value="Orphanet:"/>
+                <entry key="UBERON" value="UBERON:"/>
+                <entry key="DO" value="DOID:"/>
+                <entry key="EFO" value="EFO:"/>
+                <entry key="MI" value="MI:"/>
+                <entry key="ZFA" value="ZFA:"/>
+                <entry key="CS" value="CS:"/>
+            </map>
+        </property>
+
+        <!-- default file encoding is "ISO-8859-1" -->
+        <property name="fileEncodingOverride"><!--key: ontology ID; value: name of file encoding -->
+            <map>
+                <entry key="RDO" value="UTF-8"/>
+                <entry key="CMO" value="UTF-8"/>
+                <entry key="MMO" value="UTF-8"/>
+                <entry key="XCO" value="UTF-8"/>
+                <entry key="ORDO" value="UTF-8"/>
+            </map>
+        </property>
+
+        <property name="rootTerms"><!--key: ontology ID;
+                value: root term acc id followed by list of roots in obo file;
+                all term acc ids are , (comma) separated;
+                f.e.                 <entry key="NBO" value="NBO:0000000,NBO:0000243,NBO:0000313"/>
+                will create relations NBO:0000000 <==[is_a] NBO:0000243
+                                      NBO:0000000 <==[is_a] NBO:0000313
+            -->
+            <map>
+                <entry key="CHEBI" value="CHEBI:0,CHEBI:36342,CHEBI:50906,CHEBI:24431"/>
+                <entry key="SO" value="SO:9999999,SO:0000110,SO:0000400,SO:0001060,SO:0001260,SO:0002072"/>
+                <entry key="NBO" value="NBO:0000000,NBO:0000243,NBO:0000313"/>
+                <entry key="ORDO" value="Orphanet:0,Orphanet:C001,Orphanet:C005,Orphanet:C010,Orphanet:C012,Orphanet:C023"/>
+                <entry key="UBERON" value="UBERON:9999999,UBERON:0000000,UBERON:0001062"/>
+            </map>
+        </property>
+
+        <property name="propertyValueSubstitutions">
+            <!-- defines how to convert complex property_value: lines into simpler lines;
+            f.e.       property_value: created:by "George Gkoutos" xsd:string
+            becomes    created_by: "George Gkoutos"
+            -->
+            <map>
+                <entry key="created:by" value="created_by" />
+                <entry key="http://purl.org/dc/elements/1.1/creator" value="created_by" />
+                <entry key="dc-contributor" value="created_by" />
+
+                <entry key="creation:date" value="creation_date" />
+                <entry key="http://purl.org/dc/elements/1.1/date" value="creation_date" />
+
+                <entry key="alt:id" value="alt_id" />
+                <entry key="fma_set_term" value="alt_id" />
+
+                <entry key="is:obsolete" value="is_obsolete" />
+                <entry key="http://purl.obolibrary.org/obo/def" value="def" />
+                <entry key="http://purl.obolibrary.org/obo/namespace" value="namespace" />
+                <entry key="http://purl.obolibrary.org/obo/synonym" value="synonym" />
+                <entry key="http://purl.obolibrary.org/obo/xref" value="xref" />
+                <entry key="http://purl.obolibrary.org/obo/comment" value="comment" />
+                <entry key="http://purl.obolibrary.org/obo/note" value="note" />
+                <entry key="source_atlas" value="xref" />
+
+                <entry key="symbol" value="synonym" />
+                <entry key="alternative:term" value="synonym" />
+                <entry key="http://www.ebi.ac.uk/efo/definition" value="def" />
+                <entry key="definition:citation" value="comment" />
+                <entry key="http://www.ebi.ac.uk/efo/reason_for_obsolescence" value="definition" />
+
+                <entry key="external_definition" value="external_def" />
+                <entry key="dc-description" value="external_def" />
+                <entry key="external_comment" value="external_comment" />
+                <entry key="present_in_taxon" value="present_in_taxon" />
+                <entry key="dubious_for_taxon" value="dubious_for_taxon" />
+                <entry key="ambiguous_for_taxon" value="ambiguous_for_taxon" />
+                <entry key="homologous_in" value="homologous_in" />
+                <entry key="sexually_homologous_to" value="sexual_homolog_to" />
+                <entry key="has_relational_adjective" value="relational_adjective" />
+                <entry key="vertebra_number" value="xxx_number" />
+                <entry key="tooth_number" value="xxx_number" />
+                <entry key="somite_number" value="xxx_number" />
+                <entry key="ray_number" value="xxx_number" />
+                <entry key="rib_number" value="xxx_number" />
+                <entry key="phalanx_number" value="xxx_number" />
+                <entry key="rhombomere_number" value="xxx_number" />
+                <entry key="pharyngeal_arch_number" value="xxx_number" />
+                <entry key="foaf-depicted_by" value="xxx_number" />
+                <entry key="seeAlso" value="see_also" />
+                <entry key="implements_design_pattern" value="design_pattern" />
+                <entry key="axiom_lost_from_external_ontology" value="axiom_lost" />
+                <entry key="provenance_notes" value="note_provenance" />
+                <entry key="homology_notes" value="note_homology" />
+                <entry key="taxon_notes" value="note_taxon" />
+                <entry key="function_notes" value="note_function" />
+                <entry key="structure_notes" value="note_structure" />
+                <entry key="curator_notes" value="external_comment" />
+                <entry key="editor_note" value="external_comment" />
+                <entry key="external_ontology_notes" value="external_comment" />
+                <entry key="action_notes" value="external_comment" />
+                <entry key="location_notes" value="note_location" />
+                <entry key="development_notes" value="note_development" />
+                <entry key="terminology_notes" value="note_terminology" />
+                <entry key="HP:0040005" value="external_comment" />
+
+                <entry key="http://purl.obolibrary.org/obo/chebi/smiles" value="chebi_smiles" />
+                <entry key="http://purl.obolibrary.org/obo/chebi/formula" value="chebi_formula" />
+                <entry key="http://purl.obolibrary.org/obo/chebi/inchikey" value="chebi_inchikey" />
+                <entry key="http://purl.obolibrary.org/obo/chebi/inchi" value="chebi_inchi" />
+
+                <entry key="http://purl.obolibrary.org/obo/chebi/mass" value="chebi_ignored" />
+                <entry key="http://purl.obolibrary.org/obo/chebi/charge" value="chebi_ignored" />
+                <entry key="http://purl.obolibrary.org/obo/chebi/monoisotopicmass" value="chebi_ignored" />
+            </map>
+        </property>
+
+        <!-- these properties are loaded as synonyms -->
+        <property name="propertyToSynonym">
+            <list>
+                <value>exact_synonym</value>
+                <value>broad_synonym</value>
+                <value>narrow_synonym</value>
+                <value>related_synonym</value>
+                <value>synonym</value>
+                <value>alt_id</value>
+                <value>xref</value>
+                <value>xref_analog</value>
+                <value>replaced_by</value>
+                <value>consider</value>
+                <value>present_in_taxon</value>
+                <value>dubious_for_taxon</value>
+                <value>ambiguous_for_taxon</value>
+                <value>homologous_in</value>
+                <value>sexual_homolog_to</value>
+                <value>relational_adjective</value>
+                <value>see_also</value>
+                <value>axiom_lost</value>
+                <value>chebi_smiles</value>
+                <value>chebi_formula</value>
+                <value>chebi_inchi</value>
+                <value>chebi_inchikey</value>
+            </list>
+        </property>
+
+        <!-- these properties are parsed, but completely ignored in the further processing -->
+        <property name="ignoredProperties">
+            <list>
+                <value>subset:</value>
+                <value>xref_unknown:</value>
+                <value>intersection_of:</value>
+                <value>disjoint_from:</value>
+                <value>union_of:</value>
+                <value>external_def:</value>
+                <value>external_comment:</value>
+                <value>xxx_number:</value>
+                <value>design_pattern:</value>
+                <value>chebi_ignored:</value>
+            </list>
+        </property>
+
+        <property name="ontologiesWithExactMatchSynonyms">
+            <list>
+                <value>CMO</value>
+                <value>MMO</value>
+                <value>XCO</value>
+                <value>RS</value>
+            </list>
+        </property>
+
+        <!-- all synonyms that start with given prefix, will have their prefix prefix substituted with a different one -->
+        <property name="synonymPrefixSubstitutions">
+            <map>
+                <entry key="DO:DOID:" value="DOID:" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="qualityChecker" class="edu.mcw.rgd.dataload.ontologies.QualityChecker">
+        <property name="version" value="--QUALITY CHECKER -- ver. 1.3.7 -- Jan 10, 2017 --" />
+    </bean>
+
+    <bean id="dataLoader" class="edu.mcw.rgd.dataload.ontologies.DataLoader">
+        <property name="version" value="--DATA LOADER -- ver. 1.2.1 -- Jan 10, 2017 --" />
+    </bean>
+
+    <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
+        <property name="version" value="--RGD OBO FILE GENERATOR -- ver. 1.3.5 -- 2018-08-20 --" />
+        <property name="versionedFiles">
+            <map>
+                <entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
+                <entry key="CMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/clinical_measurement/clinical_measurement.obo"/>
+                <entry key="MMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/measurement_method/measurement_method.obo"/>
+                <entry key="XCO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/experimental_condition/experimental_condition.obo"/>
+                <entry key="RDO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/disease/RDO.obo"/>
+                <entry key="RS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/rat_strain/rat_strain.obo"/>
+            </map>
+        </property>
+        <property name="outDir" value="data/"/>
+    </bean>
+
+    <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
+        <property name="version" value="--GO Taxon Constraints v. 2.0 -- Aug 17, 2015 --" />
+        <property name="taxonUnionOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_union_terms.obo" />
+        <property name="taxonConstraintOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_go_triggers.obo" />
+        <property name="ratLineage">
+            <list>
+                <value>131567 ! cellular organisms</value>
+                <value>2759 ! Eukaryota</value>
+                <value>33154 ! Opisthokonta</value>
+                <value>33208 ! Metazoa</value>
+                <value>6072 ! Eumetazoa</value>
+                <value>33213 ! Bilateria</value>
+                <value>33511 ! Deuterostomia</value>
+                <value>7711 ! Chordata</value>
+                <value>89593 ! Craniata</value>
+                <value>7742 ! Vertebrata</value>
+                <value>7776 ! Gnathostomata</value>
+                <value>117570 ! Teleostomi</value><!-- bony vertebrates -->
+                <value>117571 ! Euteleostomi</value><!-- bony vertebrates -->
+                <value>8287 ! Sarcopterygii</value><!-- fish + tetrapods + lungfishes -->
+                <value>1338369 ! Dipnotetrapodomorpha</value><!-- tetrapods + lungfishes -->
+                <value>32523 ! Tetrapoda</value><!-- superclass: tetrapods (amphibians, mammals, reptiles, birds) -->
+                <value>32524 ! Amniota</value><!-- mammals, reptiles, birds -->
+                <value>40674 ! Mammalia</value><!-- class: marsupials and placentals -->
+                <value>32525 ! Theria</value><!-- supercohort: mammals giving birth to live young without using shelled eggs -->
+                <value>9347 ! Eutheria</value><!-- placentals -->
+                <value>1437010 ! Boreoeutheria</value><!-- magnorder: placental mammals, males with external testicles -->
+                <value>314146 ! Euarchontoglires</value><!-- superorder: rodents and rabbits + primates, treeshrews, colugos -->
+                <value>314147 ! Glires</value><!-- rodents and rabbits -->
+                <value>9989 ! Rodentia</value><!-- order: rodents -->
+                <value>33553 ! Sciurognathi</value><!-- suborder: rodents with specific shape to lower jaw -->
+                <value>337687 ! Muroidea</value><!-- superfamily: rodents -->
+                <value>10066 ! Muridae</value><!-- family: rodents -->
+                <value>39107 ! Murinae</value><!-- subfamily: Old World rats and mice -->
+                <value>10114 ! Rattus</value><!-- genus: rat -->
+                <value>10116 ! Rattus norvegicus</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="termStatLoader" class="edu.mcw.rgd.dataload.ontologies.TermStatsLoader">
+    </bean>
+
+    <bean id="GViewerStatsLoader" class="edu.mcw.rgd.dataload.ontologies.GViewerStatsLoader">
+        <property name="version" value="--GViewer Stats Loader -- ver. 1.0.1 -- Sep 21, 2017 --" />
+        <property name="maxAnnotCountPerTerm" value="2500" />
+    </bean>
+</beans>
