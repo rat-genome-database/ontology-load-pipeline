@@ -715,10 +715,10 @@ public class OntologyDAO {
     }
 
     /**
-     * check if a given term is a descendant, either direct or indirect descendant of a given term;<br/>
-     * f.e. 'inbred strain' --> 'SS' --> 'SS/Jr' <br>
-     *      term 'SS/Jr' is a (direct) descendant of ancestor term 'SS' <br/>
-     *      term 'SS/Jr' is a (indirect) descendant of ancestor term 'inbred strain' <br/>
+     * check if a given term is a descendant, either direct or indirect descendant of a given term;
+     * f.e. 'inbred strain' / 'SS' / 'SS/Jr' <br>
+     *      term 'SS/Jr' is a (direct) descendant of ancestor term 'SS' <br>
+     *      term 'SS/Jr' is a (indirect) descendant of ancestor term 'inbred strain' <br>
      * @param termAcc accession id of the term in question
      * @param ancestorTermAcc accession id of the ancestor term
      * @return true if the term is a descendant of the ancestor term
