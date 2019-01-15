@@ -1,3 +1,6 @@
+Jan 15, 2019  v.1.5.51
+  fixed generation of OBO files with synonyms having synonymtypedefs
+
 Sep 28, 2018  v.1.5.50
   moved from subversion to github
 

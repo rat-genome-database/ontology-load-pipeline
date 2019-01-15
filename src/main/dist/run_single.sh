@@ -17,5 +17,5 @@ fi
 cd $APPDIR
 java -Dlog4j.configuration=file://$APPDIR/properties/log4j.properties \
   -Dspring.config=../properties/default_db.xml \
-  -jar OntologyLoad.jar $GO_TAXON_CONSTRAINTS \
+  -jar lib/OntologyLoad.jar $GO_TAXON_CONSTRAINTS \
   -single_ontology=$1 $2 $3 $4 $5 $6 $7 $8 $9

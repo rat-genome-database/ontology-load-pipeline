@@ -9,7 +9,7 @@ cd $APPDIR
 
 java -Dlog4j.configuration=file://$APPDIR/properties/log4j.properties \
      -Dspring.config=../properties/default_db.xml \
-     -jar OntologyLoad.jar \
+     -jar lib/OntologyLoad.jar \
      -generate_obo_file=$1 \
      -skip_downloads \
      -skip_stats_update

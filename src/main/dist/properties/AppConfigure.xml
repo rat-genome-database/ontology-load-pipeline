@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="--ONTOLOGY LOAD pipeline -- ver. 1.5.50 -- Aug 28, 2018 --" />
+        <property name="version" value="--ONTOLOGY LOAD pipeline -- ver. 1.5.51 -- Jan 15, 2019 --" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -245,7 +245,7 @@
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
-        <property name="version" value="--RGD OBO FILE GENERATOR -- ver. 1.3.5 -- 2018-08-20 --" />
+        <property name="version" value="--RGD OBO FILE GENERATOR -- ver. 1.3.6 -- 2019-01-15 --" />
         <property name="versionedFiles">
             <map>
                 <entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>

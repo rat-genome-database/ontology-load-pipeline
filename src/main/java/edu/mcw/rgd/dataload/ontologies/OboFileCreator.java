@@ -319,11 +319,11 @@ public class OboFileCreator {
                 String xrefs = Utils.defaultString(synonym.getDbXrefs());
 
                 // 'synonym: "mito" RELATED []'
-                buf.append("synonym: \"").append(synonymName).append("\" ");
+                buf.append("synonym: \"").append(synonymName).append("\" ").append(synType);
                 if( synonymTypeDef!=null ) { // optional synonym typedef
-                    buf.append(synonymTypeDef).append(" ");
+                    buf.append(" ").append(synonymTypeDef);
                 }
-                buf.append(synType).append(" [").append(xrefs).append("]\n");
+                buf.append(" [").append(xrefs).append("]\n");
             }
         }
 
