@@ -204,6 +204,10 @@ public class DoIdQC {
             else if( line.startsWith("synonym: ") ) {
                 oboTerm.parseSynonym(line.substring(9).trim());
             }
+            else if( line.startsWith("xref: GARD:") ||
+                     line.startsWith("xref: ORDO:")) {
+                oboTerm.parseXrefSynonym(line.substring(6).trim());
+            }
             else if( line.startsWith("is_obsolete: ") ) {
                 if( line.contains("true") ) {
                     oboTerm.isObsolete = true;
@@ -555,6 +559,15 @@ public class DoIdQC {
                     tsyn.setDbXrefs(buf.substring(pos1+1, pos2));
                 }
             }
+
+            String synUniqueKey = getSynonymUniqueKey(tsyn.getName());
+            synonyms.put(synUniqueKey, tsyn);
+        }
+
+        void parseXrefSynonym(String synName) {
+            TermSynonym tsyn = new TermSynonym();
+            tsyn.setName(synName);
+            tsyn.setType("xref");
 
             String synUniqueKey = getSynonymUniqueKey(tsyn.getName());
             synonyms.put(synUniqueKey, tsyn);
