@@ -1,3 +1,6 @@
+Feb 11, 2019  v.1.5.52
+  updated source url for GO.obo file
+
 Jan 15, 2019  v.1.5.51
   fixed generation of OBO files with synonyms having synonymtypedefs
 

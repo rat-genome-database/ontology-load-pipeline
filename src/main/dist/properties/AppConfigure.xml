@@ -2,12 +2,12 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="--ONTOLOGY LOAD pipeline -- ver. 1.5.51 -- Jan 15, 2019 --" />
+        <property name="version" value="--ONTOLOGY LOAD pipeline -- ver. 1.5.52 -- Feb 11, 2019 --" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
                    -->
-                <entry key="GO" value="http://www.geneontology.org/ontology/gene_ontology.obo"/>
+                <entry key="GO" value="http://purl.obolibrary.org/obo/go/go-basic.obo"/>
                 <entry key="MP" value="http://ontologies.berkeleybop.org/mp.obo"/>
                 <!--<entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
                 <entry key="CMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/clinical_measurement/clinical_measurement.obo"/>
