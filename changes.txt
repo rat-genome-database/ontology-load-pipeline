@@ -1,6 +1,7 @@
 Apr 04, 2019  v.1.5.53
   HPO root term name is overridden to be 'Human phenotype' -- the original root term name, which was 'All',
     will become the root term synonym
+  fixed issue of orphaned GO terms that should have been obsoleted by the pipeline
 
 Feb 11, 2019  v.1.5.52
   updated source url for GO.obo file

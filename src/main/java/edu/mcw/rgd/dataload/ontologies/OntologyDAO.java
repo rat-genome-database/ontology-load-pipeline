@@ -597,6 +597,11 @@ public class OntologyDAO {
      */
     int obsoleteOrphanedTerms(String ontId) throws Exception {
 
+        // fix for GO
+        if( ontId.equals("GO") ) {
+            return obsoleteOrphanedTerms("BP") + obsoleteOrphanedTerms("MF") + obsoleteOrphanedTerms("CC");
+        }
+
         // check if there are orphaned terms
         List<Term> orphanedTerms = dao.getOrphanedTerms(ontId);
         if( orphanedTerms.isEmpty() )
