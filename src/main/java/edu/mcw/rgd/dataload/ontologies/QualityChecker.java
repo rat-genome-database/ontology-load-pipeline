@@ -138,13 +138,28 @@ public class QualityChecker extends RecordProcessor {
     }
 
     private void termNameFixup(Term termInDb, List<TermSynonym> synonymsInRgd, Record rec) {
+
+        // fixup for HP root term name:
+        //   it is 'All'
+        //   we want to change it to 'Human phenotype'
+        if( rec.getTerm().getAccId().equals("HP:0000001") ) {
+            String oldRootTermName = rec.getTerm().getTerm();
+            String newRootTermName = "Human phenotype";
+
+            rec.addSynonym(oldRootTermName, "exact_synonym");
+            rec.getTerm().setTerm(newRootTermName);
+            logTermNameChanged.info("TERM NAME CHANGED for "+rec.getTerm().getAccId()+" old=["+oldRootTermName+"] new=["+newRootTermName+"]");
+            return;
+        }
+
         // common case for RDO ontology:
         // 1. CTD file has term name [MUCKLE-WELLS SYNDROME]
         // 2. RGD database has term name [Muckle-Wells, Syndrome]
         // 3. we want to keep the term name that is in the database !
         // 4.   we call names 1. and 2. as equivalent
-        if( !termInDb.getOntologyId().equals("RDO") )
+        if( !termInDb.getOntologyId().equals("RDO") ) {
             return;
+        }
 
         // if term names differ by case, honor the term name in RGD
         String termNameInDb = termInDb.getTerm();
