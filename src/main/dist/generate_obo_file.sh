@@ -7,12 +7,7 @@ SERVER=`hostname -s`
 
 cd $APPDIR
 
-java -Dlog4j.configuration=file://$APPDIR/properties/log4j.properties \
-     -Dspring.config=../properties/default_db.xml \
-     -jar lib/OntologyLoad.jar \
-     -generate_obo_file=$1 \
-     -skip_downloads \
-     -skip_stats_update
+$APPDIR/_run.sh -generate_obo_file=$1 -skip_downloads -skip_stats_update
 
 if [ "$1" == "RDO" ]; then
   #copy RDO.obo file to RDO_yyyymmdd.obo file and copy this file to data release dir for ontologies
