@@ -256,10 +256,25 @@ public class Manager {
 
         handleMalformedRsSynonyms(time0);
 
+        obsoleteOrphanedTerms(manager.getSession(), parser.getOntPrefixes().keySet());
+
         // dump counter statistics to STDOUT
         manager.dumpCounters();
 
         System.out.println("--SUCCESS -- "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+    }
+
+    void obsoleteOrphanedTerms(PipelineSession session, Set<String> ontPrefixes) throws Exception {
+        // terms that once were part of ontology dag tree, but are no longer
+        int obsoleteTermCount = 0;
+        for (String ontPrefix: ontPrefixes) {
+            if( MalformedOboFiles.getInstance().isWellFormed(ontPrefix) ) {
+                int obsoleteCount = dao.obsoleteOrphanedTerms(ontPrefix);
+                session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE_"+ontPrefix, obsoleteCount);
+                obsoleteTermCount += obsoleteCount;
+            }
+        }
+        session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE", obsoleteTermCount);
     }
 
     void dropSynonyms(PipelineSession session) throws Exception {

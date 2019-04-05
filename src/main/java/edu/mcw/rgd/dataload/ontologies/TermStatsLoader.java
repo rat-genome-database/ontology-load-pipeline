@@ -33,6 +33,7 @@ public class TermStatsLoader {
             SpeciesType.BONOBO,
             SpeciesType.CHINCHILLA,
             SpeciesType.SQUIRREL,
+            SpeciesType.PIG,
     };
     static int[] objectKeys = { // processed objects
             RgdId.OBJECT_KEY_GENES,
@@ -86,27 +87,12 @@ public class TermStatsLoader {
         // run everything
         manager.run();
 
-        obsoleteOrphanedTerms(manager.getSession());
-
         // dump counter statistics
         manager.dumpCounters();
 
         System.out.println("-- computing term stats -- DONE -- elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
 
         logger.info("DONE!");
-    }
-
-    void obsoleteOrphanedTerms(PipelineSession session) throws Exception {
-        // terms that once were part of ontology dag tree, but are no longer
-        int obsoleteTermCount = 0;
-        for (String ontPrefix: ontPrefixes.keySet()) {
-            if( MalformedOboFiles.getInstance().isWellFormed(ontPrefix) ) {
-                int obsoleteCount = getDao().obsoleteOrphanedTerms(ontPrefix);
-                session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE_"+ontPrefix, obsoleteCount);
-                obsoleteTermCount += obsoleteCount;
-            }
-        }
-        session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE", obsoleteTermCount);
     }
 
     // compute nr of annotations for every term
