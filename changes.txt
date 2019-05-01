@@ -1,3 +1,6 @@
+May 01, 2019  v.1.5.54
+  DoLoader: added reporting of obsolete OMIM ids present in DO file
+
 Apr 04, 2019  v.1.5.53
   HPO root term name is overridden to be 'Human phenotype' -- the original root term name, which was 'All',
     will become the root term synonym

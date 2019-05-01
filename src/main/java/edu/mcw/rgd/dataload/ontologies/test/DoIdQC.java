@@ -19,6 +19,7 @@ import java.util.*;
  *     <li>acc ids that are not in incoming file, or obsolete, but that are active in RGD</li>
  *     <li>term name changes</li>
  *     <li>OMIM:PS assignments</li>
+ *     <li>OMIM ids that are inactive in OMIM</li>
  * </ol>
  */
 public class DoIdQC {
@@ -45,19 +46,12 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20190301_doid.obo";
+        String fileName = "h:/do/20190418_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
     }
 
-    // prases only the following lines:
-    // [Term]
-    // id:
-    // name:
-    // def:
-    // is_obsolete:
-    // is_a:
     void run(String fileName, String synQcFileName) throws Exception {
 
         synQcFile = new BufferedWriter(new FileWriter(synQcFileName));
@@ -154,7 +148,7 @@ public class DoIdQC {
         }
     }
 
-    Map<String, OboTerm> parseOboFile(String fileName) throws IOException {
+    Map<String, OboTerm> parseOboFile(String fileName) throws Exception {
 
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         Map<String, OboTerm> oboTerms = new HashMap<>();
@@ -207,6 +201,12 @@ public class DoIdQC {
             else if( line.startsWith("xref: GARD:") ||
                      line.startsWith("xref: ORDO:")) {
                 oboTerm.parseXrefSynonym(line.substring(6).trim());
+            }
+            else if( line.startsWith("xref: OMIM:") ) {
+                String omimId = line.substring(6).trim();
+                if( dao.isOmimIdInactive(omimId) ) {
+                    System.out.println("obsolete "+omimId+" for term "+oboTerm.id+" "+oboTerm.name);
+                }
             }
             else if( line.startsWith("is_obsolete: ") ) {
                 if( line.contains("true") ) {

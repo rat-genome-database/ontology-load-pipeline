@@ -12,6 +12,7 @@ import java.util.*;
  * Created by mtutaj on 12/13/2017.
  */
 public class FlipRdoWithDo {
+/*
     public static void main(String[] args) throws Exception {
 
         updateOMIAFile();
@@ -80,32 +81,29 @@ public class FlipRdoWithDo {
                 odao.insertTermSynonym(tsyn);
             }
 
-            /*
-            String sql = "UPDATE ont_xrefs SET term_acc=? WHERE term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_synonyms SET term_acc=? WHERE term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_term_stats SET term_acc=? WHERE term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_term_stats2 SET term_acc=? WHERE term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_dag SET parent_term_acc=? WHERE parent_term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_dag SET child_term_acc=? WHERE child_term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_dag_custom SET parent_term_acc=? WHERE parent_term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE ont_dag_custom SET child_term_acc=? WHERE child_term_acc=?";
-            odao.update(sql, doid, rdoId);
-            sql = "UPDATE full_annot SET term_acc=? WHERE term_acc=?";
-            try {
+            if( false ) {
+                String sql = "UPDATE ont_xrefs SET term_acc=? WHERE term_acc=?";
                 odao.update(sql, doid, rdoId);
-            } catch(Exception e){
-                System.out.println("flip problem for "+rdoId+" "+doid);
+                sql = "UPDATE ont_synonyms SET term_acc=? WHERE term_acc=?";
+                odao.update(sql, doid, rdoId);
+                sql = "UPDATE ont_term_stats SET term_acc=? WHERE term_acc=?";
+                odao.update(sql, doid, rdoId);
+                sql = "UPDATE ont_term_stats2 SET term_acc=? WHERE term_acc=?";
+                odao.update(sql, doid, rdoId);
+                sql = "UPDATE ont_dag SET parent_term_acc=? WHERE parent_term_acc=?";
+                odao.update(sql, doid, rdoId);
+                sql = "UPDATE ont_dag SET child_term_acc=? WHERE child_term_acc=?";
+                odao.update(sql, doid, rdoId);
+                sql = "UPDATE full_annot SET term_acc=? WHERE term_acc=?";
+                try {
+                    odao.update(sql, doid, rdoId);
+                } catch (Exception e) {
+                    System.out.println("flip problem for " + rdoId + " " + doid);
+                }
+                sql = "DELETE FROM ont_terms WHERE term_acc=?";
+                odao.update(sql, rdoId);
             }
-            sql = "DELETE FROM ont_terms WHERE term_acc=?";
-            odao.update(sql, rdoId);
-            */
+
             String sql = "BEGIN "
                 +"UPDATE ont_xrefs SET term_acc=? WHERE term_acc=?;"
                 +"UPDATE ont_synonyms SET term_acc=? WHERE term_acc=?;"
@@ -113,11 +111,8 @@ public class FlipRdoWithDo {
                 + "UPDATE ont_term_stats2 SET term_acc=? WHERE term_acc=?;"
                 + "UPDATE ont_dag SET parent_term_acc=? WHERE parent_term_acc=?;"
                 + "UPDATE ont_dag SET child_term_acc=? WHERE child_term_acc=?;"
-                + "UPDATE ont_dag_custom SET parent_term_acc=? WHERE parent_term_acc=?;"
-                + "UPDATE ont_dag_custom SET child_term_acc=? WHERE child_term_acc=?;"
                 +"END;";
-            odao.update(sql, doid, rdoId, doid, rdoId, doid, rdoId, doid, rdoId, doid, rdoId,
-                    doid, rdoId, doid, rdoId, doid, rdoId);
+            odao.update(sql, doid, rdoId, doid, rdoId, doid, rdoId, doid, rdoId, doid, rdoId, doid, rdoId);
             try {
                 sql = "UPDATE full_annot SET term_acc=? WHERE term_acc=?";
                 odao.update(sql, doid, rdoId);
@@ -201,4 +196,5 @@ public class FlipRdoWithDo {
         }
         System.exit(0);
     }
+    */
 }

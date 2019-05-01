@@ -56,6 +56,7 @@ public class Manager {
         boolean goTaxonConstraints = false;
         String filter = null;
         boolean loadGViewerStats = false;
+        boolean checkForCycles = false;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -95,9 +96,8 @@ public class Manager {
                 if (filter.equals("")) {
                     filter=null;
                 }
-            } else if (arg.startsWith("-checkForCycles") ) {
-                manager.dao.checkForCycles();
-                return;
+            } else if (arg.startsWith("-checkForCycles") || arg.startsWith("-check_for_cycles")) {
+                checkForCycles = true;
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -111,6 +111,10 @@ public class Manager {
             skipStatsUpdate = true;
         } else {
             System.out.println("running " + singleOntologyId + " with filter " + filter);
+        }
+
+        if( checkForCycles ) {
+            manager.dao.checkForCycles(singleOntologyId);
         }
 
         FileParser parser = null;

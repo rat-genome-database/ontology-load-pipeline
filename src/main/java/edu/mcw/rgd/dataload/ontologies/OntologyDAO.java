@@ -4,10 +4,7 @@ import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
-import edu.mcw.rgd.datamodel.MapData;
-import edu.mcw.rgd.datamodel.ObjectWithSymbol;
-import edu.mcw.rgd.datamodel.RgdId;
-import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.pipelines.PipelineSession;
 import edu.mcw.rgd.process.Utils;
@@ -17,6 +14,7 @@ import org.springframework.jdbc.object.BatchSqlUpdate;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,9 +23,10 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class OntologyDAO {
 
-    OntologyXDAO dao = new OntologyXDAO();
     AnnotationDAO annotDAO = new AnnotationDAO();
     MapDAO mapDAO = new MapDAO();
+    OmimDAO omimDAO = new OmimDAO();
+    OntologyXDAO dao = new OntologyXDAO();
     PathwayDAO pathwayDAO = new PathwayDAO();
     RGDManagementDAO rgdDAO = new RGDManagementDAO();
 
@@ -798,9 +797,15 @@ public class OntologyDAO {
     Map<Integer,String> _objectSymbolCache = new ConcurrentHashMap<>();
 
 
-    public void checkForCycles() throws Exception {
-        String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0";
-        List<String> accIds = StringListQuery.execute(dao, sql);
+    public void checkForCycles(String ontId) throws Exception {
+        List<String> accIds;
+        if( ontId==null ) {
+            String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0";
+            accIds = StringListQuery.execute(dao, sql);
+        } else {
+            String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0 AND ont_id=?";
+            accIds = StringListQuery.execute(dao, sql, ontId);
+        }
         Collections.shuffle(accIds);
         System.out.println("active terms loaded: "+accIds.size()+" progress interval 15sec");
 
@@ -829,5 +834,10 @@ public class OntologyDAO {
         long accIdsProcessed = stats[1].get();
         System.out.println(accIdsProcessed + ". threads=" + Thread.activeCount());
         System.out.println("===DONE=== "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+    }
+
+    public boolean isOmimIdInactive(String omimId) throws Exception {
+        Omim omim = omimDAO.getOmimByNr(omimId.substring(5));
+        return omim!=null && !omim.getStatus().equals("live");
     }
 }

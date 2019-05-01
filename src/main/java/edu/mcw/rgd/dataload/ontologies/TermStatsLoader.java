@@ -146,17 +146,6 @@ public class TermStatsLoader {
     class QCProcessor extends RecordProcessor {
 
         PhenominerDAO phenominerDAO = new PhenominerDAO();
-        int[] primaryMapKey = new int[8];
-
-        public QCProcessor() throws Exception {
-            primaryMapKey[SpeciesType.HUMAN] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.HUMAN);
-            primaryMapKey[SpeciesType.MOUSE] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.MOUSE);
-            primaryMapKey[SpeciesType.RAT] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.RAT);
-            primaryMapKey[SpeciesType.CHINCHILLA] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.CHINCHILLA);
-            primaryMapKey[SpeciesType.BONOBO] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.BONOBO);
-            primaryMapKey[SpeciesType.DOG] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.DOG);
-            primaryMapKey[SpeciesType.SQUIRREL] = dao.getPrimaryRefAssemblyMapKey(SpeciesType.SQUIRREL);
-        }
 
         public void process(PipelineRecord r) throws Exception {
 
