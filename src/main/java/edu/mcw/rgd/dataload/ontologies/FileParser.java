@@ -769,6 +769,15 @@ public class FileParser extends RecordPreprocessor {
         }
 
         reader.close();
+
+        // hard-coded: for GO ontology has-part relationships could introduce cycles
+        //   load them as synonyms
+        if( ontId.equals("GO") ) {
+            Record.addCyclicRelationship("GO", "has_part");
+            Record.addCyclicRelationship("BP", "has_part");
+            Record.addCyclicRelationship("CC", "has_part");
+            Record.addCyclicRelationship("MF", "has_part");
+        }
     }
 
     /**

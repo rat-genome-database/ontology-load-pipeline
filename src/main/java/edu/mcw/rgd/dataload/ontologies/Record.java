@@ -7,16 +7,13 @@ import edu.mcw.rgd.datamodel.ontologyx.TermXRef;
 import edu.mcw.rgd.pipelines.PipelineRecord;
 import edu.mcw.rgd.pipelines.PipelineSession;
 import edu.mcw.rgd.process.Utils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 12/28/10
- * Time: 11:52 AM
+ * @author mtutaj
+ * @since 12/28/10
  */
 public class Record extends PipelineRecord {
 
@@ -40,22 +37,6 @@ public class Record extends PipelineRecord {
     public XRefManager xrefManager = new XRefManager();
 
     public String oboText;
-
-    static int termNamesOverridden = 0;
-    static int termDefsOverridden = 0;
-    static int edgesAdded = 0;
-    static int xrefsAdded = 0;
-
-    static public void dumpMergeStats() {
-        if( termNamesOverridden+termDefsOverridden+edgesAdded+xrefsAdded == 0 ) {
-            return;
-        }
-        System.out.println("MERGE STATS:");
-        System.out.println("  term names overridden: "+termNamesOverridden);
-        System.out.println("  term defs overridden : "+termDefsOverridden);
-        System.out.println("  term relations added : "+edgesAdded);
-        System.out.println("  term xrefs added     : "+xrefsAdded);
-    }
 
     public Record() {
         setRecNo(++recno);
@@ -366,106 +347,6 @@ public class Record extends PipelineRecord {
                 }
             }
         }
-    }
-
-    /**
-     * merge the current record with the new record
-     * @param r Record object to be merged with
-     */
-    public void merge(Record r) {
-        boolean changed = false;
-
-        // term name + def
-        if( !Utils.stringsAreEqualIgnoreCase(this.getTerm().getTerm(), r.getTerm().getTerm())
-         && !Utils.defaultString(r.getTerm().getTerm()).isEmpty() ) { // don't nullify term name
-            this.getTerm().setTerm(r.getTerm().getTerm());
-            termNamesOverridden++;
-            changed = true;
-            Logger.getRootLogger().debug("***MERGE term name change "+term.getAccId()+" "+term.getTerm());
-        }
-        if( !Utils.stringsAreEqualIgnoreCase(this.getTerm().getDefinition(), r.getTerm().getDefinition())
-                && !Utils.defaultString(r.getTerm().getDefinition()).isEmpty() ) { // don't nullify term definition
-            this.getTerm().setDefinition(r.getTerm().getDefinition());
-            termDefsOverridden++;
-            changed = true;
-            Logger.getRootLogger().debug("***MERGE term def change "+term.getAccId()+" "+term.getTerm());
-        }
-
-        // merge synonyms
-        List<TermSynonym> newSynonyms = ListUtils.subtract(r.getSynonyms(), this.getSynonyms());
-        if( !newSynonyms.isEmpty() ) {
-            this.getSynonyms().addAll(newSynonyms);
-            //synonymsAdded += newSynonyms.size();
-            changed = true;
-            //System.out.println("***MERGE new synonyms "+term.getAccId()+" "+term.getTerm());
-        }
-
-        // add new xrefs
-        int newXrefs = mergeXRefs(r);
-        if( newXrefs!=0 ) {
-            xrefsAdded += newXrefs;
-            changed = true;
-            Logger.getRootLogger().debug("***MERGE new xrefs "+term.getAccId()+" "+term.getTerm());
-        }
-
-        // edges
-        int newEdges = 0;
-        try {
-            newEdges = mergeEdges(r);
-        }catch(Exception e) {
-            System.out.println("edge problem");
-        }
-        if( newEdges!=0 ) {
-            edgesAdded += newEdges;
-            changed = true;
-            Logger.getRootLogger().debug("***MERGE new edges "+term.getAccId()+" "+term.getTerm());
-        }
-
-        if( !changed ) {
-            System.out.println("MERGE no changes "+term.getAccId()+" "+term.getTerm());
-        } else {
-            //System.out.println("***MERGE changes "+term.getAccId()+" "+term.getTerm());
-        }
-    }
-
-    int mergeXRefs(Record r) {
-        if( r.xrefManager==null || r.xrefManager.getIncomingXRefs()==null ) {
-            return 0; // no incoming xrefs, nothing to merge
-        }
-        if( this.xrefManager==null || this.xrefManager.getIncomingXRefs()==null ) {
-            this.xrefManager = r.xrefManager;
-            return r.xrefManager.getIncomingXRefs().size();
-        } else {
-            List<TermXRef> newXRefs = ListUtils.subtract(r.xrefManager.getIncomingXRefs(), this.xrefManager.getIncomingXRefs());
-            xrefManager.getIncomingXRefs().addAll(newXRefs);
-            return newXRefs.size();
-        }
-    }
-
-    int mergeEdges(Record r) {
-        List<String> currentEdges = new ArrayList<>();
-        for( Map.Entry<String,Relation> entry: this.edges.entrySet() ) {
-            currentEdges.add(entry.getKey()+"|"+entry.getValue().name());
-        }
-
-        List<String> overrideEdges = new ArrayList<>();
-        for( Map.Entry<String,Relation> entry: r.edges.entrySet() ) {
-            overrideEdges.add(entry.getKey()+"|"+entry.getValue().name());
-        }
-
-        List<String> newEdges = ListUtils.subtract(overrideEdges, currentEdges);
-        if( !newEdges.isEmpty() ) {
-            for( String edge: newEdges ) {
-                String parentTermAcc = edge.substring(0, 11);
-                // skip self-referencing edges
-                if( !parentTermAcc.equals(getTerm().getAccId()) ) {
-                    String relName = edge.substring(12);
-                    Relation relation = Relation.valueOf(relName);
-                    this.edges.put(parentTermAcc, relation);
-                }
-            }
-        }
-        return newEdges.size();
     }
 
     /**

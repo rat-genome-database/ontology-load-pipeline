@@ -1,3 +1,6 @@
+May 17, 2019  v.1.5.55
+  updated URL for GO ontology (to use daily snapshots instead of monthly)
+
 May 01, 2019  v.1.5.54
   DoLoader: added reporting of obsolete OMIM ids present in DO file
 
