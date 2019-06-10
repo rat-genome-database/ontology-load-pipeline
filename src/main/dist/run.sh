@@ -22,5 +22,7 @@ $APP/run_portal.sh DOID:557
 $APP/run_portal.sh DOID:1579
 #Sensory Organ Disease Portal
 $APP/run_portal.sh DOID:0050155
+#Developmental Disease
+$APP/run_portal.sh DOID:9008582 
 
 
