@@ -1,3 +1,7 @@
+Jun 10, 2019
+  updated URL for MP ontology (to use MGI FTP url, instead of http://ontologies.berkeleybop.org)
+  -- MGI said that they will be phasing out commits of MP ontology to berkeleybop.org
+
 May 17, 2019  v.1.5.55
   updated URL for GO ontology (to use daily snapshots instead of monthly)
 

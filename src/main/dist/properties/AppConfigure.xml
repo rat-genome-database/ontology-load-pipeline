@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="--ONTOLOGY LOAD pipeline -- ver. 1.5.55 -- May 17, 2019 --" />
+        <property name="version" value="--ONTOLOGY LOAD pipeline -- build Jun 10, 2019 --" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -15,7 +15,11 @@
                 <!-- daily snapshot release of go.obo, go-basic.obo -->
                 <entry key="GO" value="http://purl.obolibrary.org/obo/go/snapshot/go-basic.obo"/>
 
-                <entry key="MP" value="http://ontologies.berkeleybop.org/mp.obo"/>
+                <!--<entry key="MP" value="http://ontologies.berkeleybop.org/mp.obo"/>-->
+                <entry key="MP" value="http://www.informatics.jax.org/downloads/reports/MPheno_OBO.ontology"/>
+                <!--<entry key="MP" value="https://build.obolibrary.io/job/obofoundry/job/pipeline-mp/job/master/lastSuccessfulBuild/artifact/src/ontology/mp.obo"/>-->
+
+
                 <!--<entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
                 <entry key="CMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/clinical_measurement/clinical_measurement.obo"/>
                 <entry key="MMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/measurement_method/measurement_method.obo"/>
