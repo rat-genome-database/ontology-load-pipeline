@@ -1,3 +1,6 @@
+Jun 19, 2019
+  DO ontology: added loading of 'NCI:' and 'ICD-O' xrefs
+
 Jun 10, 2019
   updated URL for MP ontology (to use MGI FTP url, instead of http://ontologies.berkeleybop.org)
   -- MGI said that they will be phasing out commits of MP ontology to berkeleybop.org

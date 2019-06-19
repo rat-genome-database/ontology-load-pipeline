@@ -199,7 +199,9 @@ public class DoIdQC {
                 oboTerm.parseSynonym(line.substring(9).trim());
             }
             else if( line.startsWith("xref: GARD:") ||
-                     line.startsWith("xref: ORDO:")) {
+                     line.startsWith("xref: ORDO:") ||
+                     line.startsWith("xref: ICD-O:") ||
+                     line.startsWith("xref: NCI:")) {
                 oboTerm.parseXrefSynonym(line.substring(6).trim());
             }
             else if( line.startsWith("xref: OMIM:") ) {
