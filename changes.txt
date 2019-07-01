@@ -1,3 +1,8 @@
+Jul 1, 2019
+  loader: fixed loading of term comments
+    if a term comment contains new line, carriage return or tab character(s), they are replaced by a space character
+    otherwise, we could get Oracle CHECK violation exception
+
 Jun 19, 2019
   DO ontology: added loading of 'NCI:' and 'ICD-O' xrefs
 
