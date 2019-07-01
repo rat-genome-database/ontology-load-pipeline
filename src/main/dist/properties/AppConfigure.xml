@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline -- build  2019-06-19" />
+        <property name="version" value="ONTOLOGY LOAD pipeline -- build  2019-07-01" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -47,6 +47,7 @@
                 <entry key="EFO" value="https://sourceforge.net/p/efo/code/HEAD/tree/trunk/src/efoinobo/efo.obo?format=raw"/>
                 <entry key="MI" value="http://ontologies.berkeleybop.org/mi/mi.obo"/>
                 <entry key="ZFA" value="http://ontologies.berkeleybop.org/zfa/zfa.obo"/>
+                <entry key="NCBITaxon" value="file:///tmp/ncbitaxon.obo"/>
             </map>
         </property>
         <property name="qualityChecker" ref="qualityChecker" />
@@ -57,6 +58,7 @@
     <bean id="fileParser" class="edu.mcw.rgd.dataload.ontologies.FileParser">
         <property name="ontPrefixes"><!--key: ontology ID; value: term acc id prefix -->
             <map>
+                <entry key="NCBITaxon" value="NCBITaxon:"/>
                 <entry key="GO" value="GO:"/>
                 <entry key="MP" value="MP:"/>
                 <entry key="PW" value="PW:"/>
@@ -115,6 +117,7 @@
             becomes    created_by: "George Gkoutos"
             -->
             <map>
+                <entry key="has_rank" value="comment" />
                 <entry key="created:by" value="created_by" />
                 <entry key="http://purl.org/dc/elements/1.1/creator" value="created_by" />
                 <entry key="dc-contributor" value="created_by" />
@@ -252,7 +255,6 @@
     </bean>
 
     <bean id="dataLoader" class="edu.mcw.rgd.dataload.ontologies.DataLoader">
-        <property name="version" value="--DATA LOADER -- ver. 1.2.1 -- Jan 10, 2017 --" />
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">

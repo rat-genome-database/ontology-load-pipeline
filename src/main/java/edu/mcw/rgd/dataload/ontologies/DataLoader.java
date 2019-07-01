@@ -17,11 +17,6 @@ public class DataLoader extends RecordProcessor {
 
     private OntologyDAO dao;
     protected final Logger logger = Logger.getLogger("data_loader");
-    private String version;
-
-    public DataLoader() {
-        logger.info(getVersion());
-    }
 
     public void process(PipelineRecord r) throws Exception {
         Record rec = (Record) r;
@@ -102,13 +97,5 @@ public class DataLoader extends RecordProcessor {
 
     public void setDao(OntologyDAO dao) {
         this.dao = dao;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getVersion() {
-        return version;
     }
 }

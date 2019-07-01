@@ -78,7 +78,7 @@ public class OntologyDAO {
     public void insertTerm(Term term, PipelineSession session) throws Exception {
 
         // extra check: ids parentTermAcc normalized
-        fixTermNameAndDefinition(term);
+        fixTermNameDefComment(term);
         int r = dao.insertTerm(term);
         if( r!=0 ) {
             logInsertedTerms.info("INSERT|"+term.dump("|"));
@@ -94,7 +94,7 @@ public class OntologyDAO {
      */
     public int updateTerm(Term term) throws Exception {
 
-        fixTermNameAndDefinition(term);
+        fixTermNameDefComment(term);
         return dao.updateTerm(term);
     }
 
@@ -114,7 +114,7 @@ public class OntologyDAO {
         }
     }
 
-    private void fixTermNameAndDefinition(Term term) {
+    private void fixTermNameDefComment(Term term) {
         fixTermName(term);
 
         // fix term definition: replace any tabs and new lines with spaces
@@ -131,6 +131,23 @@ public class OntologyDAO {
             if( txt.contains("\r") ) {
                 txt = txt.replace('\r', ' ');
                 term.setDefinition(txt);
+            }
+        }
+
+        // fix term comment: replace any tabs and new lines with spaces
+        txt = term.getComment();
+        if( txt!=null ) {
+            if( txt.contains("\t") ) {
+                txt = txt.replace('\t', ' ');
+                term.setComment(txt);
+            }
+            if( txt.contains("\n") ) {
+                txt = txt.replace('\n', ' ');
+                term.setComment(txt);
+            }
+            if( txt.contains("\r") ) {
+                txt = txt.replace('\r', ' ');
+                term.setComment(txt);
             }
         }
     }
