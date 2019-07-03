@@ -35,6 +35,7 @@ public class DoIdQC {
     int missingParents = 0;
     int omimPsIdsInserted = 0;
     int omimPsIdsUpToDate = 0;
+    int omimPsIdsMultiple = 0;
     int insertedSynonyms = 0;
     int suppressedSynonyms = 0;
 
@@ -127,8 +128,14 @@ public class DoIdQC {
         System.out.println("OBO TERMS WITH INCOMPATIBLE DEF "+termsWithIncompatibleDef);
         System.out.println("");
         System.out.println("MISSING PARENTS: "+missingParents);
-        System.out.println("OMIM:PS ids inserted: "+omimPsIdsInserted);
+        if( omimPsIdsInserted!=0 ) {
+            System.out.println("OMIM:PS ids inserted: " + omimPsIdsInserted);
+        }
         System.out.println("OMIM:PS ids up-to-date: "+omimPsIdsUpToDate);
+        if( omimPsIdsMultiple!=0 ) {
+            System.out.println("OMIM:PS ids assigned to multiple terms: " + omimPsIdsMultiple);
+        }
+
         System.out.println("");
         System.out.println("synonyms inserted: "+insertedSynonyms);
         System.out.println("synonyms suppressed: "+suppressedSynonyms);
@@ -439,7 +446,14 @@ public class DoIdQC {
                 dao.insertTermSynonym(tsyn, "OBO");
                 omimPsIdsInserted++;
             } else {
-                omimPsIdsUpToDate++;
+                // check if OMIM PS id is assigned to the same term in RGD as well as in DO
+                if( syns.size()>1 ) {
+                    omimPsIdsMultiple++;
+                    System.out.println(omimPsId+" assigned to multiple terms: "+Utils.concatenate(", ", syns, "getTermAcc"));
+                }
+                else {
+                    omimPsIdsUpToDate++;
+                }
             }
         }
     }
