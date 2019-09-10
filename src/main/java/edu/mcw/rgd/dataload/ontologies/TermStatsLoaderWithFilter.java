@@ -49,6 +49,7 @@ public class TermStatsLoaderWithFilter {
                 SpeciesType.BONOBO,
                 SpeciesType.CHINCHILLA,
                 SpeciesType.SQUIRREL,
+                SpeciesType.PIG,
         };
         int[] objectKeys = {
                 RgdId.OBJECT_KEY_GENES,
