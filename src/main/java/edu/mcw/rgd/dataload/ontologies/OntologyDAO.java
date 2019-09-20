@@ -815,6 +815,8 @@ public class OntologyDAO {
 
 
     public void checkForCycles(String ontId) throws Exception {
+        System.out.println("START check for cycles for ontology "+ontId);
+
         List<String> accIds;
         if( ontId==null ) {
             String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0";
@@ -844,8 +846,6 @@ public class OntologyDAO {
                 }
             } catch(Exception e) {
                 System.out.println("WARNING: CYCLE found for "+accId);
-
-
             }
         });
         long accIdsProcessed = stats[1].get();
