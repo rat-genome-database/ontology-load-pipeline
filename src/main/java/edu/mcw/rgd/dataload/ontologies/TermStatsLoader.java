@@ -175,8 +175,9 @@ public class TermStatsLoader {
             counters.increment("TERMS_WITH_STATS_MATCHED");
         }
 
+        int termsProcessed = counters.increment("TERMS_PROCESSED");
         long time1 = System.currentTimeMillis();
-        logger.debug(Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
+        logger.debug(termsProcessed+". "+Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
     }
 
     void computeAnnotatedObjectCount(TermStats stats, int speciesTypeKey) throws Exception {
