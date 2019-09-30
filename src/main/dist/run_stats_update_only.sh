@@ -4,6 +4,6 @@
 APPDIR=/home/rgddata/pipelines/OntologyLoad
 cd $APPDIR
 
-$APPDIR/_run.sh -skip_downloads -qc_thread_count=8
+$APPDIR/_run.sh -skip_downloads
 
 $APPDIR/_run.sh -skip_downloads -gviewer_stats
