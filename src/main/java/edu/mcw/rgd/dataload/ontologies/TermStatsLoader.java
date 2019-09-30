@@ -91,36 +91,25 @@ public class TermStatsLoader {
 
     public List<PRecord> loadRecordsToProcess(Map<String,String> ontPrefixes) throws Exception {
 
-        // for every ontology, load list of term acc ids
-        List<List<String>> accIdLists = new ArrayList<>();
-        for( String ontPrefix: ontPrefixes.values() ) {
-            List<String> accIds = dao.getAllTermAccIds(ontPrefix);
-            accIdLists.add(accIds);
-            System.out.println("TERM COUNT for "+ontPrefix+" is "+accIdLists.get(accIdLists.size()-1).size());
-        }
-
         List<PRecord> results = new ArrayList<>();
 
-        // add term acc ids to processing queue in round robin fashion,
-        // picking term acc ids sequentially from the lists of term acc ids;
-        // that will ensure that top-level terms are most likely to be processed first
-        // so total processing time will be minimized
-        while( !accIdLists.isEmpty() ) {
-            Iterator<List<String>> it = accIdLists.iterator();
-            while( it.hasNext() ) {
-                List<String> accIdList = it.next();
-                if( accIdList.isEmpty() )
-                    it.remove();
-                else {
-                    String termAccId = accIdList.remove(0);
-                    PRecord rec = new PRecord();
-                    rec.stats.setTermAccId(termAccId);
-                    rec.stats.setFilter(getFilter());
+        // for every ontology, load list of term acc ids
+        for( String ontPrefix: ontPrefixes.values() ) {
+            List<String> accIds = dao.getAllTermAccIds(ontPrefix);
+            System.out.println("TERM COUNT for "+ontPrefix+" is "+accIds.size());
 
-                    results.add(rec);
-                }
+            for( String accId: accIds ) {
+                PRecord rec = new PRecord();
+                rec.stats.setTermAccId(accId);
+                rec.stats.setFilter(getFilter());
+
+                results.add(rec);
             }
         }
+
+        // randomize term order for more even load in multi-thread processing
+        Collections.shuffle(results);
+
         logger.debug("loaded ontologies, term count="+results.size());
         return results;
     }
