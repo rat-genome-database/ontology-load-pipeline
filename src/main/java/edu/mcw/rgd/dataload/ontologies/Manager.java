@@ -152,7 +152,7 @@ public class Manager {
             TermStatsLoader loader1 = (TermStatsLoader) bf.getBean("termStatLoader");
             loader1.setDao(manager.dao);
             loader1.setFilter(filter);
-            loader1.run(parser.getOntPrefixes(), qcThreadCount);
+            loader1.run(parser.getOntPrefixes());
 
         }
 
