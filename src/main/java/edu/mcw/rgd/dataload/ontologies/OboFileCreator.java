@@ -63,6 +63,7 @@ public class OboFileCreator {
         String dataVersion = getDataVersion(ontId, versionedTerms, fileTrailer, outFileName);
         StringBuffer oboHeader = initOboHeader(dataVersion);
 
+        StringBuffer subsetDefs = new StringBuffer();
         StringBuffer synonymTypeDefs = new StringBuffer();
 
         // sort terms by id
@@ -98,7 +99,7 @@ public class OboFileCreator {
                 }
 
                 StringBuffer termBuf = new StringBuffer();
-                writeTerm(rec, termBuf, synonymTypeDefs);
+                writeTerm(rec, termBuf, synonymTypeDefs, subsetDefs);
                 rec.oboText = termBuf.toString();
             } catch(Exception e) {
                 throw new RuntimeException(e);
@@ -128,7 +129,7 @@ public class OboFileCreator {
         System.out.println("output file: "+getOutFileName());
 
         // write the header, body and trailer
-        updateOboHeaderWithSynonymTypeDefs(oboHeader, synonymTypeDefs);
+        updateOboHeaderWithSynonymTypeDefs(oboHeader, subsetDefs, synonymTypeDefs);
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(getOutFileName())));
         writer.println(oboHeader);
@@ -149,7 +150,7 @@ public class OboFileCreator {
         String header = ont.getOboHeader().replace("\r\n","\n");
         if( header==null || header.isEmpty() ) {
             System.out.println("OBO_HEADER for "+ontId+" ontology is not set in ONTOLOGY table! Generating default header.");
-            oboHeader.append("format-version: 1.2.1\n")
+            oboHeader.append("format-version: 1.2.2\n")
                     .append("date: #DATE#\n")
                     .append("auto-generated-by: ").append(getVersion()).append("\n")
                     .append("saved-by: rgd\n")
@@ -255,7 +256,7 @@ public class OboFileCreator {
         return dataVersion;
     }
 
-    private StringBuffer writeTerm(Record rec, StringBuffer buf, StringBuffer synonymTypeDefs) throws Exception {
+    private StringBuffer writeTerm(Record rec, StringBuffer buf, StringBuffer synonymTypeDefs, StringBuffer subsetDefs) throws Exception {
 
         buf.append("[Term]\n");
         buf.append("id: ").append(rec.getTerm().getAccId());
@@ -285,6 +286,18 @@ public class OboFileCreator {
         if( rec.getTerm().getComment()!=null ) {
             buf.append("comment: ").append(rec.getTerm().getComment());
             buf.append("\n");
+        }
+
+        // subsets
+        for( TermSynonym synonym: rec.getSynonyms() ) {
+
+            String synonymName = synonym.getName();
+            String synonymType = synonym.getType();
+
+            if( synonymType.equals("subset") ) {
+                createSubsetDefIfNotExists(synonymName, subsetDefs);
+                buf.append("subset: " + synonymName + "\n");
+            }
         }
 
         // export regular synonyms
@@ -320,7 +333,7 @@ public class OboFileCreator {
 
                 // 'synonym: "mito" RELATED []'
                 buf.append("synonym: \"").append(synonymName).append("\" ").append(synType);
-                if( synonymTypeDef!=null ) { // optional synonym typedef
+                if (synonymTypeDef != null) { // optional synonym typedef
                     buf.append(" ").append(synonymTypeDef);
                 }
                 buf.append(" [").append(xrefs).append("]\n");
@@ -333,8 +346,8 @@ public class OboFileCreator {
             String synonymName = synonym.getName();
             String synonymType = synonym.getType();
 
-            if( synonym.getType().equals("xref") ) {
-                buf.append(synonymType).append(": ").append(synonymName).append("\n");
+            if( synonymType.equals("xref") ) {
+                buf.append("xref: ").append(synonymName).append("\n");
             }
         }
 
@@ -378,14 +391,24 @@ public class OboFileCreator {
         return false;
     }
 
+    synchronized boolean createSubsetDefIfNotExists(String subsetDef, StringBuffer subsetDefs) {
+        if( subsetDefs.indexOf(subsetDef)<0 ) {
+            subsetDefs.append("subsetdef: ").append(subsetDef);
+            subsetDefs.append(" \"").append(subsetDef).append("\"");
+            subsetDefs.append("\n");
+            return true;
+        }
+        return false;
+    }
+
     // SimpleDateFormat is not thread safe
     synchronized String getCreationDate(Date dt) {
         return sdtCreationDate.format(dt);
     }
 
-    boolean updateOboHeaderWithSynonymTypeDefs(StringBuffer oboHeader, StringBuffer synonymTypeDefs) throws Exception {
+    boolean updateOboHeaderWithSynonymTypeDefs(StringBuffer oboHeader, StringBuffer subsetDefs, StringBuffer synonymTypeDefs) throws Exception {
 
-        if( synonymTypeDefs.length()==0 ) {
+        if( synonymTypeDefs.length()==0 && subsetDefs.length()==0 ) {
             return false;
         }
 
@@ -395,6 +418,7 @@ public class OboFileCreator {
             throw new Exception("Unexpected OBO header: missing 'default-namespace:' line");
         }
         oboHeader.insert(pos, synonymTypeDefs);
+        oboHeader.insert(pos, subsetDefs);
         return true;
     }
 
