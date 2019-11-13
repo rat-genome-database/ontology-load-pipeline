@@ -24,5 +24,7 @@ $APP/run_portal.sh DOID:1579
 $APP/run_portal.sh DOID:0050155
 #Developmental Disease
 $APP/run_portal.sh DOID:9008582 
+#Liver Disease
+$APP/run_portal.sh DOID:409 
 
 
