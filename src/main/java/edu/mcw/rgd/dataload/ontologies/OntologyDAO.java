@@ -624,8 +624,8 @@ public class OntologyDAO {
             return 0; // no  orphaned terms
 
         // never obsolete terms for RDO ontology! only report the issue
-        if( ontId.equals("RDO") ) {
-            System.out.println("OBSOLETE RDO TERMS: ");
+        if( ontId.equals("RDO") || ontId.equals("EFO") ) {
+            System.out.println("OBSOLETE "+ontId+" TERMS: ");
             for( Term term: orphanedTerms ) {
                 System.out.println("  "+term.dump("|"));
             }

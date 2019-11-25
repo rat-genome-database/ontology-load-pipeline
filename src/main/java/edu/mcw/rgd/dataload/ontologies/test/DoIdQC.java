@@ -47,7 +47,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20190916_doid.obo";
+        String fileName = "h:/do/20191120_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -185,7 +185,7 @@ public class DoIdQC {
                 oboTerm.id = line.substring(4).trim();
             }
             else if( line.startsWith("name: ") ) {
-                oboTerm.name = line.substring(6).trim();
+                oboTerm.name = line.substring(6).trim().replace("  "," ");
             }
             else if( line.startsWith("def: ") ) {
                 String def = line.substring(5).trim();

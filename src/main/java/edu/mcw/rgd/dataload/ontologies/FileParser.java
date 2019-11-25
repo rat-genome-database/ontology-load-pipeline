@@ -357,8 +357,8 @@ public class FileParser extends RecordPreprocessor {
             }
             // xref
             else if( line.startsWith("xref:") ) {
-                //rec.addIncomingXRefs(parseXrefs(line.substring(6)));
-                rec.addSynonym(line.substring(6), "xref");
+                parseXrefAsSynonym(line.substring(6), rec);
+//                rec.addSynonym(line.substring(6), "xref");
             }
             // synonyms
             else if( parseSynonym(line, rec) ) {
@@ -396,6 +396,23 @@ public class FileParser extends RecordPreprocessor {
         reader.close();
 
         return records;
+    }
+
+    // cleanup of 'xref:' lines in EFO ontology
+    void parseXrefAsSynonym(String line, Record rec) {
+
+        // remove comments from xrefs, f.e.
+        //   xref: HP:0006779 {source="MONDO:otherHierarchy", source="ontobio"}
+        // rewrite as
+        //   xref: HP:0006779
+        String xref = line.trim();
+        if( xref.endsWith("}") ) {
+            int pos = xref.lastIndexOf('{');
+            if( pos>0 ) {
+                xref = xref.substring(0, pos).trim();
+            }
+        }
+        rec.addSynonym(xref, "xref");
     }
 
     void parseTermName(String line, Record rec) {
@@ -777,6 +794,10 @@ public class FileParser extends RecordPreprocessor {
             Record.addCyclicRelationship("BP", "has_part");
             Record.addCyclicRelationship("CC", "has_part");
             Record.addCyclicRelationship("MF", "has_part");
+        }
+
+        if( ontId.equals("EFO") ) {
+            Record.addCyclicRelationship("EFO", "EFO:0006351"); // has_about_it
         }
     }
 
