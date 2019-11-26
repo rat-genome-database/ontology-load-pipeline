@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline -- build  2019-10-18" />
+        <property name="version" value="ONTOLOGY LOAD pipeline -- build  2019-11-25" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -44,7 +44,7 @@
                 <!--<entry key="DO" value="http://ontologies.berkeleybop.org/doid/doid.obo" />-->
                 <!--<entry key="DO" value="https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/doid.obo" />-->
 
-                <entry key="EFO" value="https://sourceforge.net/p/efo/code/HEAD/tree/trunk/src/efoinobo/efo.obo?format=raw"/>
+                <entry key="EFO" value="https://www.ebi.ac.uk/efo/efo.obo"/>
                 <entry key="MI" value="http://ontologies.berkeleybop.org/mi/mi.obo"/>
                 <entry key="ZFA" value="http://ontologies.berkeleybop.org/zfa/zfa.obo"/>
                 <entry key="NCBITaxon" value="file:///tmp/ncbitaxon.obo"/>
@@ -186,6 +186,18 @@
                 <entry key="http://purl.obolibrary.org/obo/chebi/mass" value="chebi_ignored" />
                 <entry key="http://purl.obolibrary.org/obo/chebi/charge" value="chebi_ignored" />
                 <entry key="http://purl.obolibrary.org/obo/chebi/monoisotopicmass" value="chebi_ignored" />
+
+                <!-- EFO ontology -->
+                <entry key="IAO:0000117" value="created_by" />
+                <entry key="dc-creator" value="created_by" />
+                <entry key="createdBy" value="created_by" />
+                <entry key="exactMatch" value="efo_ignored" />
+                <entry key="closeMatch" value="efo_ignored" />
+                <entry key="narrowMatch" value="efo_ignored" />
+                <entry key="organizational:class" value="efo_ignored" />
+                <entry key="gwas:trait" value="efo_ignored" />
+                <entry key="http://www.ebi.ac.uk/efo/obsoleted_in_version" value="efo_ignored" />
+                <entry key="excluded_subClassOf" value="efo_ignored" />
             </map>
         </property>
 
@@ -230,6 +242,7 @@
                 <value>xxx_number:</value>
                 <value>design_pattern:</value>
                 <value>chebi_ignored:</value>
+                <value>efo_ignored:</value>
             </list>
         </property>
 
