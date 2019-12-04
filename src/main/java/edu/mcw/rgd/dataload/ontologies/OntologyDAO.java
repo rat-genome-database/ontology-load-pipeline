@@ -38,6 +38,8 @@ public class OntologyDAO {
     protected final Logger logInsertedDags = Logger.getLogger("insertedDags");
     protected final Logger logDeletedDags = Logger.getLogger("deletedDags");
 
+    private Set<String> ontologiesWithSuppressedTermObsoletion;
+
     /**
      * get ontology object given ont_id
      * @param ontId ontology id
@@ -624,7 +626,7 @@ public class OntologyDAO {
             return 0; // no  orphaned terms
 
         // never obsolete terms for RDO ontology! only report the issue
-        if( ontId.equals("RDO") || ontId.equals("EFO") ) {
+        if( getOntologiesWithSuppressedTermObsoletion().contains(ontId) ) {
             System.out.println("OBSOLETE "+ontId+" TERMS: ");
             for( Term term: orphanedTerms ) {
                 System.out.println("  "+term.dump("|"));
@@ -856,5 +858,13 @@ public class OntologyDAO {
     public boolean isOmimIdInactive(String omimId) throws Exception {
         Omim omim = omimDAO.getOmimByNr(omimId.substring(5));
         return omim!=null && !omim.getStatus().equals("live");
+    }
+
+    public void setOntologiesWithSuppressedTermObsoletion(Set<String> ontologiesWithSuppressedTermObsoletion) {
+        this.ontologiesWithSuppressedTermObsoletion = ontologiesWithSuppressedTermObsoletion;
+    }
+
+    public Set<String> getOntologiesWithSuppressedTermObsoletion() {
+        return ontologiesWithSuppressedTermObsoletion;
     }
 }

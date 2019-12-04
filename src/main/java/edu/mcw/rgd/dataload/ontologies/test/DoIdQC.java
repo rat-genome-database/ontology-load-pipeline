@@ -208,6 +208,8 @@ public class DoIdQC {
             else if( line.startsWith("xref: GARD:") ||
                      line.startsWith("xref: ORDO:") ||
                      line.startsWith("xref: ICD-O:") ||
+                     line.startsWith("xref: ICD10CM:") ||
+                     line.startsWith("xref: ICD9CM:") ||
                      line.startsWith("xref: NCI:")) {
                 oboTerm.parseXrefSynonym(line.substring(6).trim());
             }

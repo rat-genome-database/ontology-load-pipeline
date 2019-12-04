@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline -- build  2019-11-25" />
+        <property name="version" value="ONTOLOGY LOAD pipeline -- build  2019-12-04" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -48,10 +48,12 @@
                 <entry key="MI" value="http://ontologies.berkeleybop.org/mi/mi.obo"/>
                 <entry key="ZFA" value="http://ontologies.berkeleybop.org/zfa/zfa.obo"/>
                 <entry key="NCBITaxon" value="file:///tmp/ncbitaxon.obo"/>
+                <entry key="CVCL" value="ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo"/>
             </map>
         </property>
         <property name="qualityChecker" ref="qualityChecker" />
         <property name="dataLoader" ref="dataLoader" />
+        <property name="dao" ref="dao" />
         <property name="malformedRsSynonymsEmailList" value="mtutaj@mcw.edu" />
 	</bean>
 
@@ -81,6 +83,7 @@
                 <entry key="MI" value="MI:"/>
                 <entry key="ZFA" value="ZFA:"/>
                 <entry key="CS" value="CS:"/>
+                <entry key="CVCL" value="CVCL_"/>
             </map>
         </property>
 
@@ -268,6 +271,25 @@
     </bean>
 
     <bean id="dataLoader" class="edu.mcw.rgd.dataload.ontologies.DataLoader">
+    </bean>
+
+    <bean id="dao" class="edu.mcw.rgd.dataload.ontologies.OntologyDAO">
+        <!-- some ontologies do not have relationships loaded for many terms;
+             and some ontologies are manually edited in RGD;
+             therefore the code to detect obsoleted terms should never run for these ontologies-->
+        <property name="ontologiesWithSuppressedTermObsoletion" >
+            <set>
+                <value>RDO</value>
+                <value>PW</value>
+                <value>CMO</value>
+                <value>MMO</value>
+                <value>XCO</value>
+                <value>RS</value>
+                <value>CS</value>
+                <value>EFO</value>
+                <value>CVCL</value>
+            </set>
+        </property>
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">

@@ -19,7 +19,7 @@ import java.util.*;
 public class Manager {
 
     private Map<String,String> oboFiles;
-    private OntologyDAO dao = new OntologyDAO();
+    private OntologyDAO dao;
     private String version;
     private QualityChecker qualityChecker;
     private DataLoader dataLoader;
@@ -50,7 +50,6 @@ public class Manager {
         boolean processObsoleteTerms = false;
         boolean prodRelease = false; // generate versioned obo files for prod release
 
-        boolean dropSynonyms = false;
         String singleOntologyId = null;
         int qcThreadCount = 5;
         boolean goTaxonConstraints = false;
@@ -73,9 +72,6 @@ public class Manager {
             }
             else if( arg.equals("-prod_release") ) {
                 prodRelease = true;
-            }
-            else if( arg.equals("-drop_synonyms") ) {
-                dropSynonyms = true;
             }
             else if( arg.startsWith("-single_ontology=") ) {
                 // single ontology id follows the arg
@@ -139,7 +135,7 @@ public class Manager {
                 parser.setDao(manager.dao);
                 parser.enforceSingleOntology(singleOntologyId);
             }
-            manager.downloadAndProcessExternalFiles(parser, dropSynonyms, qcThreadCount);
+            manager.downloadAndProcessExternalFiles(parser, qcThreadCount);
         }
 
         // update term stats
@@ -187,9 +183,6 @@ public class Manager {
             "   -generate_obo_file=?  generate .obo file from database for given ontology\n"+
             "                         f.e. '-generate_obo_file=RDO'\n"+
             "                              '-generate_obo_file=MMO -process_obsolete_terms -prod_release'\n"+
-            "   -drop_synonyms        drop synonyms before loading synonyms read from obo file;\n"+
-            "                         if this option is not specified on the command line, the existing synonyms\n"+
-            "                         will be retained and only new ones imported into database\n"+
             "   -go_taxon_constraints load taxon constraints for GO terms into RGD\n"+
             "                         f.e. '-go_taxon_constraints'\n"+
             "   -qc_thread_count=?    specify count of qc threads; default is 5\n"+
@@ -221,10 +214,9 @@ public class Manager {
     /**
      * download external files and process them
      * @param parser FileParser object
-     * @param dropSynonyms if true, existing synonyms will be dropped from
      * @throws Exception
      */
-    void downloadAndProcessExternalFiles(FileParser parser, boolean dropSynonyms, int qcThreadCount) throws Exception {
+    void downloadAndProcessExternalFiles(FileParser parser, int qcThreadCount) throws Exception {
 
         long time0 = System.currentTimeMillis();
 
@@ -245,11 +237,6 @@ public class Manager {
 
         // read the thread counts in each group
         PipelineSession session = manager.getSession();
-
-        // drop synonyms for processed ontologies
-        if( dropSynonyms ) {
-            dropSynonyms(session);
-        }
 
         // run everything
         manager.run();
@@ -279,14 +266,6 @@ public class Manager {
             }
         }
         session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE", obsoleteTermCount);
-    }
-
-    void dropSynonyms(PipelineSession session) throws Exception {
-
-        for( String ontId: getOboFiles().keySet() ) {
-            int count = dao.dropSynonyms(ontId);
-            session.incrementCounter("SYNONYMS_DROPPED_FOR_"+ontId, count);
-        }
     }
 
     void dropStaleSynonyms(long time0, PipelineSession session) throws Exception {
@@ -328,6 +307,14 @@ public class Manager {
             String message = Utils.readFileAsString(file.getAbsolutePath());
             Utils.sendMail(recipients, subject, message);
         }
+    }
+
+    public OntologyDAO getDao() {
+        return dao;
+    }
+
+    public void setDao(OntologyDAO dao) {
+        this.dao = dao;
     }
 
     public Map<String, String> getOboFiles() {

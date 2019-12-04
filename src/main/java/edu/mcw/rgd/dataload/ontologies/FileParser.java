@@ -145,14 +145,6 @@ public class FileParser extends RecordPreprocessor {
 
         records.putAll(process(fileName, defaultOntId, accIdPrefix, rootTermRelations));
 
-        // post-processing for RDO ontology
-        //if( accIdPrefix.equals("*") || accIdPrefix.equals("DOID:") ) {
-        //    int cnt = processCustomRelationships(defaultOntId, records);
-        //    getSession().incrementCounter("  RDO custom relationships processed", cnt);
-
-         //   Record.dumpMergeStats();
-        //}
-
         // all term records complete: put them to processing queue
         for( Record r: records.values() ) {
             this.getSession().putRecordToFirstQueue(r);
@@ -383,6 +375,10 @@ public class FileParser extends RecordPreprocessor {
                     rec.getTerm().setCreationDate(creationDate);
                 }
             }
+            // subset:
+            else if( line.startsWith("subset:") ) {
+                parseSubset(line.substring(7), rec);
+            }
 
             // IGNORED ATTRIBUTES
             else if( !parseIgnored(line, rec) ) {
@@ -396,6 +392,15 @@ public class FileParser extends RecordPreprocessor {
         reader.close();
 
         return records;
+    }
+
+    void parseSubset(String value, Record rec) {
+        // parse subsets only for CVCL ontology
+        if( !rec.getTerm().getAccId().startsWith("CVCL") ) {
+            return;
+        }
+
+        rec.addSynonym(value.trim(), "subset");
     }
 
     // cleanup of 'xref:' lines in EFO ontology
@@ -427,7 +432,8 @@ public class FileParser extends RecordPreprocessor {
         //  [Deafness, Autosomal Dominant 22] - term name
         //  [DFNA22 Deafness, Autosomal Dominant 22, with Hypertrophic Cardiomyopathy,] -- synonym
         int semicolonPos = termNameIncoming.indexOf(';');
-        if( semicolonPos>=0 ) {
+        // note: do not split term name for CVCL ontology!
+        if( semicolonPos>=0 && !rec.getTerm().getAccId().startsWith("CVCL_") ) {
 
             // ';' must not be surrounded in parentheses, like this:
             // [renal neoplasm with t(6;11)(p21;q12)]
