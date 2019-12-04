@@ -1,8 +1,7 @@
 # loads single ontology, given ontology id as parameter
-# for example:  ./run_single.sh CL
-# other parameters could follow the ontology id, for example:
-#   ./run_single.sh RS -drop_synonyms
-# will first drop existing synonyms for RS ontology, and then load it from source file
+#   for example:  ./run_single.sh CL
+# other parameters, if any, should follow the ontology id, for example:
+#   ./run_single.sh MMO -skip_stats_update
 
 . /etc/profile
 APPDIR=/home/rgddata/pipelines/OntologyLoad

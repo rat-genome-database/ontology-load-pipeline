@@ -1,3 +1,8 @@
+Dec 04, 2019
+  added code to load CVCL ontology (cellosaurus ontology)
+  removed code for unused cmdline option '-drop_synonyms'
+  DO ontology: added loading of 'ICD9:' and 'ICD10:' xrefs
+
 Nov 25, 2019
   code tune-up to load EFO ontology
 
