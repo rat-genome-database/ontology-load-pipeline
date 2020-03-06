@@ -860,6 +860,15 @@ public class OntologyDAO {
         return omim!=null && !omim.getStatus().equals("live");
     }
 
+    public Set<String> getOmimIdsInRdo() throws Exception {
+        List<TermSynonym> syns = dao.getActiveSynonymsByNamePattern("RDO", "OMIM:%");
+        Set<String> omimIds = new HashSet<>();
+        for( TermSynonym tsyn: syns ) {
+            omimIds.add(tsyn.getName());
+        }
+        return omimIds;
+    }
+
     public void setOntologiesWithSuppressedTermObsoletion(Set<String> ontologiesWithSuppressedTermObsoletion) {
         this.ontologiesWithSuppressedTermObsoletion = ontologiesWithSuppressedTermObsoletion;
     }
