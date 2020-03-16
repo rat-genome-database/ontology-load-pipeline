@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2020-02-28" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2020-03-16" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -351,7 +351,7 @@
     </bean>
 
     <bean id="GViewerStatsLoader" class="edu.mcw.rgd.dataload.ontologies.GViewerStatsLoader">
-        <property name="version" value="--GViewer Stats Loader -- ver. 1.0.1 -- Sep 21, 2017 --" />
+        <property name="version" value="--GViewer Stats Loader -- build Mar 16, 2020 --" />
         <property name="maxAnnotCountPerTerm" value="2500" />
     </bean>
 </beans>
