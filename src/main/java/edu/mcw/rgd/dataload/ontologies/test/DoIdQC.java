@@ -36,6 +36,7 @@ public class DoIdQC {
     int omimPsIdsInserted = 0;
     int omimPsIdsUpToDate = 0;
     int omimPsIdsMultiple = 0;
+    int omimIdsNotInRdo = 0;
     int insertedSynonyms = 0;
     int suppressedSynonyms = 0;
 
@@ -47,7 +48,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20191120_doid.obo";
+        String fileName = "h:/do/20200305_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -135,6 +136,7 @@ public class DoIdQC {
         if( omimPsIdsMultiple!=0 ) {
             System.out.println("OMIM:PS ids assigned to multiple terms: " + omimPsIdsMultiple);
         }
+        System.out.println("OMIM IDs not in RDO: "+omimIdsNotInRdo);
 
         System.out.println("");
         System.out.println("synonyms inserted: "+insertedSynonyms);
@@ -156,6 +158,9 @@ public class DoIdQC {
     }
 
     Map<String, OboTerm> parseOboFile(String fileName) throws Exception {
+
+        Set<String> omimIdsInRdo = dao.getOmimIdsInRdo();
+        System.out.println("OMIM IDs in RDO: "+omimIdsInRdo.size());
 
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         Map<String, OboTerm> oboTerms = new HashMap<>();
@@ -218,6 +223,10 @@ public class DoIdQC {
                 if( dao.isOmimIdInactive(omimId) ) {
                     System.out.println("obsolete "+omimId+" for term "+oboTerm.id+" "+oboTerm.name);
                 }
+                if( !omimIdsInRdo.contains(omimId) ) {
+                    System.out.println("WARNING: "+omimId+" NOT IN RGD!");
+                    omimIdsNotInRdo++;
+                }
             }
             else if( line.startsWith("is_obsolete: ") ) {
                 if( line.contains("true") ) {
@@ -227,6 +236,8 @@ public class DoIdQC {
         }
 
         reader.close();
+
+        System.out.println(fileName+" parsed!");
 
         return oboTerms;
     }
@@ -564,7 +575,14 @@ public class DoIdQC {
                 }
             }
             if( pos1<0 ) {
-                System.out.println("unknown type of synonym");
+                pos1 = buf.indexOf(" BROAD ");
+                if (pos1 >= 0) {
+                    tsyn.setType("broad_synonym");
+                    buf.delete(pos1, pos1+7);
+                }
+            }
+            if( pos1<0 ) {
+                System.out.println("unknown type of synonym: "+line);
             }
 
             // parse synonym xrefs

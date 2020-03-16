@@ -664,17 +664,6 @@ public class OntologyDAO {
     }
 
     /**
-     * drop all synonyms for given ontology
-     * @param ontId ontology id
-     * @return count of dropped synonyms
-     * @throws Exception if something wrong happens in spring framework
-     */
-    public int dropSynonyms(String ontId) throws Exception {
-
-        return dao.dropTermSynonymsForOntology(ontId);
-    }
-
-    /**
      * get map key for primary ref assembly
      * @param speciesTypeKey species type key
      * @return map key for primary ref assembly
@@ -682,7 +671,7 @@ public class OntologyDAO {
      */
     public int getPrimaryRefAssemblyMapKey(int speciesTypeKey) throws Exception {
 
-        return mapDAO.getPrimaryRefAssembly(speciesTypeKey).getKey();
+        return mapDAO.getPrimaryRefAssembly(speciesTypeKey, "NCBI").getKey();
     }
 
     /** get map data for given rgd id and map key;
@@ -858,6 +847,15 @@ public class OntologyDAO {
     public boolean isOmimIdInactive(String omimId) throws Exception {
         Omim omim = omimDAO.getOmimByNr(omimId.substring(5));
         return omim!=null && !omim.getStatus().equals("live");
+    }
+
+    public Set<String> getOmimIdsInRdo() throws Exception {
+        List<TermSynonym> syns = dao.getActiveSynonymsByNamePattern("RDO", "OMIM:%");
+        Set<String> omimIds = new HashSet<>();
+        for( TermSynonym tsyn: syns ) {
+            omimIds.add(tsyn.getName());
+        }
+        return omimIds;
     }
 
     public void setOntologiesWithSuppressedTermObsoletion(Set<String> ontologiesWithSuppressedTermObsoletion) {

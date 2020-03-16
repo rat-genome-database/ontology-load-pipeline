@@ -1,3 +1,12 @@
+Mar 16, 2020
+  gviewer stats loader: fix due to changes in rgdcore regarding primaray ref assemblies
+
+Mar 06, 2020
+  DO loader: added parsing of broad synonyms
+
+Feb 28, 2020
+  DO loader: added QC of OMIM IDs that are in DO ontology but not present in RDO
+
 Dec 04, 2019
   added code to load CVCL ontology (cellosaurus ontology)
   removed code for unused cmdline option '-drop_synonyms'
