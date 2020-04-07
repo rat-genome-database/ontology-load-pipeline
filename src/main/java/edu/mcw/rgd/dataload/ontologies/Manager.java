@@ -4,6 +4,7 @@ import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.pipelines.PipelineManager;
 import edu.mcw.rgd.pipelines.PipelineSession;
 import edu.mcw.rgd.process.Utils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
@@ -29,7 +30,7 @@ public class Manager {
         try {
             main2(args);
         } catch(Exception e) {
-            e.printStackTrace();
+            Utils.printStackTrace(e, Logger.getRootLogger());
             throw e;
         }
     }
@@ -47,8 +48,6 @@ public class Manager {
         boolean skipStatsUpdate = false;
 
         String generateOboFile = null; // if not null, contains ontology id for which .obo file should be generated
-        boolean processObsoleteTerms = false;
-        boolean prodRelease = false; // generate versioned obo files for prod release
 
         String singleOntologyId = null;
         int qcThreadCount = 5;
@@ -66,12 +65,6 @@ public class Manager {
             }
             else if( arg.startsWith("-generate_obo_file=") ) {
                 generateOboFile = arg.substring(19);
-            }
-            else if( arg.equals("-process_obsolete_terms") ) {
-                processObsoleteTerms = true;
-            }
-            else if( arg.equals("-prod_release") ) {
-                prodRelease = true;
             }
             else if( arg.startsWith("-single_ontology=") ) {
                 // single ontology id follows the arg
@@ -117,11 +110,10 @@ public class Manager {
 
         // update gviewer xml stats
         if( loadGViewerStats ) {
-            if( parser==null ) {
-                parser = (FileParser) bf.getBean("fileParser");
-                parser.setDao(manager.dao);
-                parser.enforceSingleOntology(singleOntologyId);
-            }
+            parser = (FileParser) bf.getBean("fileParser");
+            parser.setDao(manager.dao);
+            parser.enforceSingleOntology(singleOntologyId);
+
             GViewerStatsLoader loader2 = (GViewerStatsLoader) bf.getBean("GViewerStatsLoader");
             loader2.setDao(manager.dao);
             loader2.run(parser.getOntPrefixes(), qcThreadCount);
@@ -130,11 +122,10 @@ public class Manager {
 
         //download external files and setup file parser
         if( !skipDownloads ) {
-            if( parser==null ) {
-                parser = (FileParser) bf.getBean("fileParser");
-                parser.setDao(manager.dao);
-                parser.enforceSingleOntology(singleOntologyId);
-            }
+            parser = (FileParser) bf.getBean("fileParser");
+            parser.setDao(manager.dao);
+            parser.enforceSingleOntology(singleOntologyId);
+
             manager.downloadAndProcessExternalFiles(parser, qcThreadCount);
         }
 
@@ -155,7 +146,7 @@ public class Manager {
         // generate obo files
         if( generateOboFile!=null ) {
             OboFileCreator oboFileCreator = (OboFileCreator) bf.getBean("oboFileGenerator");
-            oboFileCreator.run(generateOboFile, processObsoleteTerms, prodRelease);
+            oboFileCreator.run(generateOboFile);
         }
 
         // generate obo files
@@ -182,7 +173,7 @@ public class Manager {
             "                         f.e. '-single_ontology=PW'\n"+
             "   -generate_obo_file=?  generate .obo file from database for given ontology\n"+
             "                         f.e. '-generate_obo_file=RDO'\n"+
-            "                              '-generate_obo_file=MMO -process_obsolete_terms -prod_release'\n"+
+            "                              '-generate_obo_file='  generates .obo files for all ontologies as specified in AppConfigure.xml\n"+
             "   -go_taxon_constraints load taxon constraints for GO terms into RGD\n"+
             "                         f.e. '-go_taxon_constraints'\n"+
             "   -qc_thread_count=?    specify count of qc threads; default is 5\n"+
@@ -201,13 +192,7 @@ public class Manager {
      */
     String enforceSingleOntology(String ontId) {
         // modify oboFiles map: only the selected ontology should stay
-        Iterator<String> it = oboFiles.keySet().iterator();
-        while( it.hasNext() ) {
-            String curOntId = it.next();
-            if( !curOntId.equalsIgnoreCase(ontId) ) {
-                it.remove();
-            }
-        }
+        oboFiles.keySet().removeIf(curOntId -> !curOntId.equalsIgnoreCase(ontId));
         return ontId;
     }
 

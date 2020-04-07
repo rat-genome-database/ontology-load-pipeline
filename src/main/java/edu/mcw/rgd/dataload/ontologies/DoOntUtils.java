@@ -31,7 +31,7 @@ and (not exists(
    )
      */
     public static void main(String[] args) throws Exception {
-
+/*
         Dao doDAO = new Dao();
 
         OntologyDAO dao = new OntologyDAO();
@@ -176,6 +176,8 @@ and (not exists(
         }
         Utils.writeStringToFile(buf.toString(), "termsNotMatchingWithDO.txt");
         new OboFileCreator().run("RDO", rdoCustomTermsNotMatchingWithDo);
+
+ */
     }
 
     static class Dao extends OntologyXDAO {

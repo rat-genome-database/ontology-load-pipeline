@@ -1,3 +1,6 @@
+Apr 07, 2020
+  obo-generator: vastly improved summary email
+
 Mar 16, 2020
   gviewer stats loader: fix due to changes in rgdcore regarding primaray ref assemblies
 

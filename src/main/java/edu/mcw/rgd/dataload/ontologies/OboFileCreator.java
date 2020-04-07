@@ -22,38 +22,51 @@ public class OboFileCreator {
     // 2013-08-12T12:32:11Z
     static SimpleDateFormat sdtCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    private boolean processObsoleteTerms = false;
-    private boolean prodRelease = false;
     private String ontId;
     private String outFileName;
     private String outDir;
     private String version;
     private Map<String,String> versionedFiles;
+    private Set<String> emitObsoleteTermsFor;
+    private boolean versionStringWritten = false;
+
+    public void run() throws Exception {
+        for( String ontId: getVersionedFiles().keySet() ) {
+            run(ontId);
+        }
+    }
 
     /**
      * dump all terms (with definitions and synonyms) from given ontology into a obo file
      * @param ontId ontology id
      * @throws Exception
      */
-    public void run(String ontId, boolean processObsoleteTerms, boolean prodRelease) throws Exception {
-        this.processObsoleteTerms = processObsoleteTerms;
-        this.prodRelease = prodRelease;
-        run(ontId, null);
+    public void run(String ontId) throws Exception {
+
+        if( Utils.isStringEmpty(ontId) ) {
+            run();
+        } else {
+            boolean processObsoleteTerms = getEmitObsoleteTermsFor().contains(ontId);
+            run(ontId, processObsoleteTerms);
+        }
     }
 
 
     /**
      * dump all terms (with definitions and synonyms) from given ontology into a obo file
      * @param ontId ontology id
-     * @param termsOverride if specified only these terms will be exported as .OBO file;
-     *        if not specified (NULL), all active terms for given ontology will be exported
      * @throws Exception
      */
-    public void run(String ontId, List<Term> termsOverride) throws Exception {
+    public void run(String ontId, boolean processObsoleteTerms) throws Exception {
 
         long time0 = System.currentTimeMillis();
 
-        System.out.println(getVersion()+" ONT_ID="+ontId);
+        // write version string only once
+        if( !versionStringWritten ) {
+            System.out.println(getVersion());
+            versionStringWritten = true;
+        }
+
         setOntId(ontId);
 
         StringBuffer versionedTerms = new StringBuffer();
@@ -67,9 +80,8 @@ public class OboFileCreator {
         StringBuffer synonymTypeDefs = new StringBuffer();
 
         // sort terms by id
-        List<Term> terms = termsOverride!=null ? termsOverride :
-                processObsoleteTerms ? dao.getAllTerms(ontId) : dao.getActiveTerms(ontId);
-        Collections.sort(terms, new Comparator<Term>() {
+        List<Term> terms = processObsoleteTerms ? dao.getAllTerms(ontId) : dao.getActiveTerms(ontId);
+        terms.sort(new Comparator<Term>() {
             public int compare(Term o1, Term o2) {
                 return o1.getAccId().compareTo(o2.getAccId());
             }
@@ -113,7 +125,7 @@ public class OboFileCreator {
 
         // see if generated terms are the same as in the versioned file
         if( termsBuf.toString().equals(versionedTerms.toString()) ) {
-            System.out.println(terms.size()+" terms the same -- nothing written");
+            System.out.println(getOntId()+": "+terms.size()+" terms the same -- nothing written --- elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
             return;
         }
 
@@ -121,12 +133,8 @@ public class OboFileCreator {
         Utils.writeStringToFile(versionedTerms.toString(), "/tmp/old_"+ontId.toLowerCase()+".obo");
 
         // generate output file name
-        if( outFileName.length()==0 || !prodRelease ) {
-            setOutFileName(getOutDir() + ontId + ".obo");
-        } else {
-            setOutFileName(outFileName.toString());
-        }
-        System.out.println("output file: "+getOutFileName());
+        setOutFileName(outFileName.toString());
+        System.out.println(getOntId()+" output file: "+getOutFileName());
 
         // write the header, body and trailer
         updateOboHeaderWithSynonymTypeDefs(oboHeader, subsetDefs, synonymTypeDefs);
@@ -138,7 +146,7 @@ public class OboFileCreator {
 
         writer.close();
 
-        System.out.println("--- "+terms.size()+" terms written --- elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+        System.out.println("   "+terms.size()+" terms written --- elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     StringBuffer initOboHeader(String dataVersion) throws Exception {
@@ -147,8 +155,8 @@ public class OboFileCreator {
 
         // load ontology header from database
         Ontology ont = dao.getOntology(ontId);
-        String header = ont.getOboHeader().replace("\r\n","\n");
-        if( header==null || header.isEmpty() ) {
+        String header = Utils.defaultString(ont.getOboHeader()).replace("\r\n","\n");
+        if( header.isEmpty() ) {
             System.out.println("OBO_HEADER for "+ontId+" ontology is not set in ONTOLOGY table! Generating default header.");
             oboHeader.append("format-version: 1.2.2\n")
                     .append("date: #DATE#\n")
@@ -162,7 +170,7 @@ public class OboFileCreator {
         // replace #DATE# placeholder with the current date
         int pos = oboHeader.indexOf("#DATE#");
         if( pos>=0 ) {
-            oboHeader = oboHeader.replace(pos, pos+6, (new SimpleDateFormat("dd:MM:yyyy HH:mm")).format(new java.util.Date()));
+            oboHeader = oboHeader.replace(pos, pos+6, (new SimpleDateFormat("dd:MM:yyyy HH:mm")).format(new Date()));
         }
 
         pos = oboHeader.indexOf("#GENERATOR#");
@@ -243,20 +251,20 @@ public class OboFileCreator {
         String backupFileName = getOutDir()+versionedFile.substring(slashPos+1);
         outFileName.append(backupFileName);
 
-        if( prodRelease ) {
-            backupFileName = backupFileName.replace(".obo", "_" + fileDate + "_v" + oldDataVersion + ".obo");
+        // create backup file
+        backupFileName = backupFileName.replace(".obo", "_" + fileDate + "_v" + oldDataVersion + ".obo");
 
-            File backupFile = new File(backupFileName);
-            if (!backupFile.exists()) {
-                String fileContent = Utils.readFileAsString(localFile);
-                Utils.writeStringToFile(fileContent, backupFileName);
-            }
+        File backupFile = new File(backupFileName);
+        if (!backupFile.exists()) {
+            String fileContent = Utils.readFileAsString(localFile);
+            backupFile.getParentFile().mkdirs();
+            Utils.writeStringToFile(fileContent, backupFileName);
         }
 
         return dataVersion;
     }
 
-    private StringBuffer writeTerm(Record rec, StringBuffer buf, StringBuffer synonymTypeDefs, StringBuffer subsetDefs) throws Exception {
+    private void writeTerm(Record rec, StringBuffer buf, StringBuffer synonymTypeDefs, StringBuffer subsetDefs) throws Exception {
 
         buf.append("[Term]\n");
         buf.append("id: ").append(rec.getTerm().getAccId());
@@ -296,7 +304,7 @@ public class OboFileCreator {
 
             if( synonymType.equals("subset") ) {
                 createSubsetDefIfNotExists(synonymName, subsetDefs);
-                buf.append("subset: " + synonymName + "\n");
+                buf.append("subset: ").append(synonymName).append("\n");
             }
         }
 
@@ -374,7 +382,6 @@ public class OboFileCreator {
 
         // extra line separating term sections
         buf.append("\n");
-        return buf;
     }
 
     synchronized boolean createSynonymTypeDefIfNotExists(String synTypeDef, String synTypeDefInfo, String synTypeDefType,
@@ -528,5 +535,13 @@ public class OboFileCreator {
 
     public Map<String,String> getVersionedFiles() {
         return versionedFiles;
+    }
+
+    public void setEmitObsoleteTermsFor(Set<String> emitObsoleteTermsFor) {
+        this.emitObsoleteTermsFor = emitObsoleteTermsFor;
+    }
+
+    public Set<String> getEmitObsoleteTermsFor() {
+        return emitObsoleteTermsFor;
     }
 }
