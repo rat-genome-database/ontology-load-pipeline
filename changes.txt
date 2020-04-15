@@ -1,3 +1,6 @@
+Apr 15, 2020
+  parser: for GO, fixed generation of Not4Curation synonyms
+
 Apr 07, 2020
   obo-generator: vastly improved summary email
 
@@ -141,20 +144,14 @@ Jun 30, 2017  v.1.5.24
   term stats loader: added computation of counts for variants
   obo file creator: fixed conversion of 'primary_id' to 'alt_id' synonyms to prevent emission of duplicate synonym lines
 
-
 Jun 23, 2017  v.1.5.23
-----------------------
-term stats loader: added computation of counts for variants
-
+  term stats loader: added computation of counts for variants
 
 Jun 8, 2017  v.1.5.22
-----------------------
-term stats loader: added computation of annotation counts for terms for all species (species_type_key=0)
-
+  term stats loader: added computation of annotation counts for terms for all species (species_type_key=0)
 
 May 26, 2017  v.1.5.21
-----------------------
-term stats loader: added computation of counts of phenominer annotations for male and female strains
+  term stats loader: added computation of counts of phenominer annotations for male and female strains
 
 
 Mar 16, 2017  v. 1.5.20

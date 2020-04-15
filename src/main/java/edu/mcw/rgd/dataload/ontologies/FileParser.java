@@ -395,12 +395,18 @@ public class FileParser extends RecordPreprocessor {
     }
 
     void parseSubset(String value, Record rec) {
-        // parse subsets only for CVCL ontology
-        if( !rec.getTerm().getAccId().startsWith("CVCL") ) {
+
+        // parse subsets for CVCL ontology
+        if( rec.getTerm().getAccId().startsWith("CVCL") ) {
+            rec.addSynonym(value.trim(), "subset");
             return;
         }
 
-        rec.addSynonym(value.trim(), "subset");
+        // special cases of ignored field 'subset:'
+        if( value.contains("gocheck_do_not_annotate") || value.contains("gocheck_do_not_manually_annotate") ) {
+            rec.addSynonym("Not4Curation", "synonym");
+            getSession().incrementCounter("SYNONYMS_GO_NOT4CURATION", 1);
+        }
     }
 
     // cleanup of 'xref:' lines in EFO ontology
@@ -563,13 +569,6 @@ public class FileParser extends RecordPreprocessor {
     }
 
     boolean parseIgnored(String line, Record rec) {
-
-        // special cases of ignored field 'subset:'
-        if( line.contains("gocheck_do_not_annotate") || line.contains("gocheck_do_not_manually_annotate") ) {
-            rec.addSynonym("Not4Curation", "synonym");
-            getSession().incrementCounter("SYNONYMS_GO_NOT4CURATION", 1);
-            return true;
-        }
 
         for( String ignoredAttr: getIgnoredProperties() ) {
             if( line.startsWith(ignoredAttr) ) {
