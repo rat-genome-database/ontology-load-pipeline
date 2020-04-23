@@ -30,6 +30,7 @@ public class TermStatsLoader {
             RgdId.OBJECT_KEY_QTLS,
             RgdId.OBJECT_KEY_STRAINS,
             RgdId.OBJECT_KEY_VARIANTS,
+            RgdId.OBJECT_KEY_CELL_LINES,
     };
 
     public String getFilter() {
