@@ -1,3 +1,6 @@
+Apr 24, 2020
+  term stats loader with filter: added calculation of term stats for cell lines
+
 Apr 23, 2020
   term stats loader: added calculation of term stats for cell lines
 

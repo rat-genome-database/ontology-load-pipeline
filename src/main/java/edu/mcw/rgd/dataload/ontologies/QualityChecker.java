@@ -8,14 +8,11 @@ import edu.mcw.rgd.pipelines.RecordProcessor;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 12/29/10
- * Time: 9:15 AM
+ * @author mtutaj
+ * @since 12/29/10
  * Performs QC for given term
  */
 public class QualityChecker extends RecordProcessor {
@@ -23,12 +20,7 @@ public class QualityChecker extends RecordProcessor {
     private OntologyDAO dao;
 
     protected final Logger logger = Logger.getLogger("qc");
-    private String version;
     protected final Logger logTermNameChanged = Logger.getLogger("termNameChanged");
-
-    public QualityChecker() {
-        logger.info(getVersion());
-    }
 
     /**
      * process one unique ontology term; first ensures that given term and all its parent terms
@@ -106,32 +98,6 @@ public class QualityChecker extends RecordProcessor {
                     String relId = Relation.getRelIdFromRel(entry.getValue());
                     System.out.println("WARNING: CYCLE found for "+parentTermAcc+" "+Relation.getRelFromRelId(relId)+" "+childTermAcc);
                     getSession().incrementCounter("TERMS_WITH_CYCLES", 1);
-                }
-            }
-        }
-    }
-
-    void checkForCyclesOld(Record rec) throws Exception {
-        for( Map.Entry<String, Relation> entry: rec.getEdges().entrySet() ) {
-            String parentTermAcc = entry.getKey();
-            String childTermAcc = rec.getTerm().getAccId();
-            if( parentTermAcc==null || childTermAcc==null ) {
-                continue;
-            }
-
-            if( !parentTermAcc.equals(childTermAcc) ) {
-
-                // test if the newly inserted DAG does not form loops
-                try {
-                    dao.getDescendantCount(parentTermAcc);
-                } catch(SQLException e) {
-                    // we intercept only these exceptions: 'ORA-01436: CONNECT BY loop in user data'
-                    if( e.getErrorCode()==1436 ) {
-                        // connect by loop detected: report it
-                        String relId = Relation.getRelIdFromRel(entry.getValue());
-                        System.out.println("WARNING: CYCLE found for "+parentTermAcc+" "+Relation.getRelFromRelId(relId)+" "+childTermAcc);
-                        getSession().incrementCounter("TERMS_WITH_CYCLES", 1);
-                    }
                 }
             }
         }
@@ -253,13 +219,5 @@ public class QualityChecker extends RecordProcessor {
 
     public void setDao(OntologyDAO dao) {
         this.dao = dao;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getVersion() {
-        return version;
     }
 }
