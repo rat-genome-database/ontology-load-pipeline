@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2020-04-15" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2020-04-24" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -267,7 +267,6 @@
     </bean>
 
     <bean id="qualityChecker" class="edu.mcw.rgd.dataload.ontologies.QualityChecker">
-        <property name="version" value="--QUALITY CHECKER -- ver. 1.3.8 -- Apr 4, 2019 --" />
     </bean>
 
     <bean id="dataLoader" class="edu.mcw.rgd.dataload.ontologies.DataLoader">

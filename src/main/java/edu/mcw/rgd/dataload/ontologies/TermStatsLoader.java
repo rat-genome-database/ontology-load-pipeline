@@ -25,11 +25,12 @@ public class TermStatsLoader {
 
     private final Logger logger = Logger.getLogger("stats");
 
-    static int[] objectKeys = { // processed objects
-            RgdId.OBJECT_KEY_GENES,
-            RgdId.OBJECT_KEY_QTLS,
-            RgdId.OBJECT_KEY_STRAINS,
-            RgdId.OBJECT_KEY_VARIANTS,
+    public static int[] PROCESSED_OBJECT_KEYS = { // processed objects
+        RgdId.OBJECT_KEY_GENES,
+        RgdId.OBJECT_KEY_QTLS,
+        RgdId.OBJECT_KEY_STRAINS,
+        RgdId.OBJECT_KEY_VARIANTS,
+        RgdId.OBJECT_KEY_CELL_LINES,
     };
 
     public String getFilter() {
@@ -182,7 +183,7 @@ public class TermStatsLoader {
 
     void computeAnnotatedObjectCount(TermStats stats, int speciesTypeKey) throws Exception {
 
-        for( int objectKey: objectKeys ) {
+        for( int objectKey: PROCESSED_OBJECT_KEYS ) {
             computeAnnotatedObjectCount(stats, speciesTypeKey, objectKey);
         }
         //computeAnnotatedObjectCount(stats, speciesTypeKey, 0);

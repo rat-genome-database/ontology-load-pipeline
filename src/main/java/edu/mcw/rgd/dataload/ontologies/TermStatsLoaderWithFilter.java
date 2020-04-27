@@ -1,7 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.dao.spring.StringMapQuery;
-import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
@@ -15,26 +14,32 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TermStatsLoaderWithFilter {
 
+    private OntologyDAO dao;
+
     public static void main(String[] args) throws Exception {
 
         String ontPrefix = "PW";
         String filter = "RDO:0003591";
-        dao = new OntologyDAO();
 
-        run(ontPrefix, filter);
+        List<String> ontPrefixes = new ArrayList<>();
+        ontPrefixes.add(ontPrefix);
+        run(ontPrefixes, filter, new OntologyDAO());
     }
 
-    static private OntologyDAO dao;
-
     public static void run(Collection<String> ontPrefixes, String filter, OntologyDAO odao) throws Exception {
-        dao = odao;
+
+        TermStatsLoaderWithFilter loader = new TermStatsLoaderWithFilter(odao);
         for( String ontPrefix: ontPrefixes ) {
             String ont = ontPrefix.equals("*") ? "DOID:" : ontPrefix;
-            run(ont, filter);
+            loader.run(ont, filter);
         }
     }
 
-    public static void run(String ontPrefix, String filter) throws Exception {
+    public TermStatsLoaderWithFilter(OntologyDAO dao) {
+        this.dao = dao;
+    }
+
+    void run(String ontPrefix, String filter) throws Exception {
 
         final Logger log = Logger.getLogger("stats");
         log.info("processing "+ontPrefix+" with filter "+filter);
@@ -42,20 +47,14 @@ public class TermStatsLoaderWithFilter {
         long time0 = System.currentTimeMillis();
 
         int[] speciesTypeKeys = {
-                SpeciesType.HUMAN,
-                SpeciesType.MOUSE,
-                SpeciesType.RAT,
-                SpeciesType.DOG,
-                SpeciesType.BONOBO,
-                SpeciesType.CHINCHILLA,
-                SpeciesType.SQUIRREL,
-		SpeciesType.PIG,
-        };
-        int[] objectKeys = {
-                RgdId.OBJECT_KEY_GENES,
-                RgdId.OBJECT_KEY_QTLS,
-                RgdId.OBJECT_KEY_STRAINS,
-                RgdId.OBJECT_KEY_VARIANTS,
+            SpeciesType.HUMAN,
+            SpeciesType.MOUSE,
+            SpeciesType.RAT,
+            SpeciesType.DOG,
+            SpeciesType.BONOBO,
+            SpeciesType.CHINCHILLA,
+            SpeciesType.SQUIRREL,
+		    SpeciesType.PIG,
         };
 
         // build dag
@@ -81,7 +80,7 @@ public class TermStatsLoaderWithFilter {
 
         // compute stats for species and object
         for( int speciesTypeKey: speciesTypeKeys ) {
-            for( int objectKey: objectKeys ) {
+            for( int objectKey: TermStatsLoader.PROCESSED_OBJECT_KEYS ) {
                 run(filter, dag, dao, speciesTypeKey, objectKey, log);
             }
         }
@@ -94,7 +93,7 @@ public class TermStatsLoaderWithFilter {
         System.out.println(msg);
     }
 
-    static List<StringMapQuery.MapPair> loadDagRelations(String ontPrefix, Logger log) throws Exception {
+    List<StringMapQuery.MapPair> loadDagRelations(String ontPrefix, Logger log) throws Exception {
 
         List<StringMapQuery.MapPair> dagRelations = null;
         Exception lastException = null;
@@ -128,7 +127,7 @@ public class TermStatsLoaderWithFilter {
     final static int STATS_DELETED = 2;
     final static int TERMS_WITH_UP_TO_DATE_STATS = 3;
 
-    static void qcAndLoadStats(Map<String, TermData> dag, String ontPrefix, String filter, Logger log) {
+    void qcAndLoadStats(Map<String, TermData> dag, String ontPrefix, String filter, Logger log) {
         log.info("  qc and load the stats");
         final AtomicInteger[] counters = new AtomicInteger[4];
         for( int i=0; i<4; i++ ) {
@@ -179,7 +178,7 @@ public class TermStatsLoaderWithFilter {
         System.out.println("    terms with up-to-date stats: "+counters[TERMS_WITH_UP_TO_DATE_STATS].get());
     }
 
-    static void run(String filter, Map<String, TermData> dag, OntologyDAO dao, int speciesTypeKey, int objectKey, Logger log) throws Exception {
+    void run(String filter, Map<String, TermData> dag, OntologyDAO dao, int speciesTypeKey, int objectKey, Logger log) throws Exception {
 
         log.debug("  INIT species="+speciesTypeKey+" object="+objectKey);
 
@@ -228,46 +227,46 @@ public class TermStatsLoaderWithFilter {
         log.debug("  DONE species="+speciesTypeKey+" object="+objectKey);
         //System.out.println("  DONE species="+speciesTypeKey+" object="+objectKey);
     }
-}
 
-class TermData {
-    TermStats stats = new TermStats();
-    List<TermData> children;
-    List<Integer> rgdIds;
-    Collection<Integer> rgdIdsWithChildren;
+    class TermData {
+        TermStats stats = new TermStats();
+        List<TermData> children;
+        List<Integer> rgdIds;
+        Collection<Integer> rgdIdsWithChildren;
 
-    public TermData(String termAcc, String filter) {
-        stats.setTermAccId(termAcc);
-        stats.setFilter(filter);
-    }
-
-    String getTermAcc() {
-        return stats.getTermAccId();
-    }
-
-    void addChild(TermData child) {
-        if( children==null ) {
-            children = new ArrayList<>();
-        }
-        children.add(child);
-    }
-
-    Collection<Integer> getRgdIdsWithChildren() {
-        // check if already precomputed
-        if( rgdIdsWithChildren!=null ) {
-            return rgdIdsWithChildren;
+        public TermData(String termAcc, String filter) {
+            stats.setTermAccId(termAcc);
+            stats.setFilter(filter);
         }
 
-        // if no children, it is easy
-        if( children==null ) {
-            rgdIdsWithChildren = rgdIds;
-            return rgdIdsWithChildren;
+        String getTermAcc() {
+            return stats.getTermAccId();
         }
 
-        Set<Integer> result = new HashSet<>(rgdIds);
-        for (TermData td : children) {
-            result.addAll(td.getRgdIdsWithChildren());
+        void addChild(TermData child) {
+            if (children == null) {
+                children = new ArrayList<>();
+            }
+            children.add(child);
         }
-        return result;
+
+        Collection<Integer> getRgdIdsWithChildren() {
+            // check if already precomputed
+            if (rgdIdsWithChildren != null) {
+                return rgdIdsWithChildren;
+            }
+
+            // if no children, it is easy
+            if (children == null) {
+                rgdIdsWithChildren = rgdIds;
+                return rgdIdsWithChildren;
+            }
+
+            Set<Integer> result = new HashSet<>(rgdIds);
+            for (TermData td : children) {
+                result.addAll(td.getRgdIdsWithChildren());
+            }
+            return result;
+        }
     }
 }
