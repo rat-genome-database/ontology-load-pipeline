@@ -1,3 +1,6 @@
+Jun 08, 2020
+  obo generator: improved summary email
+
 Apr 24, 2020
   term stats loader with filter: added calculation of term stats for cell lines
 

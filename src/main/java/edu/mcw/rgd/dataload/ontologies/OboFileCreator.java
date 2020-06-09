@@ -30,12 +30,6 @@ public class OboFileCreator {
     private Set<String> emitObsoleteTermsFor;
     private boolean versionStringWritten = false;
 
-    public void run() throws Exception {
-        for( String ontId: getVersionedFiles().keySet() ) {
-            run(ontId);
-        }
-    }
-
     /**
      * dump all terms (with definitions and synonyms) from given ontology into a obo file
      * @param ontId ontology id
@@ -43,23 +37,22 @@ public class OboFileCreator {
      */
     public void run(String ontId) throws Exception {
 
+        long time0 = System.currentTimeMillis();
+
         if( Utils.isStringEmpty(ontId) ) {
-            run();
+            for( String ontId2: getVersionedFiles().keySet() ) {
+                runImpl(ontId2);
+            }
         } else {
-            boolean processObsoleteTerms = getEmitObsoleteTermsFor().contains(ontId);
-            run(ontId, processObsoleteTerms);
+            runImpl(ontId);
         }
+
+        System.out.println("=== OK ===     elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
+    void runImpl(String ontId) throws Exception {
 
-    /**
-     * dump all terms (with definitions and synonyms) from given ontology into a obo file
-     * @param ontId ontology id
-     * @throws Exception
-     */
-    public void run(String ontId, boolean processObsoleteTerms) throws Exception {
-
-        long time0 = System.currentTimeMillis();
+        boolean processObsoleteTerms = getEmitObsoleteTermsFor().contains(ontId);
 
         // write version string only once
         if( !versionStringWritten ) {
@@ -125,7 +118,7 @@ public class OboFileCreator {
 
         // see if generated terms are the same as in the versioned file
         if( termsBuf.toString().equals(versionedTerms.toString()) ) {
-            System.out.println(getOntId()+": "+terms.size()+" terms the same -- nothing written --- elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+            System.out.println(getOntId()+": "+terms.size()+" terms the same -- nothing written");
             return;
         }
 
@@ -146,7 +139,7 @@ public class OboFileCreator {
 
         writer.close();
 
-        System.out.println("   "+terms.size()+" terms written --- elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+        System.out.println("   "+terms.size()+" terms written");
     }
 
     StringBuffer initOboHeader(String dataVersion) throws Exception {
@@ -488,11 +481,20 @@ public class OboFileCreator {
             if( xref.getXrefValue()==null ) {
                 continue;
             }
-            if( buf.length()>0 )
+            if( buf.length()>0 ) {
                 buf.append(", ");
-            buf.append(xref.getXrefType());
-            buf.append(":");
-            buf.append(xref.getXrefValue().replace(":","\\:").replace(",","\\,"));
+            }
+
+            String value = xref.getXrefValue();
+            // export urls as:
+            // http://xxxxx "{type}"
+            if( value.startsWith("http://") || value.startsWith("https://") ) {
+                buf.append(value).append(" \"").append(xref.getXrefType()).append("\"");
+            } else {
+                buf.append(xref.getXrefType());
+                buf.append(":");
+                buf.append(value.replace(":", "\\:").replace(",", "\\,"));
+            }
         }
         return buf.toString();
     }
