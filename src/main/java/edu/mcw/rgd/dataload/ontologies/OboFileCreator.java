@@ -468,10 +468,6 @@ public class OboFileCreator {
         Collections.sort(inRgdXRefs, new Comparator<TermXRef>() {
             @Override
             public int compare(TermXRef o1, TermXRef o2) {
-                int r = Utils.stringsCompareToIgnoreCase(o1.getXrefType(), o2.getXrefType());
-                if( r!=0 ) {
-                    return r;
-                }
                 return Utils.stringsCompareToIgnoreCase(o1.getXrefValue(), o2.getXrefValue());
             }
         });
@@ -486,14 +482,28 @@ public class OboFileCreator {
             }
 
             String value = xref.getXrefValue();
-            // export urls as:
-            // http://xxxxx "{type}"
-            if( value.startsWith("http://") || value.startsWith("https://") ) {
-                buf.append(value).append(" \"").append(xref.getXrefType()).append("\"");
-            } else {
-                buf.append(xref.getXrefType());
-                buf.append(":");
-                buf.append(value.replace(":", "\\:").replace(",", "\\,"));
+
+            // format value: escape commas, and 2nd and subsequent colons
+            int colon1Pos = value.indexOf(':');
+            if( colon1Pos>=0 ) {
+                int colon2Pos = value.indexOf(':', colon1Pos+1);
+                if( colon2Pos>colon1Pos ) {
+                    value = value.substring(0, colon1Pos+1) + value.substring(colon1Pos+1).replace(":", "\\:");
+                }
+            }
+            int commaPos = value.indexOf(',');
+            if( commaPos>=0 ) {
+                value = value.replace(",", "\\,");
+            }
+            buf.append(value);
+
+            // export description if any
+            if( !Utils.isStringEmpty(xref.getXrefDescription()) ) {
+                String desc = xref.getXrefDescription()
+                        .replace("\"", "\\\"")
+                        .replace(":", "\\:")
+                        .replace(",", "\\,");
+                buf.append(" \"").append(desc).append("\"");
             }
         }
         return buf.toString();
