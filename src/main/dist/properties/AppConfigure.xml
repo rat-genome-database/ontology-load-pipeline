@@ -292,7 +292,7 @@
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
-        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2020-04-07 --" />
+        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2020-07-03 --" />
         <property name="versionedFiles">
             <map>
                 <entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
