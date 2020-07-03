@@ -878,19 +878,7 @@ public class FileParser extends RecordPreprocessor {
                 }
             }
 
-            int colonPos = dbxref.indexOf(':');
-            if( colonPos>=0 ) {
-                xref.setXrefType(dbxref.substring(0, colonPos).trim());
-                String val = dbxref.substring(colonPos+1).trim();
-                if( val.isEmpty() ) {
-                    System.out.println("empty xref value");
-                }
-                xref.setXrefValue(val);
-            }
-            else {
-                xref.setXrefType(null);
-                xref.setXrefValue(dbxref.trim());
-            }
+            xref.setXrefValue(dbxref.trim());
             xrefs.add(xref);
         }
         return xrefs;
