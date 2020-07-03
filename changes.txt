@@ -1,3 +1,6 @@
+Jul 02, 2020
+  parser: updated code to load term def xrefs
+
 Jun 08, 2020
   obo generator: improved summary email
 
