@@ -323,11 +323,7 @@ public class OntologyDAO {
         if( prefix.equals("*") )
             prefix = "DOID:";
 
-        String sql = "SELECT t.term_acc "+
-            "FROM ont_terms t,ont_term_stats2 s "+
-            "WHERE t.term_acc like ? AND t.term_acc=s.term_acc(+) "+
-            " AND s.stat_name(+)='child_term_count' "+
-            "ORDER BY NVL(stat_value,0) DESC,term_acc";
+        String sql = "SELECT t.term_acc FROM ont_terms t WHERE t.term_acc like ?";
         return StringListQuery.execute(dao, sql, prefix+"%");
     }
 
