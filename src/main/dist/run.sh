@@ -26,5 +26,7 @@ $APP/run_portal.sh DOID:0050155
 $APP/run_portal.sh DOID:9008582 
 #Liver Disease
 $APP/run_portal.sh DOID:409 
+#COVID Disease
+$APP/run_portal.sh DOID:0080599
 
 
