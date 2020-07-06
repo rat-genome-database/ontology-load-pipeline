@@ -90,7 +90,7 @@ public class FixXrefsForPhenominerOntologies {
 
                 // delete this xref from the term
                 for( TermXRef xrefInRgd: xrefsInRgd ) {
-                    String inRgd = xrefInRgd.getXrefType()+":"+xrefInRgd.getXrefValue();
+                    String inRgd = xrefInRgd.getXrefValue();
                     if( xref.startsWith(inRgd) ) {
                         odao.deleteTermXRef(xrefInRgd);
                         xrefsDeleted++;
