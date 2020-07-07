@@ -40,6 +40,10 @@ public class OntologyDAO {
 
     private Set<String> ontologiesWithSuppressedTermObsoletion;
 
+    public String getConnectionInfo() {
+        return dao.getConnectionInfo();
+    }
+
     /**
      * get ontology object given ont_id
      * @param ontId ontology id

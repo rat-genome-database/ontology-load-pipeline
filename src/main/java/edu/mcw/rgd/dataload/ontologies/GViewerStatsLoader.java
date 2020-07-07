@@ -9,6 +9,7 @@ import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.reporting.Link;
 import org.apache.log4j.Logger;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,6 +55,14 @@ public class GViewerStatsLoader {
 
         long time0 = System.currentTimeMillis();
 
+        logger.info("");
+        logger.info("GVIEWER STATS LOADER");
+        logger.info("   "+dao.getConnectionInfo());
+
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        logger.info("   started at "+sdt.format(new Date(time0)));
+        logger.info("");
+
         init();
 
         List<String> incomingTermAccs = loadIncomingTermAccs(ontPrefixes);
@@ -61,9 +70,7 @@ public class GViewerStatsLoader {
         Collection<TermStats> termStats = qc(incomingTermAccs);
         load(termStats);
 
-        System.out.println("-- computing gviewer stats -- DONE -- elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
-
-        logger.info("DONE!");
+        logger.info("GVIEWER STATS DONE -- elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     public void setVersion(String version) {
@@ -86,20 +93,32 @@ public class GViewerStatsLoader {
 
         List<String> results = new ArrayList<>();
 
+        String processedOntPrefixes = "";
+        String skippedOntPrefixes = "";
+
         // for every ontology, load list of term acc ids
         for( String ontPrefix: ontPrefixes.values() ) {
 
             if( getProcessedOntologyPrefixes().contains(ontPrefix) ) {
                 List<String> accIds = dao.getAllTermAccIds(ontPrefix);
                 results.addAll(accIds);
-                System.out.println("GVIEWER STATS: TERM COUNT for " + ontPrefix + " is " + accIds.size());
+                logger.debug("GVIEWER STATS: TERM COUNT for " + ontPrefix + " is " + accIds.size());
+
+                if( ontPrefix.equals("*") ) {
+                    ontPrefix = "DOID:";
+                }
+                processedOntPrefixes += ontPrefix + " ";
             } else {
-                System.out.println("GVIEWER STATS: TERM COUNT for " + ontPrefix + " is 0 -- not on processed list");
+                logger.debug("GVIEWER STATS: TERM COUNT for " + ontPrefix + " is 0 -- not on processed list");
+
+                skippedOntPrefixes += ontPrefix + " ";
             }
         }
 
         Collections.shuffle(results);
         logger.info("GVIEWER STATS: loaded ontologies, term count="+results.size());
+        logger.info("    processed ontology prefixes: ["+processedOntPrefixes.trim()+"]");
+        logger.info("    skipped ontology prefixes: ["+skippedOntPrefixes.trim()+"]");
 
         return results;
     }
