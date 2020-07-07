@@ -1,7 +1,8 @@
 #update gviewer_stats for all ontologies as specified in properties/AppConfigure.xml
 . /etc/profile
 
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPNAME=OntologyLoad
+APPDIR=/home/rgddata/pipelines/$APPNAME
 cd $APPDIR
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 
