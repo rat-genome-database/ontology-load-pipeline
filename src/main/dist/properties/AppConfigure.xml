@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2020-07-03" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2020-07-06" />
         <property name="oboFiles"><!--key: default ontology ID; value: path to data file -->
             <map><!-- NOTE: if ontology is found at http://www.obofoundry.org/, its url will start
                    ...      https://raw.githubusercontent.com/...
@@ -78,7 +78,6 @@
                 <entry key="VT" value="VT:"/>
                 <entry key="ORDO" value="Orphanet:"/>
                 <entry key="UBERON" value="UBERON:"/>
-                <entry key="DO" value="DOID:"/>
                 <entry key="EFO" value="EFO:"/>
                 <entry key="MI" value="MI:"/>
                 <entry key="ZFA" value="ZFA:"/>
@@ -358,7 +357,29 @@
     </bean>
 
     <bean id="GViewerStatsLoader" class="edu.mcw.rgd.dataload.ontologies.GViewerStatsLoader">
-        <property name="version" value="--GViewer Stats Loader -- build Mar 16, 2020 --" />
+        <property name="version" value="--GViewer Stats Loader -- build Jul 06, 2020 --" />
         <property name="maxAnnotCountPerTerm" value="2500" />
+        <property name="processedOntologyPrefixes">
+            <set>
+                <value>GO:</value>
+                <value>MP:</value>
+                <value>PW:</value>
+                <value>CMO:</value>
+                <value>MMO:</value>
+                <value>XCO:</value>
+                <value>RS:</value>
+                <value>SO:</value>
+                <value>CL:</value>
+                <value>MA:</value>
+                <value>*</value><!-- DOID -->
+                <value>NBO:</value>
+                <value>HP:</value>
+                <value>CHEBI:</value>
+                <value>VT:</value>
+                <value>UBERON:</value>
+                <value>CS:</value>
+            </set>
+        </property>
+
     </bean>
 </beans>
