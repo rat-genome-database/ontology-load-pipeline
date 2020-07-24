@@ -48,7 +48,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20200618_doid.obo";
+        String fileName = "h:/do/20200723_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -266,36 +266,24 @@ public class DoIdQC {
         List<TermXRef> incomingXrefs = new ArrayList<>();
         String[] xrefs = xrefStr.split("\\,\\ ");
         for( String xref: xrefs ) {
-            // find ':' split point
-            int splitPoint = -1;
-            for( ;; ) {
-                splitPoint = xref.indexOf(':', splitPoint);
-                if( splitPoint<0 ) {
-                    break;
-                }
-                if( xref.charAt(splitPoint-1)=='\\' ) {
-                    splitPoint++; // skip quoted ':'
-                } else {
-                    break;
-                }
-            }
-            if( splitPoint<0 ) {
-                System.out.println("invalid xref: "+xref);
+            String value = xref.replace("\\:", ":");
+            if( value.indexOf(':')<0 ) {
+                System.out.println("invalid def xref: ["+xref+"]");
                 continue;
             }
 
-            String part1 = xref.substring(0, splitPoint);
-            String part2 = xref.substring(splitPoint+1).replace("\\:", ":");
-            // fix for "PMID" : "?term=7693129"
-            if( Utils.stringsAreEqual(part1, "PMID") ) {
-                if( part2!=null && part2.startsWith("?term=") ) {
-                    part2 = part2.substring(6);
+            // replace 'url:http\://en.wikipedia.org/wiki/Hemangiosarcoma' with 'http://en.wikipedia.org/wiki/Hemangiosarcoma'
+            if( value.startsWith("url:") ) {
+                // ensure there is a second ':'
+                int colon2pos = value.indexOf(':', 4);
+                if( colon2pos>0 ) {
+                    value = value.substring(4);
                 }
             }
 
             TermXRef x = new TermXRef();
             x.setXrefDescription("DO");
-            x.setXrefValue(part1+":"+part2);
+            x.setXrefValue(value);
             incomingXrefs.add(x);
         }
         return incomingXrefs;
