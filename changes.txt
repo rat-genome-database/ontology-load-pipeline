@@ -1,3 +1,6 @@
+Jul 24, 2020
+  DO QC loader: better code to load definition xrefs
+
 Jul 06, 2020
   gviewer stats: simplified code; only processing ontologies without cycles
 
