@@ -1,6 +1,4 @@
 # launch ontology loading sequentially for every ontology, except RDO
-# if loading of any ontology fails, it won't affect loading of other ontologies
-# that's why this script is preferred to run over run.sh script
 #
 APP=/home/rgddata/pipelines/OntologyLoad
 

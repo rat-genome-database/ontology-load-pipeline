@@ -1,3 +1,6 @@
+Aug 10, 2020
+  fixed script run_stats_update_only.sh
+
 Jul 24, 2020
   DO QC loader: better code to load definition xrefs
 
