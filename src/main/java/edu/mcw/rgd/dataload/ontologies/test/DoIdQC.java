@@ -38,6 +38,7 @@ public class DoIdQC {
     int omimPsIdsMultiple = 0;
     int omimIdsNotInRdo = 0;
     int insertedSynonyms = 0;
+    int deletedSynonyms = 0;
     int suppressedSynonyms = 0;
 
     int xrefsMatched = 0;
@@ -48,7 +49,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20200723_doid.obo";
+        String fileName = "h:/do/20201221_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -140,6 +141,7 @@ public class DoIdQC {
 
         System.out.println("");
         System.out.println("synonyms inserted: "+insertedSynonyms);
+        System.out.println("synonyms deleted: "+deletedSynonyms+"    -- ICD10CM:xxx and ICD9CM:xxx");
         System.out.println("synonyms suppressed: "+suppressedSynonyms);
 
         System.out.println("");
@@ -464,6 +466,7 @@ public class DoIdQC {
         oboTerm.synonyms.remove(termNameUniqueKey);
 
         List<TermSynonym> synonymsInRgd = dao.getTermSynonyms(termInRgd.getAccId());
+
         Map<String, TermSynonym> synonymInRgdMap = new HashMap<>();
         for( TermSynonym tsyn: synonymsInRgd ) {
             String synUK = getSynonymUniqueKey(tsyn.getName());
@@ -477,7 +480,10 @@ public class DoIdQC {
             }
         }
 
+        deleteObsoleteIcdSynonyms(oboTerm.synonyms, synonymInRgdMap);
+
         oboTerm.synonyms.keySet().removeAll(synonymInRgdMap.keySet());
+
         if( !oboTerm.synonyms.isEmpty() ) {
             synQcFile.write(oboTerm.id+" ["+oboTerm.name+"]\n");
             for( TermSynonym tsyn: oboTerm.synonyms.values() ) {
@@ -503,6 +509,32 @@ public class DoIdQC {
                 }
             }
             synQcFile.write("\n");
+        }
+    }
+
+    void deleteObsoleteIcdSynonyms(Map<String, TermSynonym> incomingSynonyms, Map<String, TermSynonym> synonymsInRgd) throws Exception {
+
+        // find those 'ICD10CM:xxx' and 'ICD9CM:xxx' synonyms that are in RGD but they are not among incoming synonyms
+        // they are obsolete and they must be deleted
+        List<TermSynonym> obsoleteSynonymsInRgd = null;
+        Iterator<Map.Entry<String,TermSynonym>> it = synonymsInRgd.entrySet().iterator();
+        while( it.hasNext() ) {
+            Map.Entry<String,TermSynonym> entry = it.next();
+            String key = entry.getKey();
+            if( key.endsWith(".icd10cm") || key.endsWith(".icd9cm") ) {
+                if( !incomingSynonyms.containsKey(key) ) {
+                    if( obsoleteSynonymsInRgd==null ) {
+                        obsoleteSynonymsInRgd = new ArrayList<>();
+                    }
+                    obsoleteSynonymsInRgd.add(entry.getValue());
+                    it.remove();
+                }
+            }
+        }
+
+        if( obsoleteSynonymsInRgd!=null ) {
+            dao.deleteTermSynonyms(obsoleteSynonymsInRgd);
+            deletedSynonyms += obsoleteSynonymsInRgd.size();
         }
     }
 

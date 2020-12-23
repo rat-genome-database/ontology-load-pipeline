@@ -1,3 +1,6 @@
+Dec 22, 2020
+  DO QC: improved handling of xref synonyms
+
 Aug 10, 2020
   fixed script run_stats_update_only.sh
 
