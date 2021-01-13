@@ -280,8 +280,13 @@ public class OboFileCreator {
         }
 
         if( rec.getTerm().getDefinition()!=null ) {
-            buf.append("def: \"").append(rec.getTerm().getDefinition())
-                    .append("\" [").append(getDbXRefs(rec.getTerm().getAccId())).append("]\n");
+            buf.append("def: \"");
+
+            // escape double quotes in the definition
+            String escapedDef = rec.getTerm().getDefinition().replace("\"", "\\\"");
+            buf.append(escapedDef);
+
+            buf.append("\" [").append(getDbXRefs(rec.getTerm().getAccId())).append("]\n");
         }
 
         if( rec.getTerm().getComment()!=null ) {
@@ -491,6 +496,12 @@ public class OboFileCreator {
                     value = value.substring(0, colon1Pos+1) + value.substring(colon1Pos+1).replace(":", "\\:");
                 }
             }
+
+            // xref value cannot end with comma
+            if( value.endsWith(",") ) {
+                value = value.substring(0, value.length()-1);
+            }
+
             int commaPos = value.indexOf(',');
             if( commaPos>=0 ) {
                 value = value.replace(",", "\\,");
