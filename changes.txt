@@ -1,3 +1,7 @@
+Jan 13, 2021
+  obo exporter fix: added escaping of double quote characters in term definitions
+  DO loader: fixed loading of definition dbxrefs
+
 Dec 22, 2020
   DO QC: improved handling of xref synonyms
 

@@ -49,7 +49,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20201221_doid.obo";
+        String fileName = "h:/do/20201222_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -285,7 +285,18 @@ public class DoIdQC {
 
             TermXRef x = new TermXRef();
             x.setXrefDescription("DO");
-            x.setXrefValue(value);
+
+            // commas could be escaped in the source -- unescape it
+            String unescapedValue = value.replace("\\,", ",");
+            // also, value should not end with a comma (looks like a typo)
+            if( unescapedValue.endsWith(",") ) {
+                unescapedValue = unescapedValue.substring(0, unescapedValue.length()-1);
+            }
+            if( unescapedValue.length()!= value.length() ) {
+                System.out.println("unescaped");
+            }
+            x.setXrefValue(unescapedValue);
+
             incomingXrefs.add(x);
         }
         return incomingXrefs;
