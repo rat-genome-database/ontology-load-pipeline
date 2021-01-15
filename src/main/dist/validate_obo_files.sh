@@ -7,6 +7,7 @@ APPDIR=/home/rgddata/pipelines/OntologyLoad
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 ONT_DIR="/home/rgddata/ontology"
 
+# source obo files
 obo_files=()
 obo_files+=("$ONT_DIR/pathway/pathway.obo")
 obo_files+=("$ONT_DIR/clinical_measurement/clinical_measurement.obo")
@@ -15,7 +16,15 @@ obo_files+=("$ONT_DIR/experimental_condition/experimental_condition.obo")
 obo_files+=("$ONT_DIR/disease/RDO.obo")
 obo_files+=("$ONT_DIR/rat_strain/rat_strain.obo")
 
-owl_files=("PW.owl" "CMO.owl" "MMO.owl" "XCO.owl" "RDO.owl" "RS.owl")
+#generated owl files
+owl_files=()
+owl_files+=("$ONT_DIR/pathway/pathway.owl")
+owl_files+=("$ONT_DIR/clinical_measurement/clinical_measurement.owl")
+owl_files+=("$ONT_DIR/measurement_method/measurement_method.owl")
+owl_files+=("$ONT_DIR/experimental_condition/experimental_condition.owl")
+owl_files+=("$ONT_DIR/disease/RDO.owl")
+owl_files+=("$ONT_DIR/rat_strain/rat_strain.owl")
+
 error_file=robot.errors
 
 cd $APPDIR
