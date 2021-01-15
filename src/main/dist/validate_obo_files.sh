@@ -26,12 +26,13 @@ owl_files+=("$ONT_DIR/disease/RDO.owl")
 owl_files+=("$ONT_DIR/rat_strain/rat_strain.owl")
 
 error_file=robot.errors
+echo " " > $error_file
 
 cd $APPDIR
 
 for i in ${!obo_files[@]}; do
   infile=${obo_files[$i]}
-  outfile="data/${owl_files[$i]}"
+  outfile="${owl_files[$i]}"
   java -jar robot.jar convert --input $infile --output $outfile >> $error_file
 done
 
