@@ -1,3 +1,6 @@
+Jan 27, 2021
+  MI ontology: updated source
+
 Jan 13, 2021
   obo exporter fix: added escaping of double quote characters in term definitions
   DO loader: fixed loading of definition dbxrefs
