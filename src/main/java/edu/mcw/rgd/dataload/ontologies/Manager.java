@@ -207,7 +207,7 @@ public class Manager {
         long time0 = System.currentTimeMillis();
 
         parser.setOboFiles(getOboFiles());
-        parser.setApiKey( Utils.readFileAsString(getApiKeyFile()) );
+        parser.setApiKey( Utils.readFileAsString(getApiKeyFile()).trim() );
 
         // create pipeline manager
         PipelineManager manager = new PipelineManager();
