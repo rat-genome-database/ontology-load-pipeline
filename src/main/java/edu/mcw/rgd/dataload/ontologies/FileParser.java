@@ -36,6 +36,7 @@ public class FileParser extends RecordPreprocessor {
     private Map<String,String> fileEncodingOverride;
     private Map<String,Date> startTimes = new HashMap<>();
     private Map<String,String> synonymPrefixSubstitutions;
+    private String apiKey;
 
     public FileParser() {
 
@@ -62,10 +63,13 @@ public class FileParser extends RecordPreprocessor {
             String path=entry.getValue().toLowerCase();
             logger.info("THREAD: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" PATH="+path);
 
-            //preloadManualDoidSynonyms(ontId);
+            String srcFile = entry.getValue();
+            if( srcFile.contains("##APIKEY##") ) {
+                srcFile = srcFile.replace("##APIKEY##", apiKey);
+            }
 
             FileDownloader downloader = new FileDownloader();
-            downloader.setExternalFile(entry.getValue());
+            downloader.setExternalFile(srcFile);
             logger.info("input file: "+downloader.getExternalFile());
             downloader.setLocalFile("data/"+ontId+".obo");
             if( path.endsWith(".gz") )
@@ -1021,5 +1025,13 @@ public class FileParser extends RecordPreprocessor {
 
     public Map<String,String> getSynonymPrefixSubstitutions() {
         return synonymPrefixSubstitutions;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

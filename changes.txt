@@ -1,5 +1,6 @@
 Jan 27, 2021
   MI ontology: updated source
+  security: the value of api key is now stored in an external property file api.key (not in the code)
 
 Jan 13, 2021
   obo exporter fix: added escaping of double quote characters in term definitions

@@ -32,6 +32,12 @@ PROCESSING RULES (aka requirements)
    Definition xrefs are loaded into ONT_XREFs table.
    Term xrefs (obo line starting with 'xref: ') are loaded as synonyms of type 'xref'
 
+API KEY
+
+The data source for many ontologies is http://data.bioontology.org.
+This source requires to provide a unique 'apikey'.
+For security reasons we store the actual value of 'apikey' not in the code,
+but in an external property file 'properties/api.key'.
 
 OBSOLETE FEATURES
 

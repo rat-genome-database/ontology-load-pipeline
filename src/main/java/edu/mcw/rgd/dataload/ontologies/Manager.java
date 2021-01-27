@@ -25,6 +25,7 @@ public class Manager {
     private QualityChecker qualityChecker;
     private DataLoader dataLoader;
     private String malformedRsSynonymsEmailList;
+    private String apiKeyFile;
 
     public static void main(String[] args) throws Exception {
         try {
@@ -206,6 +207,7 @@ public class Manager {
         long time0 = System.currentTimeMillis();
 
         parser.setOboFiles(getOboFiles());
+        parser.setApiKey( Utils.readFileAsString(getApiKeyFile()) );
 
         // create pipeline manager
         PipelineManager manager = new PipelineManager();
@@ -340,5 +342,13 @@ public class Manager {
 
     public String getMalformedRsSynonymsEmailList() {
         return malformedRsSynonymsEmailList;
+    }
+
+    public String getApiKeyFile() {
+        return apiKeyFile;
+    }
+
+    public void setApiKeyFile(String apiKeyFile) {
+        this.apiKeyFile = apiKeyFile;
     }
 }
