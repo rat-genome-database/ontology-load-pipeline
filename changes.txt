@@ -1,5 +1,5 @@
 Jan 27, 2021
-  MI ontology: updated source
+  CL,MI,SO,UBERON ontologies: updated sources (files for these ontologies did not change for 9+ months)
   security: the value of api key is now stored in an external property file api.key (not in the code)
 
 Jan 13, 2021

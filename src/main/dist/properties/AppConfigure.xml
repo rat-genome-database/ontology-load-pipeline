@@ -31,8 +31,8 @@
                 -->
                 <entry key="CS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/chinchilla/CS.obo"/>
 
-                <entry key="SO" value="http://ontologies.berkeleybop.org/so/so-simple.obo"/>
-                <entry key="CL" value="http://ontologies.berkeleybop.org/cl/cl-basic.obo"/>
+                <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
+                <entry key="CL" value="https://raw.githubusercontent.com/obophenotype/cell-ontology/master/cl-basic.obo"/>
 
                 <entry key="MA" value="http://www.informatics.jax.org/downloads/reports/adult_mouse_anatomy.obo"/>
                 <!--<entry key="RDO" value="http://ctdbase.org/reports/CTD_diseases.obo.gz"/>-->
@@ -42,7 +42,9 @@
                 <entry key="CHEBI" value="ftp://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.obo"/>
                 <entry key="VT" value="http://data.bioontology.org/ontologies/VT/download/?apikey=##APIKEY##" />
                 <entry key="ORDO" value="http://data.bioontology.org/ontologies/ORDO_OBO/download/?apikey=##APIKEY##" />
-                <entry key="UBERON" value="http://ontologies.berkeleybop.org/uberon/basic.obo"/>
+
+                <!-- http://uberon.github.io/downloads.html -->
+                <entry key="UBERON" value="http://purl.obolibrary.org/obo/uberon/basic.obo"/>
 
                 <entry key="EFO" value="https://www.ebi.ac.uk/efo/efo.obo"/>
                 <entry key="MI" value="http://data.bioontology.org/ontologies/MI/download/?apikey=##APIKEY##"/>
