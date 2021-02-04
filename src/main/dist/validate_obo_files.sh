@@ -5,7 +5,11 @@
 . /etc/profile
 APPDIR=/home/rgddata/pipelines/OntologyLoad
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
-ONT_DIR="/home/rgddata/ontology"
+if [ "$SERVER" == "REED" ]; then
+  ONT_DIR="/data/data/ontology"
+else # TRAVIS
+  ONT_DIR="/home/rgddata/ontology"
+fi
 
 # source obo files
 obo_files=()

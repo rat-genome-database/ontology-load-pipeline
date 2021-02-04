@@ -49,7 +49,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20201222_doid.obo";
+        String fileName = "h:/do/20210128_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -292,9 +292,9 @@ public class DoIdQC {
             if( unescapedValue.endsWith(",") ) {
                 unescapedValue = unescapedValue.substring(0, unescapedValue.length()-1);
             }
-            if( unescapedValue.length()!= value.length() ) {
-                System.out.println("unescaped");
-            }
+            //if( unescapedValue.length()!= value.length() ) {
+            //    System.out.println("unescaped");
+            //}
             x.setXrefValue(unescapedValue);
 
             incomingXrefs.add(x);
