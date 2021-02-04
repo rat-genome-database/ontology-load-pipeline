@@ -4,12 +4,13 @@
 #
 . /etc/profile
 APPDIR=/home/rgddata/pipelines/OntologyLoad
-SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
-if [ "$SERVER" == "REED" ]; then
-  ONT_DIR="/data/data/ontology"
+SERVER=`hostname -s`
+if [ "$SERVER" == "reed" ]; then
+  ONT_DIR="rgdpub@${SERVER}.rgd.mcw.edu:/rgd/data/ontology"
 else # TRAVIS
   ONT_DIR="/home/rgddata/ontology"
 fi
+
 
 # source obo files
 obo_files=()
@@ -20,6 +21,14 @@ obo_files+=("$ONT_DIR/experimental_condition/experimental_condition.obo")
 obo_files+=("$ONT_DIR/disease/RDO.obo")
 obo_files+=("$ONT_DIR/rat_strain/rat_strain.obo")
 
+obo_tmp_files=()
+obo_tmp_files+=("/tmp/pathway.obo")
+obo_tmp_files+=("/tmp/clinical_measurement.obo")
+obo_tmp_files+=("/tmp/measurement_method.obo")
+obo_tmp_files+=("/tmp/experimental_condition.obo")
+obo_tmp_files+=("/tmp/RDO.obo")
+obo_tmp_files+=("/tmp/rat_strain.obo")
+
 #generated owl files
 owl_files=()
 owl_files+=("$ONT_DIR/pathway/pathway.owl")
@@ -29,15 +38,27 @@ owl_files+=("$ONT_DIR/experimental_condition/experimental_condition.owl")
 owl_files+=("$ONT_DIR/disease/RDO.owl")
 owl_files+=("$ONT_DIR/rat_strain/rat_strain.owl")
 
+owl_tmp_files=()
+owl_tmp_files+=("/tmp/pathway.owl")
+owl_tmp_files+=("/tmp/clinical_measurement.owl")
+owl_tmp_files+=("/tmp/measurement_method.owl")
+owl_tmp_files+=("/tmp/experimental_condition.owl")
+owl_tmp_files+=("/tmp/RDO.owl")
+owl_tmp_files+=("/tmp/rat_strain.owl")
+
+
 error_file=robot.errors
 echo " " > $error_file
 
 cd $APPDIR
 
 for i in ${!obo_files[@]}; do
-  infile=${obo_files[$i]}
-  outfile="${owl_files[$i]}"
+  infile=${obo_tmp_files[$i]}
+  outfile="${owl_tmp_files[$i]}"
+
+  scp -p "${obo_files[$i]}" $infile
   java -jar robot.jar convert --input $infile --output $outfile >> $error_file
+  scp -p $outfile "${owl_files[$i]}"
 done
 
 if [ -s $error_file ]; then
