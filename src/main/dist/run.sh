@@ -28,5 +28,7 @@ $APP/run_portal.sh DOID:9008582
 $APP/run_portal.sh DOID:409 
 #COVID Disease
 $APP/run_portal.sh DOID:0080599
+#iInfectious Disease
+$APP/run_portal.sh DOID:0050117 
 
 
