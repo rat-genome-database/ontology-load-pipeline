@@ -22,12 +22,12 @@ obo_files+=("$ONT_DIR/disease/RDO.obo")
 obo_files+=("$ONT_DIR/rat_strain/rat_strain.obo")
 
 obo_tmp_files=()
-obo_tmp_files+=("/tmp/pathway.obo")
-obo_tmp_files+=("/tmp/clinical_measurement.obo")
-obo_tmp_files+=("/tmp/measurement_method.obo")
-obo_tmp_files+=("/tmp/experimental_condition.obo")
+obo_tmp_files+=("/tmp/PW.obo")
+obo_tmp_files+=("/tmp/CMO.obo")
+obo_tmp_files+=("/tmp/MMO.obo")
+obo_tmp_files+=("/tmp/XCO.obo")
 obo_tmp_files+=("/tmp/RDO.obo")
-obo_tmp_files+=("/tmp/rat_strain.obo")
+obo_tmp_files+=("/tmp/RS.obo")
 
 #generated owl files
 owl_files=()
@@ -39,15 +39,15 @@ owl_files+=("$ONT_DIR/disease/RDO.owl")
 owl_files+=("$ONT_DIR/rat_strain/rat_strain.owl")
 
 owl_tmp_files=()
-owl_tmp_files+=("/tmp/pathway.owl")
-owl_tmp_files+=("/tmp/clinical_measurement.owl")
-owl_tmp_files+=("/tmp/measurement_method.owl")
-owl_tmp_files+=("/tmp/experimental_condition.owl")
+owl_tmp_files+=("/tmp/PW.owl")
+owl_tmp_files+=("/tmp/CMO.owl")
+owl_tmp_files+=("/tmp/MMO.owl")
+owl_tmp_files+=("/tmp/XCO.owl")
 owl_tmp_files+=("/tmp/RDO.owl")
-owl_tmp_files+=("/tmp/rat_strain.owl")
+owl_tmp_files+=("/tmp/RS.owl")
 
 
-error_file=robot.errors
+error_file="$APPDIR/robot.errors"
 echo " " > $error_file
 
 cd $APPDIR
