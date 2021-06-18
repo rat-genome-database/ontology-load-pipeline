@@ -46,16 +46,13 @@ public class TermStatsLoaderWithFilter {
 
         long time0 = System.currentTimeMillis();
 
-        int[] speciesTypeKeys = {
-            SpeciesType.HUMAN,
-            SpeciesType.MOUSE,
-            SpeciesType.RAT,
-            SpeciesType.DOG,
-            SpeciesType.BONOBO,
-            SpeciesType.CHINCHILLA,
-            SpeciesType.SQUIRREL,
-		    SpeciesType.PIG,
-        };
+        // load species type keys to process (exclude non-public species like yeast, zebrafish etc)
+        List<Integer> speciesTypeKeys = new ArrayList<>();
+        for( int sp: SpeciesType.getSpeciesTypeKeys() ) {
+            if( SpeciesType.isSearchable(sp) ) {
+                speciesTypeKeys.add(sp);
+            }
+        }
 
         // build dag
         Map<String, TermData> dag = new ConcurrentHashMap<>();
