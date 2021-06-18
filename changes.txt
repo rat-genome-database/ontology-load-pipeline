@@ -1,3 +1,6 @@
+Jun 18, 2021
+  TermStatsLoaderWithFilter: fixed handling of species list (verver, molerat were missing)
+
 Apr 29, 2021
   tuned up OBO validation script
 
