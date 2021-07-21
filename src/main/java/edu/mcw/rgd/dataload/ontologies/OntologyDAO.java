@@ -158,6 +158,12 @@ public class OntologyDAO {
         }
     }
 
+    public int deleteDag(TermDagEdge dag) throws Exception {
+
+        logDeletedDags.info(dag.dump("|"));
+        return dao.deleteDag(dag);
+    }
+
     /**
      * delete all dags for given ontology
      * @param ontId ontology id
