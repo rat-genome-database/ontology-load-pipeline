@@ -1,5 +1,7 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+import edu.mcw.rgd.datamodel.ontologyx.Relation;
+import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.pipelines.PipelineManager;
 import edu.mcw.rgd.pipelines.PipelineSession;
@@ -236,10 +238,35 @@ public class Manager {
 
         obsoleteOrphanedTerms(manager.getSession(), parser.getOntPrefixes().keySet());
 
+        deleteCyclicRelations(manager.getSession(), parser.getOntPrefixes().keySet());
+
         // dump counter statistics to STDOUT
         manager.dumpCounters();
 
         System.out.println("--SUCCESS -- "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+    }
+
+    void deleteCyclicRelations(PipelineSession session, Set<String> ontPrefixes) throws Exception {
+        // TODO: this hard-coded exceptions should be put in property file
+        int cyclesDeleted = 0;
+        for (String ontPrefix: ontPrefixes) {
+            // so far we know about cyclic relations in UBERON, that started appearing in July 2021
+            if( !ontPrefix.equals("UBERON") ) {
+                continue;
+            }
+            try {
+                // verify if this is still a problem
+                dao.getAncestorCount("UBERON:8000009");
+            } catch(Exception e) {
+                TermDagEdge dag = new TermDagEdge();
+                dag.setParentTermAcc("UBERON:8000009");
+                dag.setChildTermAcc("UBERON:0002354");
+                dag.setRel(Relation.PART_OF);
+                dao.deleteDag(dag);
+                cyclesDeleted++;
+            }
+        }
+        session.incrementCounter("CYCLIC_RELATIONS_DROPPED_FROM_DAG", cyclesDeleted);
     }
 
     void obsoleteOrphanedTerms(PipelineSession session, Set<String> ontPrefixes) throws Exception {

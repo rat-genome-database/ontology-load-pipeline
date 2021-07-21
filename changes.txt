@@ -1,3 +1,6 @@
+Jul 21, 2021
+  loader: added removal of cyclic relationship for UBERON
+
 Jun 18, 2021
   TermStatsLoaderWithFilter: fixed handling of species list (verver, molerat were missing)
 

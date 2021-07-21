@@ -39,6 +39,34 @@ This source requires to provide a unique 'apikey'.
 For security reasons we store the actual value of 'apikey' not in the code,
 but in an external property file 'properties/api.key'.
 
+GRAPH CYCLES
+
+Ontology terms are loaded into a DAG structure, meaning, cycles are not allowed. Therefore during loading,
+after a term is processed, checks are performed to see if cycles has been created. If yes, they are being reported.
+However, when entire ontology has been loaded, there should not be any cycles. If they are, they must be removed,
+or that will break some pipelines and tools in RGD.
+
+At any time, script 'check_for_cycles.sh <ONT_ID>' could be run to see if there are any cycles. If there are,
+just pick any term and run these queries (modifying value of LEVEL parameter) to see a cycle in the path:
+
+<pre>
+select sys_connect_by_path(child_term_acc,'/') p
+from ont_dag
+start with parent_term_acc='UBERON:0003104'
+connect by  prior child_term_acc=parent_term_acc
+ and level<31
+order by length(p) desc
+
+select sys_connect_by_path(parent_term_acc,'/') p
+from ont_dag
+start with child_term_acc='UBERON:0003104'
+connect by  prior parent_term_acc=child_term_acc
+ and level<31
+order by length(p) desc
+</pre>
+then drop the offending relationship from ONT_DAG table
+
+
 OBSOLETE FEATURES
 
 a) CTDMapper for RDO ontology
