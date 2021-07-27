@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
@@ -11,8 +12,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**

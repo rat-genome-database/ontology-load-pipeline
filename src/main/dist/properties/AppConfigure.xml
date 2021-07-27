@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2021-07-21" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  2021-07-26" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -85,17 +85,6 @@
                 <entry key="ZFA" value="ZFA:"/>
                 <entry key="CS" value="CS:"/>
                 <entry key="CVCL" value="CVCL_"/>
-            </map>
-        </property>
-
-        <!-- default file encoding is "ISO-8859-1" -->
-        <property name="fileEncodingOverride"><!--key: ontology ID; value: name of file encoding -->
-            <map>
-                <entry key="RDO" value="UTF-8"/>
-                <entry key="CMO" value="UTF-8"/>
-                <entry key="MMO" value="UTF-8"/>
-                <entry key="XCO" value="UTF-8"/>
-                <entry key="ORDO" value="UTF-8"/>
             </map>
         </property>
 

@@ -1,3 +1,8 @@
+Jul 26, 2021
+  parser: treats all files as UTF-8-encoded
+    (previously most files were considered ISO-8859-1 encoded, and some UTF-8 encoded;
+     that resulted in garbled characters being loaded, because now everybody is using UTF-8 encoding)
+
 Jul 21, 2021
   loader: added removal of cyclic relationship for UBERON
 

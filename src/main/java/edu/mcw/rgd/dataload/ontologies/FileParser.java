@@ -33,7 +33,6 @@ public class FileParser extends RecordPreprocessor {
 
     protected final Logger logger = Logger.getLogger("file_parser");
     private List<String> ontologiesWithExactMatchSynonyms;
-    private Map<String,String> fileEncodingOverride;
     private Map<String,Date> startTimes = new HashMap<>();
     private Map<String,String> synonymPrefixSubstitutions;
     private String apiKey;
@@ -108,20 +107,19 @@ public class FileParser extends RecordPreprocessor {
         }
     }
 
-    private BufferedReader openFile(String fileName, String ontId) throws IOException {
+    private BufferedReader openFile(String fileName) throws IOException {
 
-        BufferedReader reader;
+        String encoding = "UTF-8"; // default encoding
+
+        InputStream is;
         if( fileName.endsWith(".gz") ) {
-            String encoding = "ISO-8859-1";
-            String encodingOverride = this.getFileEncodingOverride().get(ontId);
-            if( encodingOverride!=null )
-                encoding = encodingOverride;
+            is = new GZIPInputStream(new FileInputStream(fileName));
+        } else {
+            is = new FileInputStream(fileName);
+        }
 
-            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fileName)), encoding));
-        } else
-            reader = new BufferedReader(new FileReader(fileName));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding));
         return reader;
-
     }
 
     boolean process(String fileName, String defaultOntId, String accIdPrefix) throws Exception {
@@ -137,7 +135,7 @@ public class FileParser extends RecordPreprocessor {
         }
         System.out.println("processing ontology "+defaultOntId);
 
-        if( !validateOboFile(fileName, defaultOntId) ) {
+        if( !validateOboFile(fileName) ) {
             return false;
         }
 
@@ -175,13 +173,12 @@ public class FileParser extends RecordPreprocessor {
      * <p>
      * at a minimum, it must have a header line 'format-version:', and at least 10 lines with fields 'id:' and 'name:'
      * @param fileName name of obo file
-     * @param defaultOntId
      * @return true if obo file is well-formed; false otherwise
      * @throws Exception
      */
-    boolean validateOboFile(String fileName, String defaultOntId) throws Exception {
+    boolean validateOboFile(String fileName) throws Exception {
 
-        BufferedReader reader = openFile(fileName, defaultOntId);
+        BufferedReader reader = openFile(fileName);
         int formatVersionCount = 0;
         int idCount=0;
         int nameCount=0;
@@ -215,7 +212,7 @@ public class FileParser extends RecordPreprocessor {
         Map<String, Record> records = new HashMap<>(4003);
 
         // read the input stream -- whether zipped or not
-        BufferedReader reader = openFile(fileName, defaultOntId);
+        BufferedReader reader = openFile(fileName);
 
         String line, val;
         Record rec = null;
@@ -494,6 +491,11 @@ public class FileParser extends RecordPreprocessor {
             }
         }
         rec.getTerm().setTerm(termName);
+
+        byte[] b = termName.getBytes();
+        if( b.length!=termName.length() ) {
+            System.out.println("xxx");
+        }
     }
 
     boolean parseComment(String line, Record rec) {
@@ -775,7 +777,7 @@ public class FileParser extends RecordPreprocessor {
 
     private void loadCyclicRelationships(String fileName, String ontId) throws IOException {
 
-        BufferedReader reader = openFile(fileName, ontId);
+        BufferedReader reader = openFile(fileName);
 
         String line;
         String id = "";
@@ -993,14 +995,6 @@ public class FileParser extends RecordPreprocessor {
 
     public List<String> getOntologiesWithExactMatchSynonyms() {
         return ontologiesWithExactMatchSynonyms;
-    }
-
-    public void setFileEncodingOverride(Map<String,String> fileEncodingOverride) {
-        this.fileEncodingOverride = fileEncodingOverride;
-    }
-
-    public Map<String,String> getFileEncodingOverride() {
-        return fileEncodingOverride;
     }
 
     public void setIgnoredProperties(List<String> ignoredProperties) {
