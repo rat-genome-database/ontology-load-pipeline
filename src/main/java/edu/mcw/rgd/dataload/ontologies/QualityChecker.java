@@ -3,8 +3,7 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordProcessor;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
@@ -15,7 +14,7 @@ import java.util.*;
  * @since 12/29/10
  * Performs QC for given term
  */
-public class QualityChecker extends RecordProcessor {
+public class QualityChecker {
 
     private OntologyDAO dao;
 
@@ -25,11 +24,10 @@ public class QualityChecker extends RecordProcessor {
     /**
      * process one unique ontology term; first ensures that given term and all its parent terms
      * exist in database; then checks whether any of term properties (term name, synonyms, etc) have to be updated
-     * @param r PipelineRecord object
+     * @param rec Record object
      * @throws Exception
      */
-    public void process(PipelineRecord r) throws Exception {
-        Record rec = (Record) r;
+    public void process(Record rec, CounterPool counters) throws Exception {
 
         // look for term with given term-acc in database
         String termAcc = rec.getTerm().getAccId();
@@ -44,14 +42,14 @@ public class QualityChecker extends RecordProcessor {
         // ensure that both the term being processed
         // and all terms being parent terms of the processed term
         // are in the database
-        ensureTermsAreInDatabase(rec);
+        ensureTermsAreInDatabase(rec, counters);
         // retrieve term from database
         Term term = dao.getTerm(termAcc);
 
         rec.setFlag("MATCH");
-        getSession().incrementCounter("TERMS_MATCHED", 1);
+        counters.increment("TERMS_MATCHED");
 
-        qcRelations(rec);
+        qcRelations(rec, counters);
 
         // for RDO ontology, do term name fixup
         List<TermSynonym> synonymsInRgd = dao.getTermSynonyms(termAcc);
@@ -73,14 +71,14 @@ public class QualityChecker extends RecordProcessor {
             rec.setFlag("UPDATE");
         }
 
-        handleSynonyms(synonymsInRgd, rec);
+        handleSynonyms(synonymsInRgd, rec, counters);
 
         rec.qcXRefs(dao);
 
-        checkForCycles(rec);
+        checkForCycles(rec, counters);
     }
 
-    void checkForCycles(Record rec) throws Exception {
+    void checkForCycles(Record rec, CounterPool counters) {
         for( Map.Entry<String, Relation> entry: rec.getEdges().entrySet() ) {
             String parentTermAcc = entry.getKey();
             String childTermAcc = rec.getTerm().getAccId();
@@ -97,7 +95,7 @@ public class QualityChecker extends RecordProcessor {
                         // connect by loop detected: report it
                     String relId = Relation.getRelIdFromRel(entry.getValue());
                     System.out.println("WARNING: CYCLE found for "+parentTermAcc+" "+Relation.getRelFromRelId(relId)+" "+childTermAcc);
-                    getSession().incrementCounter("TERMS_WITH_CYCLES", 1);
+                    counters.increment("TERMS_WITH_CYCLES");
                 }
             }
         }
@@ -171,7 +169,7 @@ public class QualityChecker extends RecordProcessor {
         }
     }
 
-    void qcRelations(Record rec) throws Exception {
+    void qcRelations(Record rec, CounterPool counters) throws Exception {
 
         String term1OntId = rec.getTerm().getOntologyId();
 
@@ -183,18 +181,18 @@ public class QualityChecker extends RecordProcessor {
             }
             String term2OntId = dao.getTerm(term2Acc).getOntologyId();
             if( !term1OntId.equals(term2OntId) ) {
-                getSession().incrementCounter("DAG_EDGES_CROSS_ONTOLOGY", 1);
+                counters.increment("DAG_EDGES_CROSS_ONTOLOGY");
                 it.remove();
             }
         }
     }
 
-    private void handleSynonyms( List<TermSynonym> synonymsInRgd, Record rec) throws Exception {
+    private void handleSynonyms( List<TermSynonym> synonymsInRgd, Record rec, CounterPool counters) throws Exception {
 
-        rec.qcSynonyms(synonymsInRgd, getSession());
+        rec.qcSynonyms(synonymsInRgd, counters);
     }
 
-    private void ensureTermsAreInDatabase(Record rec) throws Exception {
+    private void ensureTermsAreInDatabase(Record rec, CounterPool counters) throws Exception {
 
         List<Term> terms = new LinkedList<>();
 
@@ -210,7 +208,7 @@ public class QualityChecker extends RecordProcessor {
             terms.add(parentTerm);
         }
 
-        dao.ensureTermsAreInDatabase(terms, getSession());
+        dao.ensureTermsAreInDatabase(terms, counters);
     }
 
     public OntologyDAO getDao() {

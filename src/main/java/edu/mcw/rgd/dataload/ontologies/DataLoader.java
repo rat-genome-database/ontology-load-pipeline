@@ -3,8 +3,7 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordProcessor;
+import edu.mcw.rgd.process.CounterPool;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -13,26 +12,25 @@ import java.util.Map;
  * @author mtutaj
  * @since 12/29/10
  */
-public class DataLoader extends RecordProcessor {
+public class DataLoader {
 
     private OntologyDAO dao;
     protected final Logger logger = Logger.getLogger("data_loader");
 
-    public void process(PipelineRecord r) throws Exception {
-        Record rec = (Record) r;
+    public void process(Record rec, CounterPool counters) throws Exception {
         Term term = rec.getTerm();
 
         logger.debug("processing ["+rec.getRecNo()+".] "+term.getAccId());
 
         if( rec.isFlagSet("NO_ACC_ID") ) {
-            getSession().incrementCounter("TERMS_MISSING_ACC_ID", 1);
+            counters.increment("TERMS_MISSING_ACC_ID");
             return;
         }
 
         if( rec.isFlagSet("UPDATE") ) {
             logger.debug("UPDATE ACC_ID:"+term.getAccId()+", TERM:"+term.getTerm()+", ISOBSOLETE:"+term.getObsolete()+", DEFINITION:"+term.getDefinition()+", COMMENT:"+term.getComment());
             dao.updateTerm(term);
-            getSession().incrementCounter("TERMS_UPDATED", 1);
+            counters.increment("TERMS_UPDATED");
         }
 
         if( !rec.getEdges().isEmpty() ) {
@@ -50,28 +48,28 @@ public class DataLoader extends RecordProcessor {
                     String relId = Relation.getRelIdFromRel(entry.getValue());
                     logger.debug("UPSERT DAG ("+parentTermAcc+","+childTermAcc+","+entry.getValue()+")");
                     dao.insertDag(parentTermAcc, childTermAcc, relId);
-                    getSession().incrementCounter("DAG_EDGES_INCOMING", 1);
+                    counters.increment("DAG_EDGES_INCOMING");
                 }
             }
         }
 
         // handle synonyms
-        loadSynonyms(rec);
+        loadSynonyms(rec, counters);
 
         // handle dbxrefs
-        rec.loadXRefs(dao, getSession());
+        rec.loadXRefs(dao, counters);
     }
 
-    void loadSynonyms(Record rec) throws Exception {
+    void loadSynonyms(Record rec, CounterPool counters) throws Exception {
 
         // insert new synonyms
         if( !rec.getSynonymsForInsert().isEmpty() ) {
             for( TermSynonym synonym: rec.getSynonymsForInsert() ) {
 
                 if( dao.insertTermSynonym(synonym, null) ) {
-                    getSession().incrementCounter("SYNONYMS_INSERTED", 1);
+                    counters.increment("SYNONYMS_INSERTED");
                 } else {
-                    getSession().incrementCounter("SYNONYMS_FOR_INSERT_SKIPPED", 1);
+                    counters.increment("SYNONYMS_FOR_INSERT_SKIPPED");
                 }
             }
         }
@@ -79,15 +77,15 @@ public class DataLoader extends RecordProcessor {
         // update synonyms
         if( !rec.getSynonymsForUpdate().isEmpty() ) {
             dao.updateTermSynonymLastModifiedDate(rec.getSynonymsForUpdate());
-            //getSession().incrementCounter("SYNONYMS_UPDATE_LAST_MOD_DATE", rec.getSynonymsForUpdate().size());
+            //counters.add("SYNONYMS_UPDATE_LAST_MOD_DATE", rec.getSynonymsForUpdate().size());
         }
 
         // delete synonyms
         if( !rec.getSynonymsForDelete().isEmpty() ) {
             int deleted = dao.deleteTermSynonyms(rec.getSynonymsForDelete());
             int skipped = rec.getSynonymsForDelete().size() - deleted;
-            getSession().incrementCounter("SYNONYMS_DELETED", deleted);
-            getSession().incrementCounter("SYNONYMS_FOR_DELETE_SKIPPED", skipped);
+            counters.add("SYNONYMS_DELETED", deleted);
+            counters.add("SYNONYMS_FOR_DELETE_SKIPPED", skipped);
         }
     }
 

@@ -1,11 +1,9 @@
 package edu.mcw.rgd.dataload.ontologies;
 
-import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
-import edu.mcw.rgd.pipelines.PipelineManager;
-import edu.mcw.rgd.pipelines.PipelineSession;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -33,6 +30,15 @@ public class Manager {
     public static void main(String[] args) throws Exception {
         try {
             main2(args);
+
+            /*
+            String[] ontIds = {"XCO", "MMO", "NBO", "MI", "SO", "CL", "PW", "ZFA", "CMO", "VT", "MA", "RS", "MP", "HP", "UBERON", "GO", "CHEBI"};
+            String[] args2 = {"-single_ontology=", "-skip_stats_update"};
+            for( String ontId: ontIds ) {
+                args2[0] = "-single_ontology="+ontId;
+                main2(args2);
+            }
+             */
         } catch(Exception e) {
             Utils.printStackTrace(e, Logger.getRootLogger());
             throw e;
@@ -130,7 +136,7 @@ public class Manager {
             parser.setDao(manager.dao);
             parser.enforceSingleOntology(singleOntologyId);
 
-            manager.downloadAndProcessExternalFiles(parser, qcThreadCount);
+            manager.downloadAndProcessExternalFiles(parser);
         }
 
         // update term stats
@@ -205,49 +211,52 @@ public class Manager {
      * @param parser FileParser object
      * @throws Exception
      */
-    void downloadAndProcessExternalFiles(FileParser parser, int qcThreadCount) throws Exception {
+    void downloadAndProcessExternalFiles(FileParser parser) throws Exception {
 
         long time0 = System.currentTimeMillis();
 
-        parser.setOboFiles(getOboFiles());
         parser.setApiKey( Utils.readFileAsString(getApiKeyFile()).trim() );
-
-        // create pipeline manager
-        PipelineManager manager = new PipelineManager();
-        // first thread group: break obo files into a stream of records
-        manager.addPipelineWorkgroup(parser, "FP", getOboFiles().size(), 0);
-
-        // another thread group: perform quality checking in 5 thread
         qualityChecker.setDao(dao);
-        manager.addPipelineWorkgroup(qualityChecker, "QC", qcThreadCount, 0);
-
-        // last thread group: perform data loading in 1 thread
         dataLoader.setDao(dao);
-        manager.addPipelineWorkgroup(dataLoader, "DL", 1, 0);
 
-        // read the thread counts in each group
-        PipelineSession session = manager.getSession();
+        // first thread group: break obo files into a stream of records
+        for( Map.Entry<String,String> entry: getOboFiles().entrySet() ) {
+            String ontId = entry.getKey();
+            String path = entry.getValue();
 
-        // run everything
-        manager.run();
+            CounterPool counters = new CounterPool();
 
-        parser.postProcess();
+            List<Record> records = parser.process(ontId, path, counters);
 
-        dropStaleSynonyms(time0, session);
+            records.parallelStream().forEach( rec -> {
 
-        handleMalformedRsSynonyms(time0);
+                try {
+                    qualityChecker.process(rec, counters);
+                    dataLoader.process(rec, counters);
+                } catch( Exception e ) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-        obsoleteOrphanedTerms(manager.getSession(), parser.getOntPrefixes().keySet());
 
-        deleteCyclicRelations(manager.getSession(), parser.getOntPrefixes().keySet());
+            parser.postProcess();
 
-        // dump counter statistics to STDOUT
-        manager.dumpCounters();
+            dropStaleSynonyms(time0, counters);
+
+            handleMalformedRsSynonyms(time0);
+
+            obsoleteOrphanedTerms(counters, parser.getOntPrefixes().keySet());
+
+            deleteCyclicRelations(counters, parser.getOntPrefixes().keySet());
+
+            // dump counter statistics to STDOUT
+            System.out.println(counters.dumpAlphabetically());
+        }
 
         System.out.println("--SUCCESS -- "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
-    void deleteCyclicRelations(PipelineSession session, Set<String> ontPrefixes) throws Exception {
+    void deleteCyclicRelations(CounterPool counters, Set<String> ontPrefixes) throws Exception {
         // TODO: this hard-coded exceptions should be put in property file
         int cyclesDeleted = 0;
         for (String ontPrefix: ontPrefixes) {
@@ -267,23 +276,29 @@ public class Manager {
                 cyclesDeleted++;
             }
         }
-        session.incrementCounter("CYCLIC_RELATIONS_DROPPED_FROM_DAG", cyclesDeleted);
+        if( cyclesDeleted!=0 ) {
+            counters.add("CYCLIC_RELATIONS_DROPPED_FROM_DAG", cyclesDeleted);
+        }
     }
 
-    void obsoleteOrphanedTerms(PipelineSession session, Set<String> ontPrefixes) throws Exception {
+    void obsoleteOrphanedTerms(CounterPool counters, Set<String> ontPrefixes) throws Exception {
         // terms that once were part of ontology dag tree, but are no longer
         int obsoleteTermCount = 0;
         for (String ontPrefix: ontPrefixes) {
             if( MalformedOboFiles.getInstance().isWellFormed(ontPrefix) ) {
                 int obsoleteCount = dao.obsoleteOrphanedTerms(ontPrefix);
-                session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE_"+ontPrefix, obsoleteCount);
-                obsoleteTermCount += obsoleteCount;
+                if( obsoleteCount!=0 ) {
+                    counters.add("ORPHANED_TERMS_MADE_OBSOLETE_"+ontPrefix, obsoleteCount);
+                    obsoleteTermCount += obsoleteCount;
+                }
             }
         }
-        session.incrementCounter("ORPHANED_TERMS_MADE_OBSOLETE", obsoleteTermCount);
+        if( obsoleteTermCount!=0 ) {
+            counters.add("ORPHANED_TERMS_MADE_OBSOLETE", obsoleteTermCount);
+        }
     }
 
-    void dropStaleSynonyms(long time0, PipelineSession session) throws Exception {
+    void dropStaleSynonyms(long time0, CounterPool counters) throws Exception {
 
         // drop any stale synonyms
         for( String ontId: getOboFiles().keySet() ) {
@@ -292,24 +307,28 @@ public class Manager {
                 continue;
 
             if( ontId.equals("GO") ) {
-                dropStaleSynonyms("CC", time0, session);
-                dropStaleSynonyms("MF", time0, session);
-                dropStaleSynonyms("BP", time0, session);
+                dropStaleSynonyms("CC", time0, counters);
+                dropStaleSynonyms("MF", time0, counters);
+                dropStaleSynonyms("BP", time0, counters);
             }
             else {
-                dropStaleSynonyms(ontId, time0, session);
+                dropStaleSynonyms(ontId, time0, counters);
             }
         }
     }
 
-    void dropStaleSynonyms(String ontId, long time0, PipelineSession session) throws Exception {
+    void dropStaleSynonyms(String ontId, long time0, CounterPool counters) throws Exception {
 
         // drop any stale synonyms
         List<TermSynonym> staleSynonyms = dao.getTermSynonymsModifiedBefore(ontId, "OBO", new Date(time0));
         int deleted = dao.deleteTermSynonyms(staleSynonyms);
         int skipped = staleSynonyms.size()-deleted;
-        session.incrementCounter("SYNONYMS_STALE_DROPPED_FOR_"+ontId, deleted);
-        session.incrementCounter("SYNONYMS_STALE_SKIPPED_FOR_"+ontId, skipped);
+        if( deleted!=0 ) {
+            counters.add("SYNONYMS_STALE_DROPPED_FOR_"+ontId, deleted);
+        }
+        if( skipped!=0 ) {
+            counters.add("SYNONYMS_STALE_SKIPPED_FOR_" + ontId, skipped);
+        }
     }
 
     void handleMalformedRsSynonyms(long time0) throws IOException {
