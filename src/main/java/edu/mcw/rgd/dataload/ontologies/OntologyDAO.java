@@ -6,7 +6,7 @@ import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontologyx.*;
-import edu.mcw.rgd.pipelines.PipelineSession;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.object.BatchSqlUpdate;
@@ -78,17 +78,17 @@ public class OntologyDAO {
     /**
      * insert ontology term into database if it does not exist
      * @param term OntTerm object to be inserted
-     * @param session PipelineSession object
+     * @param counters CounterPool object
      * @throws Exception if something wrong happens in spring framework
      */
-    public void insertTerm(Term term, PipelineSession session) throws Exception {
+    public void insertTerm(Term term, CounterPool counters) throws Exception {
 
         // extra check: ids parentTermAcc normalized
         fixTermNameDefComment(term);
         int r = dao.insertTerm(term);
         if( r!=0 ) {
             logInsertedTerms.info("INSERT|"+term.dump("|"));
-            session.incrementCounter("TERMS_INSERTED_"+term.getOntologyId(), 1);
+            counters.increment("TERMS_INSERTED_"+term.getOntologyId());
         }
     }
 
@@ -653,10 +653,10 @@ public class OntologyDAO {
     /**
      * this method examined all term accession ids, and if the terms are not in database, they are inserted
      * @param terms list of terms
-     * @param session PipelineSession object
+     * @param counters CounterPool object
      * @throws Exception if something wrong happens in spring framework
      */
-    public synchronized void ensureTermsAreInDatabase(List<Term> terms, PipelineSession session) throws Exception {
+    public synchronized void ensureTermsAreInDatabase(List<Term> terms, CounterPool counters) throws Exception {
 
         for( Term term: terms ) {
             if( term.getAccId()==null ) {
@@ -664,7 +664,7 @@ public class OntologyDAO {
             }
             Term termInDb = getTerm(term.getAccId());
             if( termInDb==null ) {
-                insertTerm(term, session);
+                insertTerm(term, counters);
             }
         }
     }

@@ -4,21 +4,23 @@ import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.datamodel.ontologyx.TermXRef;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.PipelineSession;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author mtutaj
  * @since 12/28/10
  */
-public class Record extends PipelineRecord {
+public class Record {
 
-    private static int recno = 0;
+    private static int _recno = 0;
+    private int recNo;
     private Term term = new Term();
+    private Set<String> flags = new ConcurrentSkipListSet<>();
 
     // FLAGS
     // "INSERT";  this term needs to be inserted into db
@@ -39,7 +41,7 @@ public class Record extends PipelineRecord {
     public String oboText;
 
     public Record() {
-        setRecNo(++recno);
+        recNo = ++_recno;
     }
 
     public void addIncomingXRefs(List<TermXRef> xrefs) {
@@ -51,25 +53,25 @@ public class Record extends PipelineRecord {
         xrefManager.qc(term.getAccId(), inRgdXRefs);
     }
 
-    public void loadXRefs(OntologyDAO dao, PipelineSession session) throws Exception {
+    public void loadXRefs(OntologyDAO dao, CounterPool counters) throws Exception {
 
         if( !xrefManager.getMatchingXRefs().isEmpty() ) {
-            session.incrementCounter("DBXREFS_MATCHING", xrefManager.getMatchingXRefs().size());
+            counters.add("DBXREFS_MATCHING", xrefManager.getMatchingXRefs().size());
         }
 
         if( !xrefManager.getForInsertXRefs().isEmpty() ) {
             dao.insertTermXRefs(xrefManager.getForInsertXRefs());
-            session.incrementCounter("DBXREFS_INSERTED", xrefManager.getForInsertXRefs().size());
+            counters.add("DBXREFS_INSERTED", xrefManager.getForInsertXRefs().size());
         }
 
         if( !xrefManager.getForDeleteXRefs().isEmpty() ) {
             dao.deleteTermXRefs(xrefManager.getForDeleteXRefs());
-            session.incrementCounter("DBXREFS_DELETED", xrefManager.getForDeleteXRefs().size());
+            counters.add("DBXREFS_DELETED", xrefManager.getForDeleteXRefs().size());
         }
 
         if( !xrefManager.getDescChangedXRefs().isEmpty() ) {
             dao.updateTermXRefDescriptions(xrefManager.getDescChangedXRefs());
-            session.incrementCounter("DBXREFS_DESCRIPTON_CHANGED", xrefManager.getDescChangedXRefs().size());
+            counters.add("DBXREFS_DESCRIPTON_CHANGED", xrefManager.getDescChangedXRefs().size());
         }
     }
 
@@ -313,10 +315,10 @@ public class Record extends PipelineRecord {
     /**
      * run qc for synonyms
      * @param synonymsInRgd list of synonyms in rgd
-     * @param session pipeline session
+     * @param counters counters
      * @throws Exception if something wrong happens in spring framework
      */
-    public void qcSynonyms( List<TermSynonym> synonymsInRgd, PipelineSession session) throws Exception {
+    public void qcSynonyms( List<TermSynonym> synonymsInRgd, CounterPool counters) throws Exception {
 
         synonymManager.qc(term.getTerm(), synonymsInRgd, this.synonyms);
 
@@ -331,7 +333,7 @@ public class Record extends PipelineRecord {
             }
         }
 
-        session.incrementCounter("SYNONYMS_MATCHED", synonymManager.matchingSynonyms.size());
+        counters.add("SYNONYMS_MATCHED", synonymManager.matchingSynonyms.size());
 
         // special QC for RS synonyms starting with 'RGD':
         //  to make strain to RS-term association possible, RS-term must have a synonym in form 'RGD ID: strainRgdId'
@@ -393,5 +395,17 @@ public class Record extends PipelineRecord {
 
     public void setTerm(Term term) {
         this.term = term;
+    }
+
+    public int getRecNo() {
+        return recNo;
+    }
+
+    public void setFlag(String flag) {
+        flags.add(flag);
+    }
+
+    public boolean isFlagSet(String flag) {
+        return flags.contains(flag);
     }
 }

@@ -1,7 +1,7 @@
 package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.datamodel.ontologyx.*;
-import edu.mcw.rgd.pipelines.RecordPreprocessor;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.FileDownloader;
 import org.apache.log4j.Logger;
 
@@ -15,11 +15,10 @@ import java.util.zip.GZIPInputStream;
  * @author mtutaj
  * Date: 12/29/10
  */
-public class FileParser extends RecordPreprocessor {
+public class FileParser {
 
     private OntologyDAO dao;
 
-    private Map<String, String> oboFiles;
     private Map<String, String> ontPrefixes;
     private Map<String, Relation> relations; // map of relation name as found in obo file to Relation enum
     private Map<String, String> rootTerms;
@@ -36,6 +35,7 @@ public class FileParser extends RecordPreprocessor {
     private Map<String,Date> startTimes = new HashMap<>();
     private Map<String,String> synonymPrefixSubstitutions;
     private String apiKey;
+    private CounterPool counters;
 
     public FileParser() {
 
@@ -47,52 +47,46 @@ public class FileParser extends RecordPreprocessor {
         }
     }
 
-    public void process() throws Exception {
+    public List<Record> process(String ontId, String path, CounterPool counters) throws Exception {
 
-        // get the file index we are working with based on thread name ("FS" is the prefix followed by digits)
-        int fileIndex = Integer.parseInt(Thread.currentThread().getName().substring(2));
+        this.counters = counters;
 
-        // find our file: n-th entry in the hashmap
-        for( Map.Entry<String,String> entry: getOboFiles().entrySet() ) {
-            if( --fileIndex > 0 )
-                continue;
+        // download the file if its name starts with http or ftp
+        logger.info(" ONT_ID="+ontId+" PATH="+path);
 
-            // download the file if its name starts with http or ftp
-            String ontId = entry.getKey();
-            String path=entry.getValue().toLowerCase();
-            logger.info("THREAD: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" PATH="+path);
-
-            String srcFile = entry.getValue();
-            if( srcFile.contains("##APIKEY##") ) {
-                srcFile = srcFile.replace("##APIKEY##", apiKey);
-            }
-
-            FileDownloader downloader = new FileDownloader();
-            downloader.setExternalFile(srcFile);
-            logger.info("input file: "+downloader.getExternalFile());
-            downloader.setLocalFile("data/"+ontId+".obo");
-            if( path.endsWith(".gz") )
-                downloader.setLocalFile(downloader.getLocalFile()+".gz");
-            downloader.setPrependDateStamp(true);
-            downloader.setUseCompression(true); // use gzip compression when storing the downloaded files
-
-            String localFile = downloader.downloadNew();
-
-            // our file is ready for processing
-            logger.info("START: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
-            if( process(localFile, ontId, ontPrefixes.get(ontId)) ) {
-                logger.info("DONE: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
-
-                System.out.println("Parsing complete for ONT_ID=" + ontId + " FILE=" + localFile);
-            } else {
-                logger.warn("MALFORMED OBO FILE: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
-
-                MalformedOboFiles.getInstance().addOntId(ontId);
-
-                System.out.println("Parsing ABORTED (MALFORMED OBO FILE): ONT_ID=" + ontId + ", FILE=" + localFile);
-            }
-            return;
+        String srcFile = path;
+        if( srcFile.contains("##APIKEY##") ) {
+            srcFile = srcFile.replace("##APIKEY##", apiKey);
         }
+
+        FileDownloader downloader = new FileDownloader();
+        downloader.setExternalFile(srcFile);
+        logger.info("input file: "+downloader.getExternalFile());
+        downloader.setLocalFile("data/"+ontId+".obo");
+        if( path.endsWith(".gz") )
+            downloader.setLocalFile(downloader.getLocalFile()+".gz");
+        downloader.setPrependDateStamp(true);
+        downloader.setUseCompression(true); // use gzip compression when storing the downloaded files
+
+        String localFile = downloader.downloadNew();
+
+        // our file is ready for processing
+        Map<String, Record> results = new HashMap<>();
+        logger.info("START: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
+        if( processAll(localFile, ontId, ontPrefixes.get(ontId), results) ) {
+            logger.info("DONE: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
+
+            System.out.println("Parsing complete for ONT_ID=" + ontId + " FILE=" + localFile);
+        } else {
+            logger.warn("MALFORMED OBO FILE: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
+
+            MalformedOboFiles.getInstance().addOntId(ontId);
+
+            System.out.println("Parsing ABORTED (MALFORMED OBO FILE): ONT_ID=" + ontId + ", FILE=" + localFile);
+        }
+
+        List<Record> records = new ArrayList<>(results.values());
+        return records;
     }
 
     public void postProcess() throws Exception {
@@ -122,7 +116,7 @@ public class FileParser extends RecordPreprocessor {
         return reader;
     }
 
-    boolean process(String fileName, String defaultOntId, String accIdPrefix) throws Exception {
+    boolean processAll(String fileName, String defaultOntId, String accIdPrefix, Map<String, Record> records) throws Exception {
 
         Date startTime = new Date();
         startTimes.put(defaultOntId, startTime);
@@ -141,16 +135,9 @@ public class FileParser extends RecordPreprocessor {
 
         loadCyclicRelationships(fileName, defaultOntId);
 
-        Map<String, Record> records = new HashMap<>();
-
         Map<String, String> rootTermRelations = loadRootTerms(defaultOntId, records);
 
         records.putAll(process(fileName, defaultOntId, accIdPrefix, rootTermRelations));
-
-        // all term records complete: put them to processing queue
-        for( Record r: records.values() ) {
-            this.getSession().putRecordToFirstQueue(r);
-        }
 
         return true;
     }
@@ -266,7 +253,7 @@ public class FileParser extends RecordPreprocessor {
                     int colonPos = accId.indexOf(':');
                     String prefix = colonPos>0 ? accId.substring(0, colonPos) : accId;
                     String counter = "skipped "+prefix+" term(s) for ontology "+defaultOntId;
-                    getSession().incrementCounter(counter, 1);
+                    counters.increment(counter);
 
                     String msg = "term "+accId+" skipped, because it does not match ontology prefix "+defaultOntId;
                     logger.info(msg);
@@ -406,7 +393,7 @@ public class FileParser extends RecordPreprocessor {
         // special cases of ignored field 'subset:'
         if( value.contains("gocheck_do_not_annotate") || value.contains("gocheck_do_not_manually_annotate") ) {
             rec.addSynonym("Not4Curation", "synonym");
-            getSession().incrementCounter("SYNONYMS_GO_NOT4CURATION", 1);
+            counters.increment("SYNONYMS_GO_NOT4CURATION");
         }
     }
 
@@ -541,7 +528,7 @@ public class FileParser extends RecordPreprocessor {
                     if( synonymName.startsWith(synonymNamePrefix) ) {
                         // substitute synonym name prefix
                         synonymName = entry.getValue()+synonymName.substring(synonymNamePrefix.length());
-                        getSession().incrementCounter("SYNONYMS_SUBST_NAME_PREFIX_"+synonymNamePrefix, 1);
+                        counters.increment("SYNONYMS_SUBST_NAME_PREFIX_"+synonymNamePrefix);
                     }
                 }
 
@@ -578,7 +565,7 @@ public class FileParser extends RecordPreprocessor {
 
         for( String ignoredAttr: getIgnoredProperties() ) {
             if( line.startsWith(ignoredAttr) ) {
-                getSession().incrementCounter("ignored field: "+ignoredAttr, 1);
+                counters.increment("ignored field: "+ignoredAttr);
                 return true;
             }
         }
@@ -690,8 +677,7 @@ public class FileParser extends RecordPreprocessor {
         // we will keep counts only of types of unexpected relations
         int pos = line.indexOf(' ');
         String relName = line.substring(0, pos);
-        String counter = "UNSPECIFIED_RELATION_"+relName;
-        getSession().incrementCounter(counter, 1);
+        counters.increment("UNSPECIFIED_RELATION_"+relName);
     }
 
     private void addRelationship(Record rec, String accId, Relation rel, String ontId) {
@@ -719,7 +705,7 @@ public class FileParser extends RecordPreprocessor {
 
         int rowsAffected = dao.deleteDags(ontId, cutoffDate);
         logger.info(rowsAffected + " dags deleted for " + ontId);
-        getSession().incrementCounter("DAG_EDGES_DELETED", rowsAffected);
+        counters.add("DAG_EDGES_DELETED", rowsAffected);
     }
 
     synchronized private void dumpInsertedDagsForOntology(String ontId, Date cutoffDate) throws Exception {
@@ -735,7 +721,7 @@ public class FileParser extends RecordPreprocessor {
 
         int rowsAffected = dao.dumpInsertedDags(ontId, cutoffDate);
         logger.info(rowsAffected + " dags inserted for " + ontId);
-        getSession().incrementCounter("DAG_EDGES_INSERTED", rowsAffected);
+        counters.add("DAG_EDGES_INSERTED", rowsAffected);
     }
 
     /**
@@ -947,14 +933,6 @@ public class FileParser extends RecordPreprocessor {
         xrefs.add(txt.substring(start).trim());
 
         return xrefs;
-    }
-
-    public Map<String, String> getOboFiles() {
-        return oboFiles;
-    }
-
-    public void setOboFiles(Map<String, String> oboFiles) {
-        this.oboFiles = oboFiles;
     }
 
     public Map<String, String> getOntPrefixes() {
