@@ -5,7 +5,8 @@ import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -18,8 +19,8 @@ public class QualityChecker {
 
     private OntologyDAO dao;
 
-    protected final Logger logger = Logger.getLogger("qc");
-    protected final Logger logTermNameChanged = Logger.getLogger("termNameChanged");
+    protected final Logger logger = LogManager.getLogger("qc");
+    protected final Logger logTermNameChanged = LogManager.getLogger("termNameChanged");
 
     /**
      * process one unique ontology term; first ensures that given term and all its parent terms

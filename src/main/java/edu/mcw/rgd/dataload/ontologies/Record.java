@@ -6,7 +6,8 @@ import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.datamodel.ontologyx.TermXRef;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -343,7 +344,7 @@ public class Record {
             for( TermSynonym tsyn: synonyms ) {
                 if( tsyn.getName().startsWith("RGD") ) {
                     if( !tsyn.getName().startsWith("RGD ID: ") ) {
-                        Logger log = Logger.getLogger("malformedRsSynonyms");
+                        Logger log = LogManager.getLogger("malformedRsSynonyms");
                         log.warn(tsyn.getTermAcc() + " " + tsyn.getName());
                     }
                 }

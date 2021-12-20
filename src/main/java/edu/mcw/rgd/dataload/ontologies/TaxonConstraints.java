@@ -4,7 +4,8 @@ import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.FileDownloader;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,7 +32,7 @@ public class TaxonConstraints {
     private List<String> ratLineage;
     private Set<Integer> ratLineageSet;
 
-    protected final Logger logger = Logger.getLogger("goTaxonConstraints");
+    protected final Logger logger = LogManager.getLogger("goTaxonConstraints");
 
     // definitions of taxon unions; example entry
     //[Term]

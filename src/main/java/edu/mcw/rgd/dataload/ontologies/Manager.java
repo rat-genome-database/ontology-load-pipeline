@@ -5,7 +5,7 @@ import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
@@ -40,7 +40,7 @@ public class Manager {
             }
              */
         } catch(Exception e) {
-            Utils.printStackTrace(e, Logger.getRootLogger());
+            Utils.printStackTrace(e, LogManager.getLogger("status"));
             throw e;
         }
     }

@@ -3,7 +3,8 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.FileDownloader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.text.ParseException;
@@ -30,7 +31,7 @@ public class FileParser {
     static SimpleDateFormat sdtCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     static SimpleDateFormat sdtCreationDate2 = new SimpleDateFormat("yyyy-MM-dd");
 
-    protected final Logger logger = Logger.getLogger("file_parser");
+    protected final Logger logger = LogManager.getLogger("file_parser");
     private List<String> ontologiesWithExactMatchSynonyms;
     private Map<String,Date> startTimes = new HashMap<>();
     private Map<String,String> synonymPrefixSubstitutions;

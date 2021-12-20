@@ -3,7 +3,8 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +42,7 @@ public class TermStatsLoaderWithFilter {
 
     void run(String ontPrefix, String filter) throws Exception {
 
-        final Logger log = Logger.getLogger("stats");
+        final Logger log = LogManager.getLogger("stats");
         log.info("processing "+ontPrefix+" with filter "+filter);
 
         long time0 = System.currentTimeMillis();

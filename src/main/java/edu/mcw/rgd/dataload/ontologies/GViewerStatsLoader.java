@@ -7,7 +7,8 @@ import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.reporting.Link;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GViewerStatsLoader {
     private OntologyDAO dao;
-    private final Logger logger = Logger.getLogger("gviewer_stats");
+    private final Logger logger = LogManager.getLogger("gviewer_stats");
     private String version;
     private Set<String> processedOntologyPrefixes;
 
