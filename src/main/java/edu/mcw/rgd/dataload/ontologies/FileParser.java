@@ -3,7 +3,8 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.FileDownloader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.text.ParseException;
@@ -30,7 +31,7 @@ public class FileParser {
     static SimpleDateFormat sdtCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     static SimpleDateFormat sdtCreationDate2 = new SimpleDateFormat("yyyy-MM-dd");
 
-    protected final Logger logger = Logger.getLogger("file_parser");
+    protected final Logger logger = LogManager.getLogger("file_parser");
     private List<String> ontologiesWithExactMatchSynonyms;
     private Map<String,Date> startTimes = new HashMap<>();
     private Map<String,String> synonymPrefixSubstitutions;
@@ -204,6 +205,7 @@ public class FileParser {
         String line, val;
         Record rec = null;
         while( (line=reader.readLine())!=null ) {
+
             // detect term boundary
             if( line.startsWith("[") ) {
                 // write the current record into queue for further processing
@@ -648,7 +650,6 @@ public class FileParser {
         Relation rel = relations.get(relName);
         if( rel==null ) {
             rel = Relation.NOT_SPECIFIED;
-            handleUnexpectedRelation(line);
         }
 
         // term acc id for the relation is between 1st and 2nd space
@@ -665,6 +666,9 @@ public class FileParser {
         }
         else {
             addRelationship(rec, accId2, rel, ontId);
+            if( rel.equals(Relation.NOT_SPECIFIED) ) {
+                handleUnexpectedRelation(line);
+            }
         }
     }
 
@@ -792,9 +796,13 @@ public class FileParser {
             Record.addCyclicRelationship("CC", "has_part");
             Record.addCyclicRelationship("MF", "has_part");
         }
-
+        else
         if( ontId.equals("EFO") ) {
             Record.addCyclicRelationship("EFO", "EFO:0006351"); // has_about_it
+        }
+        else
+        if( ontId.equals("UBERON") ) {
+            Record.addCyclicRelationship("UBERON", "mutually_spatially_disjoint_with");
         }
     }
 

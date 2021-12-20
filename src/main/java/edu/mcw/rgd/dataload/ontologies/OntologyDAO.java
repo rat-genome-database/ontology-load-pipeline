@@ -8,7 +8,8 @@ import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.*;
@@ -30,13 +31,13 @@ public class OntologyDAO {
     PathwayDAO pathwayDAO = new PathwayDAO();
     RGDManagementDAO rgdDAO = new RGDManagementDAO();
 
-    protected final Logger logErrors = Logger.getLogger("errors");
-    protected final Logger logInsertedTerms = Logger.getLogger("insertedTerms");
-    protected final Logger logInsertedXRefs = Logger.getLogger("insertedXRefs");
-    protected final Logger logDeletedXRefs = Logger.getLogger("deletedXRefs");
-    protected final Logger logDescChangedXRefs = Logger.getLogger("descChangedXRefs");
-    protected final Logger logInsertedDags = Logger.getLogger("insertedDags");
-    protected final Logger logDeletedDags = Logger.getLogger("deletedDags");
+    protected final Logger logStatus = LogManager.getLogger("status");
+    protected final Logger logInsertedTerms = LogManager.getLogger("insertedTerms");
+    protected final Logger logInsertedXRefs = LogManager.getLogger("insertedXRefs");
+    protected final Logger logDeletedXRefs = LogManager.getLogger("deletedXRefs");
+    protected final Logger logDescChangedXRefs = LogManager.getLogger("descChangedXRefs");
+    protected final Logger logInsertedDags = LogManager.getLogger("insertedDags");
+    protected final Logger logDeletedDags = LogManager.getLogger("deletedDags");
 
     private Set<String> ontologiesWithSuppressedTermObsoletion;
 
@@ -112,11 +113,11 @@ public class OntologyDAO {
             term.setTerm(" ");
 
             // log all occurrences of fixed term names to error log
-            logErrors.warn("term "+term.getAccId()+" has no term name");
+            logStatus.warn("term "+term.getAccId()+" has no term name");
         }
 
         if(Utils.isStringEmpty(term.getAccId()) ) {
-            logErrors.warn("term "+termName+" has no term acc!!!");
+            logStatus.warn("term "+termName+" has no term acc!!!");
         }
     }
 
@@ -257,7 +258,7 @@ public class OntologyDAO {
         synonym.setLastModifiedDate(synonym.getCreatedDate());
         synonym.setSource(source==null ? "OBO" : source);
 
-        Logger log = Logger.getLogger("synonymsInserted");
+        Logger log = LogManager.getLogger("synonymsInserted");
         log.info(synonym.dump("|"));
 
         synonym.setKey(dao.insertTermSynonym(synonym));
@@ -286,7 +287,7 @@ public class OntologyDAO {
             return 0;
         }
 
-        Logger log = Logger.getLogger("synonymsDeleted");
+        Logger log = LogManager.getLogger("synonymsDeleted");
         for( TermSynonym syn: synonyms ) {
             log.info(syn.dump("|"));
         }
@@ -641,7 +642,7 @@ public class OntologyDAO {
         }
 
         // dump terms to be obsoleted into 'obsoletedTerms.log'
-        Logger log = Logger.getLogger("obsoletedTerms");
+        Logger log = LogManager.getLogger("obsoletedTerms");
         for( Term term: orphanedTerms ) {
             log.info(term.dump("|"));
         }

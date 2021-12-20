@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/> -->
+            <PatternLayout pattern="[%d{yyyy-MM-hh HH:mm:ss}] %msg%n"/>
+        </Console>
+
+        <RollingFile name="status" append="true" fileName="logs/status.log" filePattern="logs/status.log.%d{yyyy-MM}">
+            <PatternLayout pattern="%d %p [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <File name="summary" append="false" fileName="logs/summary.log">
+            <PatternLayout pattern="%m%n"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </File>
+        <RollingFile name="detail" append="true" fileName="logs/detail.log" filePattern="logs/detail.log.%d{yyyy-MM}">
+            <PatternLayout pattern="%d %p [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="gviewer_stats" append="true" fileName="logs/gviewer_stats.log" filePattern="logs/gviewer_stats.log.%d{yyyy-MM}">
+            <PatternLayout pattern="%d %p [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <File name="gviewer_stats_summary" append="false" fileName="logs/gviewer_stats_summary.log">
+            <PatternLayout pattern="%m%n"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </File>
+        <RollingFile name="gviewer_stats_monthly" append="true" fileName="logs/gviewer_stats_monthly.log" filePattern="logs/gviewer_stats_monthly.log.%d{yyyy-MM}">
+            <PatternLayout pattern="%d %p [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="goTaxonConstraints" append="true" fileName="logs/goTaxonConstraints.log" filePattern="logs/goTaxonConstraints.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="malformedRsSynonyms" append="true" fileName="logs/malformedRsSynonyms.log" filePattern="logs/malformedRsSynonyms.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="descChangedXRefs" append="true" fileName="logs/descChangedXRefs.log" filePattern="logs/descChangedXRefs.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="deletedXRefs" append="true" fileName="logs/deletedXRefs.log" filePattern="logs/deletedXRefs.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="insertedXRefs" append="true" fileName="logs/insertedXRefs.log" filePattern="logs/insertedXRefs.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="termNameChanged" append="true" fileName="logs/termNameChanged.log" filePattern="logs/termNameChanged.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="insertedTerms" append="true" fileName="logs/insertedTerms.log" filePattern="logs/insertedTerms.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="obsoletedTerms" append="true" fileName="logs/obsoletedTerms.log" filePattern="logs/obsoletedTerms.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="deletedDags" append="true" fileName="logs/deletedDags.log" filePattern="logs/deletedDags.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="insertedDags" append="true" fileName="logs/insertedDags.log" filePattern="logs/insertedDags.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="synonymsDeleted" append="true" fileName="logs/synonymsDeleted.log" filePattern="logs/synonymsDeleted.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="synonymsInserted" append="true" fileName="logs/synonymsInserted.log" filePattern="logs/synonymsInserted.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="stats" append="true" fileName="logs/stats.log" filePattern="logs/stats.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="data_loader" append="true" fileName="logs/data_loader.log" filePattern="logs/data_loader.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="qc" append="true" fileName="logs/qc.log" filePattern="logs/qc.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="file_parser" append="true" fileName="logs/file_parser.log" filePattern="logs/file_parser.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <!-- daily -->
+        <Logger name="status" level="debug" additivity="false">
+            <AppenderRef ref="status" level="info"/>
+            <AppenderRef ref="summary" level="info"/><!-- human readable -->
+            <AppenderRef ref="detail"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+
+        <Logger name="gviewer_stats" level="debug" additivity="false">
+            <AppenderRef ref="gviewer_stats_summary" level="info"/>
+            <AppenderRef ref="gviewer_stats_monthly" level="info"/>
+            <AppenderRef ref="gviewer_stats"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+
+        <!-- monthly -->
+        <Logger name="goTaxonConstraints" level="debug" additivity="false">
+            <AppenderRef ref="goTaxonConstraints"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="malformedRsSynonyms" level="debug" additivity="false">
+            <AppenderRef ref="malformedRsSynonyms"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="descChangedXRefs" level="debug" additivity="false">
+            <AppenderRef ref="descChangedXRefs"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="deletedXRefs" level="debug" additivity="false">
+            <AppenderRef ref="deletedXRefs"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="insertedXRefs" level="debug" additivity="false">
+            <AppenderRef ref="insertedXRefs"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="termNameChanged" level="debug" additivity="false">
+            <AppenderRef ref="termNameChanged"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="insertedTerms" level="debug" additivity="false">
+            <AppenderRef ref="insertedTerms"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="obsoletedTerms" level="debug" additivity="false">
+            <AppenderRef ref="obsoletedTerms"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="deletedDags" level="debug" additivity="false">
+            <AppenderRef ref="deletedDags"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="insertedDags" level="debug" additivity="false">
+            <AppenderRef ref="insertedDags"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="synonymsDeleted" level="debug" additivity="false">
+            <AppenderRef ref="synonymsDeleted"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="synonymsInserted" level="debug" additivity="false">
+            <AppenderRef ref="synonymsInserted"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="stats" level="debug" additivity="false">
+            <AppenderRef ref="stats"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="data_loader" level="debug" additivity="false">
+            <AppenderRef ref="data_loader"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="qc" level="debug" additivity="false">
+            <AppenderRef ref="qc"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="file_parser" level="debug" additivity="false">
+            <AppenderRef ref="file_parser"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+    </Loggers>
+</Configuration>
