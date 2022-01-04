@@ -282,15 +282,15 @@
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
-        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2021-01-13 --" />
+        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2022-01-04 --" />
         <property name="versionedFiles">
             <map>
-                <entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
-                <entry key="CMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/clinical_measurement/clinical_measurement.obo"/>
-                <entry key="MMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/measurement_method/measurement_method.obo"/>
-                <entry key="XCO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/experimental_condition/experimental_condition.obo"/>
-                <entry key="RDO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/disease/RDO.obo"/>
-                <entry key="RS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/rat_strain/rat_strain.obo"/>
+                <entry key="PW" value="https://download.rgd.mcw.edu/ontology/pathway/pathway.obo"/>
+                <entry key="CMO" value="https://download.rgd.mcw.edu/ontology/clinical_measurement/clinical_measurement.obo"/>
+                <entry key="MMO" value="https://download.rgd.mcw.edu/ontology/measurement_method/measurement_method.obo"/>
+                <entry key="XCO" value="https://download.rgd.mcw.edu/ontology/experimental_condition/experimental_condition.obo"/>
+                <entry key="RDO" value="https://download.rgd.mcw.edu/ontology/disease/RDO.obo"/>
+                <entry key="RS" value="https://download.rgd.mcw.edu/ontology/rat_strain/rat_strain.obo"/>
             </map>
         </property>
         <property name="emitObsoleteTermsFor">
