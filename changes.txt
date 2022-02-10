@@ -1,3 +1,6 @@
+Feb 10, 2022
+  DO qc: fixed handling of UTF-8 characters
+
 Jan 04, 2022
   obo exporter: config fix (was using retired ftp://ftp.rgd.mcw.edu)
 
