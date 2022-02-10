@@ -49,7 +49,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20211215_doid.obo";
+        String fileName = "h:/do/20220131_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -164,7 +164,7 @@ public class DoIdQC {
         Set<String> omimIdsInRdo = dao.getOmimIdsInRdo();
         System.out.println("OMIM IDs in RDO: "+omimIdsInRdo.size());
 
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        BufferedReader reader = Utils.openReaderUtf8(fileName);
         Map<String, OboTerm> oboTerms = new HashMap<>();
         String line;
         OboTerm oboTerm = null;
