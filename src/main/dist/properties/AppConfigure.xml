@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 10, 2022" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 14, 2022" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -51,6 +51,7 @@
                 <entry key="ZFA" value="http://ontologies.berkeleybop.org/zfa/zfa.obo"/>
                 <entry key="NCBITaxon" value="file:///tmp/ncbitaxon.obo"/>
                 <entry key="CVCL" value="ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo"/>
+                <entry key="MONDO" value="http://purl.obolibrary.org/obo/mondo/mondo.obo"/>
             </map>
         </property>
         <property name="qualityChecker" ref="qualityChecker" />
@@ -85,6 +86,7 @@
                 <entry key="ZFA" value="ZFA:"/>
                 <entry key="CS" value="CS:"/>
                 <entry key="CVCL" value="CVCL_"/>
+                <entry key="MONDO" value="MONDO"/>
             </map>
         </property>
 
@@ -101,6 +103,7 @@
                 <entry key="NBO" value="NBO:0000000,NBO:0000243,NBO:0000313"/>
                 <entry key="ORDO" value="Orphanet:0,Orphanet:C001,Orphanet:C005,Orphanet:C010,Orphanet:C012,Orphanet:C023"/>
                 <entry key="UBERON" value="UBERON:9999999,UBERON:0000000,UBERON:0001062"/>
+                <entry key="MONDO" value="MONDO:0000000,MONDO:0000001,MONDO:0021125,MONDO:0042489"/>
             </map>
         </property>
 
