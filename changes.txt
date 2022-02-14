@@ -1,3 +1,6 @@
+Feb 14, 2022
+  parser: updated to allow loading of MONDO ontology
+
 Feb 10, 2022
   DO qc: fixed handling of UTF-8 characters
 

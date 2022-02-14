@@ -317,8 +317,9 @@ public class FileParser {
                         val = line.substring(6);
                     addRelationship(rec, val, Relation.IS_A, accIdPrefix);
                 }
-                else
+                else {
                     parseRelationship(rec, line.substring(13).trim(), accIdPrefix);
+                }
             }
             // namespace
             else if( line.startsWith("namespace:") ) {
@@ -649,6 +650,24 @@ public class FileParser {
         String relName = line.substring(0, spacePos);
         Relation rel = relations.get(relName);
         if( rel==null ) {
+            // MONDO extra processing
+            if( ontId.equals("MONDO") && relName.equals("seeAlso") ) {
+                rec.addSynonym(line.substring(spacePos).trim(), "seeAlso");
+                return;
+            }
+            if( ontId.equals("MONDO") && relName.equals("excluded_subClassOf") ) {
+                // ignore these relationships entirely
+                return;
+            }
+            if( ontId.equals("MONDO") && (relName.equals("disease_has_feature") || relName.equals("disease_shares_features_of")) ) {
+                String name = line.substring(spacePos).trim();
+                int spacePos2 = name.indexOf(' ');
+                if( spacePos2>0 ) {
+                    name = name.substring(0, spacePos2);
+                }
+                rec.addSynonym(name, relName);
+                return;
+            }
             rel = Relation.NOT_SPECIFIED;
         }
 

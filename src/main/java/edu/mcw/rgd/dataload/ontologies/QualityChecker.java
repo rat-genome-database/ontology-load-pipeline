@@ -91,7 +91,7 @@ public class QualityChecker {
 
                 // test if the newly inserted DAG does not form loops
                 try {
-                    dao.getDescendantCount(parentTermAcc);
+                    dao.getAncestorCount(parentTermAcc);
                 } catch(Exception e) {
                         // connect by loop detected: report it
                     String relId = Relation.getRelIdFromRel(entry.getValue());
