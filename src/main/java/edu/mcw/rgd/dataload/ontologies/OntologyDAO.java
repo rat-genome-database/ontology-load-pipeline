@@ -88,7 +88,7 @@ public class OntologyDAO {
         fixTermNameDefComment(term);
         int r = dao.insertTerm(term);
         if( r!=0 ) {
-            logInsertedTerms.info("INSERT|"+term.dump("|"));
+            logInsertedTerms.debug("INSERT|"+term.dump("|"));
             counters.increment("TERMS_INSERTED_"+term.getOntologyId());
         }
     }
@@ -161,7 +161,7 @@ public class OntologyDAO {
 
     public int deleteDag(TermDagEdge dag) throws Exception {
 
-        logDeletedDags.info(dag.dump("|"));
+        logDeletedDags.debug(dag.dump("|"));
         return dao.deleteDag(dag);
     }
 
@@ -175,7 +175,7 @@ public class OntologyDAO {
     public int deleteDags(String ontId, Date cutoffDate) throws Exception {
 
         for( TermDagEdge dag: dao.getStaleDags(ontId, cutoffDate) ) {
-            logDeletedDags.info(dag.dump("|"));
+            logDeletedDags.debug(dag.dump("|"));
         }
         return dao.deleteStaleDags(ontId, cutoffDate);
     }
@@ -191,7 +191,7 @@ public class OntologyDAO {
 
         List<TermDagEdge> newDags = dao.getNewDags(ontId, cutoffDate);
         for( TermDagEdge dag: newDags ) {
-            logInsertedDags.info(dag.dump("|"));
+            logInsertedDags.debug(dag.dump("|"));
         }
         return newDags.size();
     }
@@ -259,7 +259,7 @@ public class OntologyDAO {
         synonym.setSource(source==null ? "OBO" : source);
 
         Logger log = LogManager.getLogger("synonymsInserted");
-        log.info(synonym.dump("|"));
+        log.debug(synonym.dump("|"));
 
         synonym.setKey(dao.insertTermSynonym(synonym));
         return true;
@@ -289,7 +289,7 @@ public class OntologyDAO {
 
         Logger log = LogManager.getLogger("synonymsDeleted");
         for( TermSynonym syn: synonyms ) {
-            log.info(syn.dump("|"));
+            log.debug(syn.dump("|"));
         }
 
         return dao.deleteTermSynonyms(synonyms);
@@ -644,7 +644,7 @@ public class OntologyDAO {
         // dump terms to be obsoleted into 'obsoletedTerms.log'
         Logger log = LogManager.getLogger("obsoletedTerms");
         for( Term term: orphanedTerms ) {
-            log.info(term.dump("|"));
+            log.debug(term.dump("|"));
         }
 
         // finally obsolete the orphaned terms
@@ -711,7 +711,7 @@ public class OntologyDAO {
 
     public int insertTermXRefs(List<TermXRef> xrefs) throws Exception {
         for( TermXRef xref: xrefs ) {
-            logInsertedXRefs.info(xref.dump("|"));
+            logInsertedXRefs.debug(xref.dump("|"));
             dao.insertTermXRef(xref);
         }
         return xrefs.size();
@@ -719,7 +719,7 @@ public class OntologyDAO {
 
     public int deleteTermXRefs(List<TermXRef> xrefs) throws Exception {
         for( TermXRef xref: xrefs ) {
-            logDeletedXRefs.info(xref.dump("|"));
+            logDeletedXRefs.debug(xref.dump("|"));
             dao.deleteTermXRef(xref);
         }
         return xrefs.size();
@@ -727,7 +727,7 @@ public class OntologyDAO {
 
     public int updateTermXRefDescriptions(List<TermXRef> xrefs) throws Exception {
         for( TermXRef xref: xrefs ) {
-            logDescChangedXRefs.info(xref.dump("|"));
+            logDescChangedXRefs.debug(xref.dump("|"));
             dao.updateTermXRefDescription(xref);
         }
         return xrefs.size();

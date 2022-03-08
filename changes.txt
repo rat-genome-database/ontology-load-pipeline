@@ -1,3 +1,6 @@
+Mar 08, 2022
+  do qc: implemented checking of OMIM:PS ids (if they are assigned to the same terms in RGD as they are in DO)
+
 Feb 14, 2022
   parser: updated to allow loading of MONDO ontology
 

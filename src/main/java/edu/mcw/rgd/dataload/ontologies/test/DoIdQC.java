@@ -49,7 +49,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20220131_doid.obo";
+        String fileName = "h:/do/20220302_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -466,6 +466,13 @@ public class DoIdQC {
                 }
                 else {
                     omimPsIdsUpToDate++;
+                }
+
+                // warn if given OMIM:PS id is assigned in DO ontology to a different term than it is in RGD
+                for( TermSynonym tsyn: syns ) {
+                    if( !tsyn.getTermAcc().equals(termInRgd.getAccId()) ) {
+                        System.out.println("*** "+omimPsId+" conflict: incoming term: "+termInRgd.getAccId()+",  term-in-RGD: "+tsyn.getTermAcc());
+                    }
                 }
             }
         }
