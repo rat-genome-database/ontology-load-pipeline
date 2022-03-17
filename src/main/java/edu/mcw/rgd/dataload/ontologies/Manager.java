@@ -65,6 +65,7 @@ public class Manager {
         String filter = null;
         boolean loadGViewerStats = false;
         boolean checkForCycles = false;
+        boolean omimPsCustomDoMapper = false;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -97,6 +98,8 @@ public class Manager {
                 }
             } else if (arg.startsWith("-checkForCycles") || arg.startsWith("-check_for_cycles")) {
                 checkForCycles = true;
+            } else if (arg.startsWith("-omim_ps_custom_do_mapper")) {
+                omimPsCustomDoMapper = true;
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -165,6 +168,11 @@ public class Manager {
             taxonConstraints.setDao(manager.dao);
             taxonConstraints.run();
         }
+
+        if( omimPsCustomDoMapper ) {
+            OmimPsCustomDoMapper psDoMapper = (OmimPsCustomDoMapper) bf.getBean("omimPsCustomDoMapper");
+            psDoMapper.run();
+        }
     }
 
     /**
@@ -188,6 +196,7 @@ public class Manager {
             "                         f.e. '-go_taxon_constraints'\n"+
             "   -qc_thread_count=?    specify count of qc threads; default is 5\n"+
             "                         f.e. '-qc_thread_count=2'\n"+
+            "   -update_ps_do_custom_mappings update OMIM_PS_DO_CUSTOM table\n"+
             "   -?                    print usage and exit\n"+
             "   -help                 print usage and exit\n"+
             "   --help                print usage and exit\n"+

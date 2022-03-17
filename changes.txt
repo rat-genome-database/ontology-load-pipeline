@@ -1,3 +1,6 @@
+Mar 17, 2022
+  deployed OmimPsCustomDoTermMapper, to populate table OMIM_PS_CUSTOM_DO
+
 Mar 08, 2022
   do qc: implemented checking of OMIM:PS ids (if they are assigned to the same terms in RGD as they are in DO)
 

@@ -865,6 +865,37 @@ public class OntologyDAO {
         return omimIds;
     }
 
+    public String getOmimPSTermAccForChildTerm(String childTermAcc, CounterPool counters) throws Exception {
+        String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name IN\n" +
+                "(SELECT phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN\n"+
+                " (SELECT synonym_name FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
+                ")";
+        List<String> termAccIds = StringListQuery.execute(dao, sql, childTermAcc);
+        if( termAccIds.isEmpty() ) {
+            return null;
+        }
+        if( termAccIds.size()>1 ) {
+            counters.increment("OMIM:PS problem: multiple OMIM:PS parents for child term "+childTermAcc+": "+Utils.concatenate(termAccIds,","));
+            return null;
+        }
+        return termAccIds.get(0);
+    }
+
+    public List<String> getChildParentDoMappings() throws Exception {
+        String sql = "SELECT child_term_acc||'|'||parent_term_acc FROM omim_ps_custom_do";
+        return StringListQuery.execute(dao, sql);
+    }
+
+    public void insertChildParentDoMapping(String childTermAcc, String parentTermAcc) throws Exception {
+        String sql = "INSERT INTO omim_ps_custom_do (child_term_acc,parent_term_acc) VALUES(?,?)";
+        dao.update(sql, childTermAcc, parentTermAcc);
+    }
+
+    public void deleteChildParentDoMapping(String childTermAcc, String parentTermAcc) throws Exception {
+        String sql = "DELETE FROM omim_ps_custom_do WHERE child_term_acc=? AND parent_term_acc=?";
+        dao.update(sql, childTermAcc, parentTermAcc);
+    }
+
     public void setOntologiesWithSuppressedTermObsoletion(Set<String> ontologiesWithSuppressedTermObsoletion) {
         this.ontologiesWithSuppressedTermObsoletion = ontologiesWithSuppressedTermObsoletion;
     }

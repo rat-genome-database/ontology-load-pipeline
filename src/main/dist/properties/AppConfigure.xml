@@ -376,4 +376,8 @@
         </property>
 
     </bean>
+
+    <bean id="omimPsCustomDoMapper" class="edu.mcw.rgd.dataload.ontologies.OmimPsCustomDoMapper">
+    </bean>
+
 </beans>
