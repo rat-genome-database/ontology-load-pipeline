@@ -309,8 +309,16 @@
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
         <property name="version" value="--GO Taxon Constraints v. 2.0 -- Mar 24, 2022 --" />
+
+        <!-- obsolete urls: they don't work anymore
         <property name="taxonUnionOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_union_terms.obo" />
         <property name="taxonConstraintOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_go_triggers.obo" />
+        -->
+
+        <property name="taxonUnionOboFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/ontology/imports/go-taxon-groupings.obo" />
+        <property name="neverInTaxonFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/taxon_constraints/never_in_taxon.tsv" />
+        <property name="onlyInTaxonFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/taxon_constraints/only_in_taxon.tsv" />
+
         <property name="ratLineage">
             <list>
                 <value>131567 ! cellular organisms</value>

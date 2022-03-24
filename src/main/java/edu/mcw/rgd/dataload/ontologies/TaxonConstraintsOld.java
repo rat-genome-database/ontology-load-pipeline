@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+/*
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.FileDownloader;
@@ -8,22 +9,34 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.*;
+*/
 
 /**
  * @author mtutaj
- * @since 3/24/22
+ * @since 1/20/14
  * <p>
  * GO taxon constraints ensure that annotations are not made to inappropriate species or sets of species.
+ * See http://www.biomedcentral.com/1471-2105/11/530 for more details.
+ * </p>
+ * http://www.geneontology.org/GO.annotation_qc.shtml#GO_AR:0000013
  * <p>
- * Synonyms of type 'only_in_taxon' and 'never_in_taxon' are loaded and then enforced,
- * and a number of GO terms is tagged with 'Not4Curation' synonyms.
+ * After this module is run, all synonyms from files taxon_union_terms.obo and taxon_go_constraints.obo
+ * are refreshed in ONT_SYNONYMS table: synonyms of type 'only_in_taxon' and 'never_in_taxon'.
+ * Then these synonyms are enforced and a number of GO terms is tagged with 'Not4Curation' synonyms.
  * (f.e. if a GO term is tagged as 'only_in_taxon Bacteria', this term and all of its child terms are
  *     tagged as 'Not4Curation', because we do not curate bacteria, only Mammals lineage)
  *
+ *******
+ * Note: this file has been made obsolete in March 2022 because the source files
+ * http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_union_terms.obo and
+ * http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_go_constraints.obo
+ * became unavailable (since several months already)
  */
-public class TaxonConstraints {
+public class TaxonConstraintsOld {
 
+    /*
     private OntologyDAO dao;
     private List<String> ratLineage;
     private Set<Integer> ratLineageSet;
@@ -52,8 +65,7 @@ public class TaxonConstraints {
 
     private String version;
     private String taxonUnionOboFile;
-    private String onlyInTaxonFile;
-    private String neverInTaxonFile;
+    private String taxonConstraintOboFile;
 
 
     public void run() throws Exception {
@@ -74,11 +86,9 @@ public class TaxonConstraints {
         FileDownloader downloader = new FileDownloader();
         downloader.setExternalFile(taxonUnionOboFile);
         downloader.setLocalFile("data/taxon_union_terms.obo");
-        downloader.setUseCompression(true);
-        downloader.setPrependDateStamp(true);
         String localFileName = downloader.download();
 
-        BufferedReader reader = Utils.openReader(localFileName);
+        BufferedReader reader = new BufferedReader(new FileReader(localFileName));
 
         String line;
         String taxonUnionId = null;
@@ -114,60 +124,59 @@ public class TaxonConstraints {
 
     void loadTaxonConstraints() throws Exception {
 
-        int neverInTaxonConstraints = loadConstraints("never_in_taxon", getNeverInTaxonFile());
-        int onlyInTaxonConstraints = loadConstraints("only_in_taxon", getOnlyInTaxonFile());
-
-        logger.info("loaded "+taxonConstraintMap.size()+ " taxon constraints");
-        logger.info("    never_in_taxon constraints: "+neverInTaxonConstraints);
-        logger.info("    only_in_taxon constraints : "+onlyInTaxonConstraints);
-    }
-
-    int loadConstraints(String prefix, String fileName) throws Exception {
-
-        int loadedConstraints = 0;
-
         FileDownloader downloader = new FileDownloader();
-        downloader.setExternalFile(fileName);
-        downloader.setLocalFile("data/"+prefix+".tsv");
-        downloader.setUseCompression(true);
-        downloader.setPrependDateStamp(true);
-        String localFileName = downloader.downloadNew();
+        downloader.setExternalFile(taxonConstraintOboFile);
+        downloader.setLocalFile("data/taxon_go_constraints.obo");
+        String localFileName = downloader.download();
 
-        BufferedReader reader = Utils.openReader(localFileName);
+        BufferedReader reader = new BufferedReader(new FileReader(localFileName));
 
         String line;
+        String goId = null;
+        List<String> taxonList = null;
 
         while( (line=reader.readLine())!=null ) {
 
-            String[] cols = line.split("[\\t]", -1);
-            if( cols.length<4 ) {
-                continue;
+            if( line.startsWith("id: ") ) {
+                goId = line.substring(4).trim();
             }
-            String goId = cols[0].trim();
-            String taxon = cols[2];
-            String taxonLabel = cols[3];
-            if( !(goId.startsWith("GO:") && taxon.startsWith("NCBITaxon")) ) {
-                continue;
-            }
+            else if( line.startsWith("relationship: ") ) {
+                // sample lines:
+                // relationship: only_in_taxon NCBITaxon_Union:0000005 {id="GOTAX:0000102"} ! Nematoda or Protostomia
+                // relationship: never_in_taxon NCBITaxon:554915 {id="GOTAX:0000501", source="PMID:21311032"} ! Amoebozoa
+                //
+                // remove extra text between braces
+                String relationship = line.substring(14);
+                int startPos = relationship.indexOf("{");
+                int stopPos = relationship.indexOf("}");
+                if( startPos>0 && stopPos > startPos ) {
+                    relationship = relationship.substring(0, startPos) + relationship.substring(stopPos+2);
+                }
 
-            // format of taxon union ids in obo file and tsv file differs; we must unify them
-            if( taxon.startsWith("NCBITaxon:Union_") ) {
-                taxon = taxon.replace("NCBITaxon:Union_", "NCBITaxon_Union:");
-            }
+                // now the relationship should be:
+                // only_in_taxon NCBITaxon_Union:0000005 ! Nematoda or Protostomia
+                // never_in_taxon NCBITaxon:554915 ! Amoebozoa
 
-            List<String> taxonList = taxonConstraintMap.get(goId);
-            if( taxonList==null ) {
+                taxonList.add(relationship);
+            }
+            else if( line.startsWith("[Term]") ) {
+                // flush the previous term
+                if( goId!=null && goId.startsWith("GO:") ) {
+                    taxonConstraintMap.put(goId, taxonList);
+                }
+                // initialize for the next term
+                goId = null;
                 taxonList = new ArrayList<>();
-                taxonConstraintMap.put(goId, taxonList);
             }
-
-            String taxonLine = prefix+" "+taxon+" ! "+taxonLabel;
-            taxonList.add(taxonLine);
-            loadedConstraints++;
         }
         reader.close();
 
-        return loadedConstraints;
+        // handle the last term
+        if( goId!=null && goId.startsWith("GO:") ) {
+            taxonConstraintMap.put(goId, taxonList);
+        }
+
+        logger.info("loaded "+taxonConstraintMap.size()+ " taxon constraints");
     }
 
     void expandTaxonUnions() {
@@ -196,7 +205,7 @@ public class TaxonConstraints {
                     for( String taxonFromUnion: taxonUnionMap.get(taxonUnionId) ) {
                         if( taxonsFromUnions==null )
                             taxonsFromUnions = new ArrayList<>();
-                        taxonsFromUnions.add(relationship + taxonFromUnion + taxon.substring(pos2));
+                        taxonsFromUnions.add(relationship + taxonFromUnion);
                     }
 
                     // remove union from the GO results
@@ -354,6 +363,22 @@ public class TaxonConstraints {
         return version;
     }
 
+    public void setTaxonUnionOboFile(String taxonUnionOboFile) {
+        this.taxonUnionOboFile = taxonUnionOboFile;
+    }
+
+    public String getTaxonUnionOboFile() {
+        return taxonUnionOboFile;
+    }
+
+    public void setTaxonConstraintOboFile(String taxonConstraintOboFile) {
+        this.taxonConstraintOboFile = taxonConstraintOboFile;
+    }
+
+    public String getTaxonConstraintOboFile() {
+        return taxonConstraintOboFile;
+    }
+
     public OntologyDAO getDao() {
         return dao;
     }
@@ -368,30 +393,6 @@ public class TaxonConstraints {
 
     public List<String> getRatLineage() {
         return ratLineage;
-    }
-
-    public String getOnlyInTaxonFile() {
-        return onlyInTaxonFile;
-    }
-
-    public void setOnlyInTaxonFile(String onlyInTaxonFile) {
-        this.onlyInTaxonFile = onlyInTaxonFile;
-    }
-
-    public String getNeverInTaxonFile() {
-        return neverInTaxonFile;
-    }
-
-    public void setNeverInTaxonFile(String neverInTaxonFile) {
-        this.neverInTaxonFile = neverInTaxonFile;
-    }
-
-    public String getTaxonUnionOboFile() {
-        return taxonUnionOboFile;
-    }
-
-    public void setTaxonUnionOboFile(String taxonUnionOboFile) {
-        this.taxonUnionOboFile = taxonUnionOboFile;
     }
 
     public void init() {
@@ -420,9 +421,6 @@ public class TaxonConstraints {
 
 
     public boolean satisfiesTaxonConstraints(String termAcc, String taxon) throws Exception {
-
-        System.out.println(termAcc+" "+taxon);
-
         // taxon constraints are only for GO terms
         if( !termAcc.startsWith("GO:") )
             return true;
@@ -452,4 +450,5 @@ public class TaxonConstraints {
         }
         return true;
     }
+    */
 }
