@@ -1,3 +1,6 @@
+Mar 24, 2022
+  updated rat lineage (NCBI taxonomy)
+  
 Mar 17, 2022
   deployed OmimPsCustomDoTermMapper, to populate table OMIM_PS_CUSTOM_DO
 

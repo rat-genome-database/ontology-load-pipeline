@@ -61,6 +61,8 @@ public class OmimPsCustomDoMapper {
             }
         });
 
+        System.out.println(counters.dumpAlphabetically());
+
         List<String> mappings = new ArrayList<>();
         for(Map.Entry<String,String> entry: childToParentMap.entrySet() ) {
             mappings.add(entry.getKey()+"|"+entry.getValue());

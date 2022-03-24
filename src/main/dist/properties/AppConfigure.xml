@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 08, 2022" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 24, 2022" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -308,7 +308,7 @@
     </bean>
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
-        <property name="version" value="--GO Taxon Constraints v. 2.0 -- Aug 17, 2015 --" />
+        <property name="version" value="--GO Taxon Constraints v. 2.0 -- Mar 24, 2022 --" />
         <property name="taxonUnionOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_union_terms.obo" />
         <property name="taxonConstraintOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_go_triggers.obo" />
         <property name="ratLineage">
@@ -337,7 +337,7 @@
                 <value>314146 ! Euarchontoglires</value><!-- superorder: rodents and rabbits + primates, treeshrews, colugos -->
                 <value>314147 ! Glires</value><!-- rodents and rabbits -->
                 <value>9989 ! Rodentia</value><!-- order: rodents -->
-                <value>33553 ! Sciurognathi</value><!-- suborder: rodents with specific shape to lower jaw -->
+                <value>1963758 ! Myomorpha</value><!-- mice and others -->
                 <value>337687 ! Muroidea</value><!-- superfamily: rodents -->
                 <value>10066 ! Muridae</value><!-- family: rodents -->
                 <value>39107 ! Murinae</value><!-- subfamily: Old World rats and mice -->
