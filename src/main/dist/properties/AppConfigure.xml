@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 24, 2022" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 25, 2022" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -308,7 +308,7 @@
     </bean>
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
-        <property name="version" value="--GO Taxon Constraints v. 2.0 -- Mar 24, 2022 --" />
+        <property name="version" value="--GO Taxon Constraints   -- build Mar 25, 2022 --" />
 
         <!-- obsolete urls: they don't work anymore
         <property name="taxonUnionOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_union_terms.obo" />

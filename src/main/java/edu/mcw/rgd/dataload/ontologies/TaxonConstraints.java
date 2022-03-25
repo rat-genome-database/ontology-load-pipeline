@@ -29,6 +29,7 @@ public class TaxonConstraints {
     private Set<Integer> ratLineageSet;
 
     protected final Logger logger = LogManager.getLogger("goTaxonConstraints");
+    protected final Logger logStatus = LogManager.getLogger("status");
 
     // definitions of taxon unions; example entry
     //[Term]
@@ -58,7 +59,6 @@ public class TaxonConstraints {
 
     public void run() throws Exception {
 
-        System.out.println(getVersion());
         logger.info(getVersion());
 
         loadTaxonUnionMap();
@@ -67,6 +67,7 @@ public class TaxonConstraints {
         syncSynonyms();
 
         logger.info("---OK---");
+        logger.info("");
     }
 
     void loadTaxonUnionMap() throws Exception {
@@ -240,9 +241,9 @@ public class TaxonConstraints {
 
                 // handle Not4Curation synonyms
                 if( satisfiesTaxonConstraints(goId, taxon) ) {
-                    //System.out.println("OK: satisfies taxon constraint "+goId+" "+ taxon);
+                    logStatus.debug("OK: satisfies taxon constraint "+goId+" "+ taxon);
                 } else {
-                    //System.out.println("BAD: not satisfies taxon constraint "+goId+" "+ taxon);
+                    logStatus.debug("BAD: not satisfies taxon constraint "+goId+" "+ taxon);
 
                     syn = new TermSynonym();
                     syn.setTermAcc(goId);
@@ -312,24 +313,21 @@ public class TaxonConstraints {
                 countNot4Curation++;
             }
             else {
-                System.out.println("ERROR: unpected synonym type/name");
+                logger.info("ERROR: unexpected synonym type / name");
             }
         }
         String msg;
         if( countNeverInTaxon>0 ) {
             msg = "  never_in_taxon synonyms "+title+": "+countNeverInTaxon;
             logger.info(msg);
-            System.out.println(msg);
         }
         if( countOnlyInTaxon>0 ) {
             msg = "  only_in_taxon synonyms "+title+": "+countOnlyInTaxon;
             logger.info(msg);
-            System.out.println(msg);
         }
         if( countNot4Curation>0 ) {
             msg = "  Not4Curation synonyms "+title+": "+countNot4Curation;
             logger.info(msg);
-            System.out.println(msg);
         }
     }
 
@@ -421,7 +419,7 @@ public class TaxonConstraints {
 
     public boolean satisfiesTaxonConstraints(String termAcc, String taxon) throws Exception {
 
-        System.out.println(termAcc+" "+taxon);
+        logStatus.debug(termAcc+" "+taxon);
 
         // taxon constraints are only for GO terms
         if( !termAcc.startsWith("GO:") )
