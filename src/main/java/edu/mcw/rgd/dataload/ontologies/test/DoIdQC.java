@@ -31,7 +31,6 @@ public class DoIdQC {
     int termsWithNewDef = 0;
     int termsWithSameDef = 0;
     int termsWithUpdatedDef = 0;
-    int termsWithIncompatibleDef = 0;
     int missingParents = 0;
     int omimPsIdsInserted = 0;
     int omimPsIdsUpToDate = 0;
@@ -49,7 +48,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20220302_doid.obo";
+        String fileName = "h:/do/20220606_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -127,7 +126,6 @@ public class DoIdQC {
         System.out.println("OBO TERMS WITH NEW DEF "+termsWithNewDef);
         System.out.println("OBO TERMS WITH SAME DEF "+termsWithSameDef);
         System.out.println("OBO TERMS WITH UPDATED DEF "+termsWithUpdatedDef);
-        System.out.println("OBO TERMS WITH INCOMPATIBLE DEF "+termsWithIncompatibleDef);
         System.out.println("");
         System.out.println("MISSING PARENTS: "+missingParents);
         if( omimPsIdsInserted!=0 ) {
@@ -367,15 +365,10 @@ public class DoIdQC {
             return;
         }
 
-        // different def -- update def only for DO
-        if( termInRgd.getDefinition().endsWith(" (DO)") ) {
-            termInRgd.setDefinition(oboDef);
-            dao.updateTerm(termInRgd);
-            termsWithUpdatedDef++;
-            return;
-        }
-
-        termsWithIncompatibleDef++;
+        // different def -- update
+        termInRgd.setDefinition(oboDef);
+        dao.updateTerm(termInRgd);
+        termsWithUpdatedDef++;
     }
 
     void qcDefXRefs( List<TermXRef> incomingXRefs, Term termInRgd ) throws Exception {

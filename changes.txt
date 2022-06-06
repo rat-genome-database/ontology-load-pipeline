@@ -1,3 +1,6 @@
+Jun 06, 2022
+  DO qc: updated loading of term definitions
+
 Mar 25, 2022
   go constraints: tuned up logging
 
