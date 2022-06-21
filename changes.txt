@@ -1,3 +1,6 @@
+Jun 21, 2022
+  TaxonConstraints: fixed a bug preventing proper generation and cleanup of Not4Curation synonyms for GO terms
+
 Jun 06, 2022
   DO qc: updated loading of term definitions
 

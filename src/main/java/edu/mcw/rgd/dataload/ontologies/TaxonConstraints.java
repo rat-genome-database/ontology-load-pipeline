@@ -4,6 +4,7 @@ import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.FileDownloader;
 import edu.mcw.rgd.process.Utils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -218,15 +219,12 @@ public class TaxonConstraints {
 
     void syncSynonyms() throws Exception {
 
-        List<TermSynonym> synonymsForInsert = new ArrayList<>();
-        List<TermSynonym> synonymsForDelete = new ArrayList<>();
-        List<TermSynonym> synonymsMatching = new ArrayList<>();
+        List<TermSynonym> incomingSynonyms = new ArrayList<>();
 
         for( Map.Entry<String, List<String>> entry: this.taxonConstraintMap.entrySet() ) {
 
             String goId = entry.getKey();
             List<String> taxons = entry.getValue();
-            List<TermSynonym> incomingSynonyms = new ArrayList<>();
 
             // create list of incoming synonyms
             for( String taxon: taxons ) {
@@ -251,7 +249,8 @@ public class TaxonConstraints {
                     syn.setName("Not4Curation");
                     addSynonym(incomingSynonyms, syn);
 
-                    for( Term term: dao.getAllActiveTermDescendants(goId) ) {
+                    List<Term> childTerms = dao.getAllActiveTermDescendants(goId);
+                    for( Term term: childTerms ) {
                         syn = new TermSynonym();
                         syn.setTermAcc(term.getAccId());
                         syn.setType("synonym");
@@ -260,39 +259,57 @@ public class TaxonConstraints {
                     }
                 }
             }
+        }
 
-            // create list of in-RGD synonyms
-            List<TermSynonym> inRgdSynonyms = dao.getTermSynonyms(goId);
-            Iterator<TermSynonym> it = inRgdSynonyms.iterator();
-            while( it.hasNext() ) {
-                TermSynonym syn = it.next();
-                if( !syn.getType().equals("only_in_taxon") &&
-                    !syn.getType().equals("never_in_taxon") &&
-                    !syn.getName().equals("Not4Curation") ) {
-                    it.remove();
-                }
-            }
+        syncSynonymsWithRgd(incomingSynonyms);
+    }
 
-            // do qc
-            SynonymManager synonymManager = new SynonymManager();
-            synonymManager.qc(goId, inRgdSynonyms, incomingSynonyms);
+    void syncSynonymsWithRgd(List<TermSynonym> incomingSynonyms) throws Exception {
 
-            // determine for-insert and for-delete synonyms
-            synonymsForInsert.addAll(synonymManager.forInsertSynonyms);
-            synonymsForDelete.addAll(synonymManager.forDeleteSynonyms);
-            for( TermSynonym syn: synonymManager.matchingSynonyms ) {
-                addSynonym(synonymsMatching, syn);
+        // load synonyms in RGD
+        List<TermSynonym> inRgdSynonyms = new ArrayList<>();
+        String[] goOntIds = {"BP", "CC", "MF"};
+        for( String goOntId: goOntIds ) {
+            inRgdSynonyms.addAll(dao.getActiveSynonymsByType(goOntId, "never_in_taxon"));
+            inRgdSynonyms.addAll(dao.getActiveSynonymsByType(goOntId, "only_in_taxon"));
+            inRgdSynonyms.addAll(dao.getActiveSynonymsByName(goOntId, "Not4Curation"));
+        }
+
+        List<TermSynonym> synonymsForInsert = ListUtils.subtract(incomingSynonyms, inRgdSynonyms);
+        List<TermSynonym> synonymsForDelete = ListUtils.subtract(inRgdSynonyms, incomingSynonyms);
+
+        List<TermSynonym> synonymsMatching = ListUtils.intersection(incomingSynonyms, inRgdSynonyms);
+
+        // check if matching synonyms have syn_key set
+        int synKeySet = 0;
+        for( TermSynonym tsyn: synonymsMatching ) {
+            if( tsyn.getKey()!=0 ) {
+                synKeySet++;
             }
         }
+        if( synKeySet < synonymsMatching.size() ) {
+            throw new Exception("unexpected: matching synonyms in RGD without SYN_KEY set");
+        }
+        dao.updateTermSynonymLastModifiedDate(synonymsMatching);
 
         // perform synonym operations on database
         for( TermSynonym syn: synonymsForInsert ) {
             dao.insertTermSynonym(syn, "GO");
         }
-        dao.deleteTermSynonyms(synonymsForDelete);
+
+        // delete term synonyms scheduled for delete if and only if they are older than 10 days
+        Date tenDaysEarlier = Utils.addDaysToDate(new Date(), -10);
+        List<TermSynonym> obsoleteSynonyms = new ArrayList<>();
+        for( TermSynonym tsyn: synonymsForDelete ) {
+            if( tsyn.getLastModifiedDate().before(tenDaysEarlier) ) {
+                obsoleteSynonyms.add(tsyn);
+            }
+        }
+        logStatus.info("synonyms for delete: "+synonymsForDelete.size()+", but only "+obsoleteSynonyms.size()+" are obsolete (not modified in the last 10 days) and only those will be deleted");
+        dao.deleteTermSynonyms(obsoleteSynonyms);
 
         printStats("inserted", synonymsForInsert);
-        printStats("deleted", synonymsForDelete);
+        printStats("deleted", obsoleteSynonyms);
         printStats("matching", synonymsMatching);
     }
 
