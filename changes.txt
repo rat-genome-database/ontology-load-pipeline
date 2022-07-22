@@ -1,3 +1,6 @@
+Jul 22, 2022
+  added EFO-to-RDO mapper
+
 Jun 21, 2022
   TaxonConstraints: fixed a bug preventing proper generation and cleanup of Not4Curation synonyms for GO terms
 
