@@ -1,7 +1,8 @@
 Jul 26, 2022
   fix to prevent erroneous deletion of dags / obsoletion of terms
   MP ontology: added loading of ORCID ids into 'created_by' field
-  
+  EFO-to-RDO mapper: refactored code to allow adding EFO-to-MP and EFO-to-HP mappers in the future
+
 Jul 22, 2022
   added EFO-to-RDO mapper
 

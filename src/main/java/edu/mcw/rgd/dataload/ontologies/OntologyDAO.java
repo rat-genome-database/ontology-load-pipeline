@@ -226,8 +226,12 @@ public class OntologyDAO {
     Map<String, List<TermSynonym>> _termSynonymCache = new ConcurrentHashMap<>();
 
 
+    public List<Term> getTermsBySynonym(String ontId, String synonymToMatch) throws Exception {
+        return dao.getTermsBySynonym(ontId, synonymToMatch, "exact");
+    }
+
     public List<Term> getRdoTermsBySynonym(String synonymToMatch) throws Exception {
-        return dao.getTermsBySynonym("RDO", synonymToMatch, "exact");
+        return getTermsBySynonym("RDO", synonymToMatch);
     }
 
     /**

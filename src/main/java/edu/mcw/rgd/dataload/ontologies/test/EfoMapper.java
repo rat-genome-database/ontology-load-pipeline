@@ -11,16 +11,23 @@ import java.util.*;
 
 public class EfoMapper {
 
+    static OntologyXDAO odao = new OntologyXDAO();
+    static OntologyDAO dao = new OntologyDAO();
+
     public static void main(String[] args) throws Exception {
 
         System.out.println("START");
 
-        OntologyDAO dao = new OntologyDAO();
+        final String ontId = "RDO";
+        run(ontId);
+    }
 
-        TermNameMatcher matcher = populateTermNameMatcher(dao);
+    static void run(String ontId) throws Exception {
 
-        BufferedWriter out = Utils.openWriter("efo_do_mappings.txt");
-        out.write("EFO ID\tEFO term\tmatch by\tDO ID\tDO term\n");
+        TermNameMatcher matcher = populateTermNameMatcher(ontId);
+
+        BufferedWriter out = Utils.openWriter("EFO_to_"+ontId+"_mappings.txt");
+        out.write("EFO ID\tEFO term\tmatch by\t"+ontId+" ID\t"+ontId+" term\n");
 
         final String TAB = "\t";
         Set<String> efoTermsWithoutMatches = new HashSet<>();
@@ -51,101 +58,14 @@ public class EfoMapper {
 
                 if( tsyn.getType().equals("xref") || tsyn.getType().equals("alt_id") ) {
                     String efoXref = tsyn.getName().toUpperCase();
-                    if( efoXref.startsWith("AAO:") ||
-                        efoXref.startsWith("ATCC:") ||
-                        efoXref.startsWith("ATC_CODE:") ||
-                            efoXref.startsWith("BAO:") ||
-                        efoXref.startsWith("BILADO:") ||
-                        efoXref.startsWith("BIRN_ANAT:") ||
-                        efoXref.startsWith("BTO:") ||
-                        efoXref.startsWith("CASRN:") ||
-                        efoXref.startsWith("CHMO:") ||
-                        efoXref.startsWith("CL:") ||
-                        efoXref.startsWith("CLO:") ||
-                        efoXref.startsWith("CMO:") ||
-                        efoXref.startsWith("COHD:") ||
-                            efoXref.startsWith("CRISP") ||
-                        efoXref.startsWith("CSP:") ||
-                        efoXref.startsWith("DERMO:") ||
-                        efoXref.startsWith("DI:") ||
-                        efoXref.startsWith("DOI:") ||
-                        efoXref.startsWith("DSSTOX_GENERIC_SID:") ||
-                        efoXref.startsWith("EFO:") ||
-                        efoXref.startsWith("EHDAA:") ||
-                        efoXref.startsWith("EMAPA:") ||
-                            efoXref.startsWith("ENM:") ||
-                        efoXref.startsWith("ERO:") ||
-                        efoXref.startsWith("EV:") ||
-                        efoXref.startsWith("EVM:") ||
-                        efoXref.startsWith("FBBT:") ||
-                        efoXref.startsWith("FBDV:") ||
-                        efoXref.startsWith("FBTC:") ||
-                        efoXref.startsWith("FMA:") ||
-                        efoXref.startsWith("GERMPLASM:") ||
-                        efoXref.startsWith("GO:") ||
-                        efoXref.startsWith("GTR:") ||
-                        efoXref.startsWith("HGNC:") ||
-                        efoXref.startsWith("HP:") ||
-                            efoXref.startsWith("HSAPDV:") ||
-                        efoXref.startsWith("ICD10:") ||
-                        efoXref.startsWith("ICD10CM:") ||
-                        efoXref.startsWith("ICD10EXP:") ||
-                        efoXref.startsWith("ICD10WHO:") ||
-                        efoXref.startsWith("ICD9:") ||
-                        efoXref.startsWith("ICD9CM:") ||
-                        efoXref.startsWith("ICDO:") ||
-                        efoXref.startsWith("IDOMAL:") ||
-                            efoXref.startsWith("ISBN:") ||
-                        efoXref.startsWith("JAX:") ||
-                        efoXref.startsWith("KEGG:") ||
-                        efoXref.startsWith("MA:") ||
-                        efoXref.startsWith("MAP:") ||
-                        efoXref.startsWith("MAT:") ||
-                        efoXref.startsWith("MCC:") ||
-                        efoXref.startsWith("MEDDRA:") ||
+                    if( efoXref.startsWith("MEDDRA:") ||
                         efoXref.startsWith("MEDGEN:") ||
-                        efoXref.startsWith("MFO:") ||
-                        efoXref.startsWith("MMUSDV:") ||
-                        efoXref.startsWith("MO:") ||
                         efoXref.startsWith("MONDO:") ||
-                        efoXref.startsWith("MP:") ||
-                            efoXref.startsWith("MTH:") ||
-                        efoXref.startsWith("NCIM:") ||
-                        efoXref.startsWith("NCI METATHESAURUS:") ||
-                        efoXref.startsWith("NIFSTD:") ||
-                        efoXref.startsWith("NPO:") ||
-                        efoXref.startsWith("OBI:") ||
-                        efoXref.startsWith("OBO:") ||
-                        efoXref.startsWith("OMIMPS:") ||
-                        efoXref.startsWith("OMIT:") ||
-                        efoXref.startsWith("ONCOTREE:") ||
-                        efoXref.startsWith("ORCID:") ||
                         efoXref.startsWith("ORDO:") ||
                         efoXref.startsWith("ORPHANET:") ||
-                        efoXref.startsWith("PATO:") ||
-                        efoXref.startsWith("PERSON:") ||
-                        efoXref.startsWith("PMID:") ||
-                        efoXref.startsWith("PO:") ||
-                        efoXref.startsWith("PR:") ||
-                            efoXref.startsWith("REACTOME:") ||
                         efoXref.startsWith("RGD:") ||
-                        efoXref.startsWith("SAEL:") ||
-                        efoXref.startsWith("SCTID:") ||
-                        efoXref.startsWith("SNOMEDCT:") ||
-                            efoXref.startsWith("SYMP:") ||
-                        efoXref.startsWith("TADS:") ||
-                        efoXref.startsWith("TAO:") ||
-                        efoXref.startsWith("TGMA:") ||
-                        efoXref.startsWith("UMLS:") ||
-                        efoXref.startsWith("UNIPROT:") ||
-                            efoXref.startsWith("VT:") ||
-                        efoXref.startsWith("WBBT:") ||
-                        efoXref.startsWith("WBLS:") ||
-                        efoXref.startsWith("WIKIPEDIA:") ||
-                        efoXref.startsWith("XAO:") ||
-                        efoXref.startsWith("ZEA:") ||
-                        efoXref.startsWith("ZFA:") ||
-                        efoXref.startsWith("ZFS:") ||
+                        efoXref.startsWith("SYMP:") ||
+                        efoXref.startsWith("VT:") ||
                         efoXref.startsWith("HTTP")) {
 
                         continue; // not processing those
@@ -155,13 +75,13 @@ public class EfoMapper {
                         if( doTerm!=null ) {
                             matches.add(efoXref +TAB+ doTerm.getAccId() +TAB+ doTerm.getTerm());
                         } else {
-                            matchByXref(efoXref, matches, dao);
+                            matchByXref(efoXref, matches, ontId);
                         }
                     }
                     else if( efoXref.startsWith("NCIT:") ) {
                         // replace "NCIT:" with "NCI:"
                         String nciAcc = "NCI:"+efoXref.substring(5);
-                        matchByXref(nciAcc, matches, dao);
+                        matchByXref(nciAcc, matches, ontId);
                     }
                     else if( efoXref.startsWith("GARD:") ) {
                         // remove leading zeros f.e. 'GARD:0000123' must be 'GARD:123'
@@ -173,14 +93,31 @@ public class EfoMapper {
                             }
                         }
                         gardAcc += efoXref.substring(i);
-                        matchByXref(gardAcc, matches, dao);
+                        matchByXref(gardAcc, matches, ontId);
                     }
                     else if( efoXref.startsWith("MESH:") ) {
-                        matchByXref(efoXref, matches, dao);
+                        matchByXref(efoXref, matches, ontId);
                     }
                     else if( efoXref.startsWith("OMIM:") ) {
-                            matchByXref(efoXref, matches, dao);
-                    } else {
+                        matchByXref(efoXref, matches, ontId);
+                    }
+                    else if( efoXref.startsWith("MP:") ) {
+                        Term doTerm = dao.getTerm(efoXref);
+                        if( doTerm!=null ) {
+                            matches.add(efoXref +TAB+ doTerm.getAccId() +TAB+ doTerm.getTerm());
+                        } else {
+                            matchByXref(efoXref, matches, ontId);
+                        }
+                    } else if( efoXref.startsWith("HP:") ) {
+                        Term doTerm = dao.getTerm(efoXref);
+                        if( doTerm!=null ) {
+                            matches.add(efoXref +TAB+ doTerm.getAccId() +TAB+ doTerm.getTerm());
+                        } else {
+                            matchByXref(efoXref, matches, ontId);
+                        }
+                    }
+
+                    else {
                         //throw new Exception("unexpected xref type: " + efoXref);
                     }
                     continue;
@@ -247,8 +184,8 @@ public class EfoMapper {
         out.close();
     }
 
-    static void matchByXref(String xrefAcc, List<String> matches, OntologyDAO dao) throws Exception {
-        List<Term> doTerms = dao.getRdoTermsBySynonym(xrefAcc);
+    static void matchByXref(String xrefAcc, List<String> matches, String ontId) throws Exception {
+        List<Term> doTerms = dao.getTermsBySynonym(ontId, xrefAcc);
         for( Term doTerm: doTerms ) {
             matches.add(xrefAcc +"\t"+ doTerm.getAccId() +"\t"+ doTerm.getTerm());
         }
@@ -257,18 +194,17 @@ public class EfoMapper {
         }
     }
 
-    static TermNameMatcher populateTermNameMatcher(OntologyDAO dao) throws Exception {
+    static TermNameMatcher populateTermNameMatcher(String ontId) throws Exception {
 
         System.out.println("initializing term name matcher ...");
 
         TermNameMatcher matcher = new TermNameMatcher();
-        matcher.loadSynonyms(dao.getActiveSynonymsByType("RDO", "exact_synonym"));
-        matcher.loadSynonyms(dao.getActiveSynonymsByType("RDO", "broad_synonym"));
-        matcher.loadSynonyms(dao.getActiveSynonymsByType("RDO", "narrow_synonym"));
-        matcher.loadSynonyms(dao.getActiveSynonymsByType("RDO", "related_synonym"));
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "exact_synonym"));
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "broad_synonym"));
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "narrow_synonym"));
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "related_synonym"));
 
-        OntologyXDAO odao = new OntologyXDAO();
-        matcher.loadTerms(odao.getActiveTerms("RDO"));
+        matcher.loadTerms(odao.getActiveTerms(ontId));
 
         System.out.println("term name matcher populated!");
         return matcher;
