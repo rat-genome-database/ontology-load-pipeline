@@ -350,7 +350,13 @@ public class FileParser {
             }
             // created_by
             else if( line.startsWith("created_by:") ) {
-                rec.getTerm().setCreatedBy(line.substring(12));
+                // per OBO spec, there could be only one 'created_by' field; merge incoming data into one field
+                String createdBy = line.substring(12);
+                if( Utils.isStringEmpty(rec.getTerm().getCreatedBy()) ) {
+                    rec.getTerm().setCreatedBy(createdBy);
+                } else if( !rec.getTerm().getCreatedBy().contains(createdBy) ) {
+                    rec.getTerm().setCreatedBy( rec.getTerm().getCreatedBy()+", "+createdBy );
+                }
             }
             // creation_date
             else if( line.startsWith("creation_date:") || line.startsWith("date:")) {
@@ -622,6 +628,19 @@ public class FileParser {
             else
                 contents = line.substring(15).trim();
 
+            // process ORCID ids: example
+            //   property_value: http://purl.org/dc/terms/contributor https://orcid.org/0000-0003-3691-0324
+            // replace with
+            //   created_by: ORCID:0000-0003-3691-0324
+            if( contents.startsWith(ORCID_PREFIX) ) {
+                String newContents = "created_by: ORCID:"+contents.substring(ORCID_PREFIX.length());
+                return newContents;
+            }
+            if( contents.startsWith(ORCID_PREFIX2) ) {
+                String newContents = "created_by: ORCID:"+contents.substring(ORCID_PREFIX2.length());
+                return newContents;
+            }
+
             for( String property: this.getPropertyValueSubstitutions().keySet() ) {
                 if( contents.startsWith(property) ) {
                     String newContents;
@@ -636,6 +655,8 @@ public class FileParser {
         // no substitutions made -- line returned as it is
         return line;
     }
+    static final String ORCID_PREFIX = "http://purl.org/dc/terms/contributor https://orcid.org/";
+    static final String ORCID_PREFIX2 = "http://purl.org/dc/terms/contributor http://orcid.org/";
 
     void parseRelationship(Record rec, String line, String ontId) throws Exception {
         // removed 'OBO_REL:' default namespace id, if present
