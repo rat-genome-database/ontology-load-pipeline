@@ -3,6 +3,7 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.FileDownloader;
+import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -119,7 +120,7 @@ public class FileParser {
 
     boolean processAll(String fileName, String defaultOntId, String accIdPrefix, Map<String, Record> records) throws Exception {
 
-        Date startTime = new Date();
+        Date startTime = Utils.addMinutesToDate(new Date(), -5);
         startTimes.put(defaultOntId, startTime);
 
         // validate if ontology id is valid
