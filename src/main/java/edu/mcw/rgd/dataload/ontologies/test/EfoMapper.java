@@ -18,7 +18,13 @@ public class EfoMapper {
 
         System.out.println("START");
 
-        final String ontId = "RDO";
+        String ontId = "HP";
+        run(ontId);
+
+        ontId = "MP";
+        run(ontId);
+
+        ontId = "RDO";
         run(ontId);
     }
 
@@ -70,7 +76,7 @@ public class EfoMapper {
 
                         continue; // not processing those
                     }
-                    if( efoXref.startsWith("DOID:") ) {
+                    if( efoXref.startsWith("DOID:") && ontId.equals("RDO") ) {
                         Term doTerm = dao.getTerm(efoXref);
                         if( doTerm!=null ) {
                             matches.add(efoXref +TAB+ doTerm.getAccId() +TAB+ doTerm.getTerm());
@@ -101,14 +107,17 @@ public class EfoMapper {
                     else if( efoXref.startsWith("OMIM:") ) {
                         matchByXref(efoXref, matches, ontId);
                     }
-                    else if( efoXref.startsWith("MP:") ) {
+                    else if( efoXref.startsWith("UMLS:") ) {
+                        matchByXref(efoXref, matches, ontId);
+                    }
+                    else if( efoXref.startsWith("MP:") && ontId.equals("MP") ) {
                         Term doTerm = dao.getTerm(efoXref);
                         if( doTerm!=null ) {
                             matches.add(efoXref +TAB+ doTerm.getAccId() +TAB+ doTerm.getTerm());
                         } else {
                             matchByXref(efoXref, matches, ontId);
                         }
-                    } else if( efoXref.startsWith("HP:") ) {
+                    } else if( efoXref.startsWith("HP:") && ontId.equals("HP") ) {
                         Term doTerm = dao.getTerm(efoXref);
                         if( doTerm!=null ) {
                             matches.add(efoXref +TAB+ doTerm.getAccId() +TAB+ doTerm.getTerm());

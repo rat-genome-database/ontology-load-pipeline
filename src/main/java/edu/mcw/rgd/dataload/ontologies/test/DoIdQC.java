@@ -48,7 +48,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20220606_doid.obo";
+        String fileName = "h:/do/20220727_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);

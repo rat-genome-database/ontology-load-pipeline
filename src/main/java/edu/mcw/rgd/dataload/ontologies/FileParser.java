@@ -342,7 +342,6 @@ public class FileParser {
             // xref
             else if( line.startsWith("xref:") ) {
                 parseXrefAsSynonym(line.substring(6), rec);
-//                rec.addSynonym(line.substring(6), "xref");
             }
             // synonyms
             else if( parseSynonym(line, rec) ) {
@@ -421,6 +420,12 @@ public class FileParser {
                 xref = xref.substring(0, pos).trim();
             }
         }
+
+        // MESH normalization: in RGD, we use 'MESH:xxx' convention; HP uses 'MSH:xxxxx'
+        if( xref.startsWith("MSH:") ) {
+            xref = "MESH:"+xref.substring(4); // turn 'MSH:xxx' into 'MESH:xxx'
+        }
+
         rec.addSynonym(xref, "xref");
     }
 
