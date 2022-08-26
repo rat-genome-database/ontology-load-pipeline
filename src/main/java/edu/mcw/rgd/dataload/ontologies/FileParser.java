@@ -743,7 +743,7 @@ public class FileParser {
     }
 
     synchronized private void deleteDagsForOntology(String ontId, Date cutoffDate) throws Exception {
-        logger.info("deleting dags for " + ontId);
+        logger.debug("deleting dags for " + ontId);
 
         // GO ontology is composed from 3 subontologies
         if( ontId.equals("GO") ) {
@@ -754,8 +754,10 @@ public class FileParser {
         }
 
         int rowsAffected = dao.deleteDags(ontId, cutoffDate);
-        logger.info(rowsAffected + " dags deleted for " + ontId);
-        counters.add("DAG_EDGES_DELETED", rowsAffected);
+        if( rowsAffected!=0 ) {
+            logger.info(rowsAffected + " dags deleted for " + ontId);
+            counters.add("DAG_EDGES_DELETED", rowsAffected);
+        }
     }
 
     synchronized private void dumpInsertedDagsForOntology(String ontId, Date cutoffDate) throws Exception {
