@@ -48,8 +48,8 @@ public class OmimPsCustomDoMapper {
                 if (doTermAcc.startsWith("DOID:90") && doTermAcc.length() == 12) {
 
                     // RDO custom term: find a parent term by using OMIM:PS associations
-                    String parentDoTermAcc = dao.getOmimPSTermAccForChildTerm(doTermAcc, counters);
-                    if( parentDoTermAcc!=null ) {
+                    List<String> parentDoTermAccs = dao.getOmimPSTermAccForChildTerm(doTermAcc, counters);
+                    for( String parentDoTermAcc: parentDoTermAccs ) {
                         // parent term cannot be a DO+ custom term
                         if( !(parentDoTermAcc.startsWith("DOID:90") && parentDoTermAcc.length()==12) ) {
                             childToParentMap.put(doTermAcc, parentDoTermAcc);

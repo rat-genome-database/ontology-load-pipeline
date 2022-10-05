@@ -1,3 +1,6 @@
+Oct 05, 2022
+  OmimPsCustomDoTermMapper: tune up (to handle situation where one OMIM:PS is associated with multiple RDO terms)
+
 Aug 26, 2022
   parser: tuned up logging
 
