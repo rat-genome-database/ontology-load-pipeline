@@ -266,6 +266,14 @@ public class OntologyDAO {
         log.debug(synonym.dump("|"));
 
         synonym.setKey(dao.insertTermSynonym(synonym));
+
+        // update term synonym cache
+        List<TermSynonym> termSynonyms = _termSynonymCache.get(synonym.getTermAcc());
+        if( termSynonyms==null ) {
+            termSynonyms = new ArrayList<>();
+            _termSynonymCache.put(synonym.getTermAcc(), termSynonyms);
+        }
+        termSynonyms.add(synonym);
         return true;
     }
 

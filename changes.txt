@@ -1,3 +1,6 @@
+Oct 25, 2022
+  EfoBulkLoad: allows to bulk load EFO/MONDO synonyms from a file
+
 Oct 05, 2022
   OmimPsCustomDoTermMapper: tune up (to handle situation where one OMIM:PS is associated with multiple RDO terms)
 
