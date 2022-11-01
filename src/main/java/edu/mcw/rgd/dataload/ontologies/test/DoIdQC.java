@@ -36,6 +36,9 @@ public class DoIdQC {
     int omimPsIdsUpToDate = 0;
     int omimPsIdsMultiple = 0;
     int omimIdsNotInRdo = 0;
+    int meshIdsNotInRdo = 0;
+    int meshIdsConflicts = 0;
+
     int insertedSynonyms = 0;
     int deletedSynonyms = 0;
     int suppressedSynonyms = 0;
@@ -48,7 +51,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20220929_doid.obo";
+        String fileName = "h:/do/20221101_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -136,6 +139,8 @@ public class DoIdQC {
             System.out.println("OMIM:PS ids assigned to multiple terms: " + omimPsIdsMultiple);
         }
         System.out.println("OMIM IDs not in RDO: "+omimIdsNotInRdo);
+        System.out.println("MESH IDs not in RDO: "+meshIdsNotInRdo);
+        System.out.println("MESH IDs conflicts: "+meshIdsConflicts);
 
         System.out.println("");
         System.out.println("synonyms inserted: "+insertedSynonyms);
@@ -226,6 +231,25 @@ public class DoIdQC {
                 if( !omimIdsInRdo.contains(omimId) ) {
                     System.out.println("WARNING: "+omimId+" NOT IN RGD!");
                     omimIdsNotInRdo++;
+                }
+            }
+            else if( line.startsWith("xref: MESH:") ) {
+                String meshId = line.substring(6).trim();
+                List<Term> termsInRgd = dao.getRdoTermsBySynonym(meshId);
+                if( termsInRgd.isEmpty() ) {
+                    System.out.println("  "+meshId+" "+oboTerm.id +" NOT IN RGD!");
+                    meshIdsNotInRdo++;
+                }
+                Iterator<Term> it = termsInRgd.iterator();
+                while( it.hasNext() ) {
+                    Term t = it.next();
+                    if( t.getAccId().equals(oboTerm.id) ) {
+                        it.remove();
+                    }
+                }
+                for( Term t: termsInRgd ) {
+                    System.out.println("  "+meshId+" "+oboTerm.id+" is assigned in RGD to "+t.getAccId());
+                    meshIdsConflicts++;
                 }
             }
             else if( line.startsWith("is_obsolete: ") ) {

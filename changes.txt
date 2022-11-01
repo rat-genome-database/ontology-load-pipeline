@@ -1,3 +1,6 @@
+Nov 01, 2022
+  DO-QC: added extensive qc of MESH ids
+
 Oct 25, 2022
   EfoBulkLoad: allows to bulk load EFO/MONDO synonyms from a file
 
