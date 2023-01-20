@@ -77,14 +77,10 @@ public class FileParser {
         logger.info("START: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
         if( processAll(localFile, ontId, ontPrefixes.get(ontId), results) ) {
             logger.info("DONE: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
-
-            System.out.println("Parsing complete for ONT_ID=" + ontId + " FILE=" + localFile);
         } else {
             logger.warn("MALFORMED OBO FILE: "+Thread.currentThread().getName()+" ONT_ID="+ontId+" FILE="+localFile);
 
             MalformedOboFiles.getInstance().addOntId(ontId);
-
-            System.out.println("Parsing ABORTED (MALFORMED OBO FILE): ONT_ID=" + ontId + ", FILE=" + localFile);
         }
 
         List<Record> records = new ArrayList<>(results.values());
@@ -753,6 +749,11 @@ public class FileParser {
             return;
         }
 
+        if( !MalformedOboFiles.getInstance().isWellFormed(ontId) ) {
+            logger.warn("*** dag deletion aborted for malformed obo file ***");
+            return;
+        }
+
         int rowsAffected = dao.deleteDags(ontId, cutoffDate);
         if( rowsAffected!=0 ) {
             logger.info(rowsAffected + " dags deleted for " + ontId);
@@ -761,7 +762,6 @@ public class FileParser {
     }
 
     synchronized private void dumpInsertedDagsForOntology(String ontId, Date cutoffDate) throws Exception {
-        logger.info("dumping inserted dags for " + ontId);
 
         // GO ontology is composed from 3 subontologies
         if( ontId.equals("GO") ) {
@@ -772,8 +772,10 @@ public class FileParser {
         }
 
         int rowsAffected = dao.dumpInsertedDags(ontId, cutoffDate);
-        logger.info(rowsAffected + " dags inserted for " + ontId);
-        counters.add("DAG_EDGES_INSERTED", rowsAffected);
+        if( rowsAffected!=0 ) {
+            logger.info(rowsAffected + " dags inserted for " + ontId);
+            counters.add("DAG_EDGES_INSERTED", rowsAffected);
+        }
     }
 
     /**

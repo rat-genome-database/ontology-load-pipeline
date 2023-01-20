@@ -1,5 +1,7 @@
 Jan 20, 2023
   updated source for CL ontology
+  removed unused jar dependency
+  suppressed dag deletion for malformed obo files
 
 Nov 01, 2022
   DO-QC: added extensive qc of MESH ids
