@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class OntologyDAO {
 
+    boolean readOnlyMode = false;
+
     AnnotationDAO annotDAO = new AnnotationDAO();
     MapDAO mapDAO = new MapDAO();
     OmimDAO omimDAO = new OmimDAO();
