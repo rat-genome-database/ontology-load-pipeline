@@ -51,7 +51,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20221215_doid.obo";
+        String fileName = "h:/do/20230130_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -235,20 +235,20 @@ public class DoIdQC {
             }
             else if( line.startsWith("xref: MESH:") ) {
                 String meshId = line.substring(6).trim();
-                List<Term> termsInRgd = dao.getRdoTermsBySynonym(meshId);
+                List<String> termsInRgd = dao.getRdoTermAccsBySynonym("DOID:", meshId);
                 if( termsInRgd.isEmpty() ) {
                     System.out.println("  "+meshId+" "+oboTerm.id +" NOT IN RGD!");
                     meshIdsNotInRdo++;
                 }
-                Iterator<Term> it = termsInRgd.iterator();
+                Iterator<String> it = termsInRgd.iterator();
                 while( it.hasNext() ) {
-                    Term t = it.next();
-                    if( t.getAccId().equals(oboTerm.id) ) {
+                    String t = it.next();
+                    if( t.equals(oboTerm.id) ) {
                         it.remove();
                     }
                 }
-                for( Term t: termsInRgd ) {
-                    System.out.println("  "+meshId+" "+oboTerm.id+" is assigned in RGD to "+t.getAccId());
+                for( String t: termsInRgd ) {
+                    System.out.println("  "+meshId+" "+oboTerm.id+" is assigned in RGD to "+t);
                     meshIdsConflicts++;
                 }
             }

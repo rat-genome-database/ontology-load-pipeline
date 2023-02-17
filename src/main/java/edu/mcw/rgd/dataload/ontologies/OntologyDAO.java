@@ -236,6 +236,14 @@ public class OntologyDAO {
         return getTermsBySynonym("RDO", synonymToMatch);
     }
 
+    public List<String> getRdoTermAccsBySynonym(String ontPrefix, String synonymName) throws Exception {
+        String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name=? AND term_acc LIKE ?";
+        if( !ontPrefix.endsWith("%") ) {
+            ontPrefix += "%";
+        }
+        return StringListQuery.execute(dao, sql, synonymName, ontPrefix);
+    }
+
     /**
      * get terms synonyms of given type within a specified ontology
      * @param ontologyId id of ontology to be searched for; must not be null

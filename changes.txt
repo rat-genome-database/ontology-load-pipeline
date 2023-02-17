@@ -1,3 +1,8 @@
+Feb 17, 2023
+  updated build.gradle to be gradle 6.x + compatible
+  updated CL source to CL release v2023-02-15
+  DoQC: optimized code
+
 Jan 20, 2023
   updated source for CL ontology
   removed unused jar dependency
