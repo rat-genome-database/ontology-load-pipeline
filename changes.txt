@@ -1,3 +1,6 @@
+Mar 02, 2023
+  updated EfoBulkLoad to also load synonyms
+
 Feb 17, 2023
   updated build.gradle to be gradle 6.x + compatible
   updated CL source to CL release v2023-02-15
