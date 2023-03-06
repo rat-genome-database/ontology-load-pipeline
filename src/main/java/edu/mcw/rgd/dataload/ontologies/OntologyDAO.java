@@ -360,6 +360,25 @@ public class OntologyDAO {
         return StringListQuery.execute(dao, sql, prefix+"%");
     }
 
+    public Collection<String> getEfoIdsFromGWAS() throws Exception {
+        String sql = "SELECT DISTINCT efo_ids FROM GWAS_CATALOG";
+        List<String> efoIds = StringListQuery.execute(dao, sql);
+        Set<String> uniqueEfoIds = new HashSet<>();
+        for( String s: efoIds ) {
+            if( s==null ) {
+                continue;
+            }
+            String[] ids = s.split("[,]");
+            for( String id: ids ) {
+                String id2 = id.trim().replace("_", ":");
+                if( id2.startsWith("EFO:") && id2.length()==11 ) {
+                    uniqueEfoIds.add(id2);
+                }
+            }
+        }
+        return uniqueEfoIds;
+    }
+
     public List<Integer> getAnnotatedObjectIds(String accId, boolean withChildren, int speciesTypeKey, int objectKey) throws Exception {
         return annotDAO.getAnnotatedObjectIds(accId, withChildren, speciesTypeKey, objectKey);
     }

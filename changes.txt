@@ -1,3 +1,6 @@
+Mar 06, 2023
+  updated EfoMapper to limit EFO terms to EFO terms appearing in GWAS data
+
 Mar 02, 2023
   updated EfoBulkLoad to also load synonyms
 

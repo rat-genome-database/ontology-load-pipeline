@@ -18,14 +18,19 @@ public class EfoMapper {
 
         System.out.println("START");
 
-        String ontId = "HP";
+        String ontId = "CMO";
         run(ontId);
 
+        /*
         ontId = "MP";
         run(ontId);
 
         ontId = "RDO";
         run(ontId);
+
+        ontId = "HP";
+        run(ontId);
+        */
     }
 
     static void run(String ontId) throws Exception {
@@ -40,6 +45,16 @@ public class EfoMapper {
         int termNr = 0;
 
         List<String> efoIds = dao.getAllTermAccIds("EFO");
+
+        if( ontId.equals("CMO") ) {
+            Collection<String> gwasEfoIds = dao.getEfoIdsFromGWAS();
+
+            List<String> efoIdsNotInRgd = new ArrayList<>(gwasEfoIds);
+            efoIdsNotInRgd.removeAll(efoIds);
+            System.out.println("efoIdsNotInRgd="+efoIdsNotInRgd.size());
+
+            efoIds = new ArrayList<>(gwasEfoIds);
+        }
         Collections.shuffle(efoIds);
         for( String efoId: efoIds ) {
             termNr++;
