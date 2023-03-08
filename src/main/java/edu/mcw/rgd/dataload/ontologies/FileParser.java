@@ -116,7 +116,7 @@ public class FileParser {
 
     boolean processAll(String fileName, String defaultOntId, String accIdPrefix, Map<String, Record> records) throws Exception {
 
-        Date startTime = Utils.addMinutesToDate(new Date(), -5);
+        Date startTime = Utils.addMinutesToDate(new Date(), -1);
         startTimes.put(defaultOntId, startTime);
 
         // validate if ontology id is valid
@@ -248,16 +248,26 @@ public class FileParser {
 
                 // skip terms not matching ontology prefix
                 if( !accIdPrefix.equals("*") && !accId.startsWith(accIdPrefix) ) {
-                    // get term prefix
-                    int colonPos = accId.indexOf(':');
-                    String prefix = colonPos>0 ? accId.substring(0, colonPos) : accId;
-                    String counter = "skipped "+prefix+" term(s) for ontology "+defaultOntId;
-                    counters.increment(counter);
 
-                    String msg = "term "+accId+" skipped, because it does not match ontology prefix "+defaultOntId;
-                    logger.info(msg);
-                    rec = null; // to skip this term
-                    continue;
+                    boolean loadForeignOntologyTerms = accIdPrefix.equals("EFO:");
+                    if( loadForeignOntologyTerms ) {
+                        // load the original accession as a synonym
+                        String newAccId = accIdPrefix + accId;
+                        addAltIdSynonymIfValid(rec, newAccId, accId);
+                        accId = newAccId;
+
+                    } else {
+                        // get term prefix
+                        int colonPos = accId.indexOf(':');
+                        String prefix = colonPos>0 ? accId.substring(0, colonPos) : accId;
+                        String counter = "skipped "+prefix+" term(s) for ontology "+defaultOntId;
+                        counters.increment(counter);
+
+                        String msg = "term "+accId+" skipped, because it does not match ontology prefix "+defaultOntId;
+                        logger.info(msg);
+                        rec = null; // to skip this term
+                        continue;
+                    }
                 }
 
                 rec.getTerm().setAccId(accId);
@@ -728,8 +738,23 @@ public class FileParser {
 
     private void addRelationship(Record rec, String accId, Relation rel, String ontId) {
 
+        // for EFO add 'EFO:' prefix to all terms coming from external ontologies
+        if( !accId.startsWith(ontId) && ontId.equals("EFO:") ) {
+            accId = ontId + accId;
+        }
+
+        // if true, add the relationship as synonym, not a dag
+        boolean addSynonym = !ontId.equals("*") && !accId.startsWith(ontId);
+
+        if( ontId.equals("EFO:") ) {
+            // for EFO, not-specified relationships load as synonyms: they cause cycles
+            if( rel.equals(Relation.NOT_SPECIFIED) ) {
+                addSynonym = true;
+            }
+        }
+
         // acyclic relationship: check if accession id refers to external ontology
-        if( !ontId.equals("*") && !accId.startsWith(ontId) ) {
+        if( addSynonym ) {
             rec.addSynonym(rel+" "+accId, "external_ontology");
         }
         else {
@@ -991,6 +1016,32 @@ public class FileParser {
         xrefs.add(txt.substring(start).trim());
 
         return xrefs;
+    }
+
+    void addAltIdSynonymIfValid(Record rec, String accId, String value) {
+        // a valid ALT_ID synonym, has two parts separated by a colon or underscore
+        // 1. 1+ upper case characters
+        // 2. 1+ digits
+        int colonPos = value.indexOf(':');
+        if( colonPos <=0 || colonPos==value.length()-1 ) {
+            colonPos = value.indexOf('_');
+            if( colonPos <=0 || colonPos==value.length()-1 ) {
+                return;
+            }
+        }
+        String prefix = value.substring(0, colonPos);
+        String suffix = value.substring(colonPos+1);
+        if( !prefix.matches("[A-Z]+") || !suffix.matches("[0-9]+") ) {
+            return; // invalid ALT_ID
+        }
+
+        String altId = prefix+":"+suffix;
+
+        TermSynonym synonym = new TermSynonym();
+        synonym.setName(altId);
+        synonym.setType("alt_id");
+        synonym.setTermAcc(accId);
+        rec.addSynonym(synonym);
     }
 
     public Map<String, String> getOntPrefixes() {

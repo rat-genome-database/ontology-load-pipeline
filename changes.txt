@@ -1,3 +1,6 @@
+Mar 09, 2023
+  implemented loading of EFO ontology -- first attempt
+
 Mar 06, 2023
   updated EfoMapper to limit EFO terms to EFO terms appearing in GWAS data
 
