@@ -432,6 +432,40 @@ public class FileParser {
             xref = "MESH:"+xref.substring(4); // turn 'MSH:xxx' into 'MESH:xxx'
         }
 
+        // EFO normalization:
+        // 1. 'Orphanet:xxx' --> 'ORDO:xxx'
+        else if( xref.startsWith("Orphanet:") ) {
+            xref = "ORDO:"+xref.substring(9);
+        }
+
+        // 2. 'MeSH:xxx' --> 'MESH:xxx'
+        else if( xref.startsWith("MeSH:") ) {
+            xref = "MESH:"+xref.substring(5);
+        }
+
+        // 3. 'OMIMPS:xxx' --> 'OMIM:PSxxx'
+        else if( xref.startsWith("OMIMPS:") ) {
+            xref = "OMIM:PS"+xref.substring(7);
+        }
+
+        // 4. 'NCIt:xxx' --> 'NCI:xxx'
+        //    'NCIT:xxx' --> 'NCI:xxx'
+        else if( xref.startsWith("NCIT:") || xref.startsWith("NCIt:") ) {
+            xref = "NCI:"+xref.substring(5);
+        }
+
+        // 5. 'GARD:0000xxx' --> 'GARD:xxx'  strip zeros after colon
+        else if( xref.startsWith("GARD:") ) {
+            // look for first non-zero character
+            int pos;
+            for( pos=5; pos<xref.length(); pos++ ) {
+                if( xref.charAt(pos) != '0' ) {
+                    break;
+                }
+            }
+            xref = "GARD:"+xref.substring(pos);
+        }
+
         rec.addSynonym(xref, "xref");
     }
 
