@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 10, 2023" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 17, 2023" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -256,6 +256,33 @@
         <property name="synonymPrefixSubstitutions">
             <map>
                 <entry key="DO:DOID:" value="DOID:" />
+            </map>
+        </property>
+
+        <property name="relationshipSubstitutions">
+            <map>
+                <entry key="BFO:0000066" value="occurs_in" />
+                <entry key="EFO:0000784" value="has_disease_location" />
+                <entry key="EFO:0001697" value="is_unit_of" />
+                <entry key="HANCESTRO:0301" value="has_ancestry_status" />
+                <entry key="HANCESTRO:0330" value="is_demonym_of" />
+                <entry key="IAO:0000136" value="is_about" />
+                <entry key="MONDO:0700097" value="cross_species_analog" />
+                <entry key="OBI:0000293" value="has_specified_input" />
+                <entry key="OBI:0000295" value="is_specified_input_of" />
+                <entry key="OBI:0000299" value="has_specified_output" />
+                <entry key="RO:0000056" value="participates_in" />
+                <entry key="RO:0000057" value="has_participant" />
+                <entry key="RO:0000081" value="role_of" />
+                <entry key="RO:0000086" value="has_quality" />
+                <entry key="RO:0001000" value="derives_from" />
+                <entry key="RO:0002104" value="has_plasma_membrane_part" />
+                <entry key="RO:0002174" value="dubious_for_taxon" />
+                <entry key="RO:0002200" value="has_phenotype" />
+                <entry key="RO:0002201" value="phenotype_of" />
+                <entry key="RO:0002211" value="regulates" />
+                <entry key="RO:0002314" value="characteristic_of_part_of" />
+                <entry key="UBPROP:0000202" value="fma_set_term" />
             </map>
         </property>
     </bean>

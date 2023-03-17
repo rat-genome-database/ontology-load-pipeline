@@ -1,3 +1,6 @@
+Mar 17, 2023
+  further improvements in loading EFO ontology
+
 Mar 10, 2023
   EFO xrefs loading tune up
 

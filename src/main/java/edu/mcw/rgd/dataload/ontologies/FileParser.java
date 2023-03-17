@@ -25,6 +25,7 @@ public class FileParser {
     private Map<String, Relation> relations; // map of relation name as found in obo file to Relation enum
     private Map<String, String> rootTerms;
     private Map<String, String> propertyValueSubstitutions;
+    private Map<String, String> relationshipSubstitutions;
     private List<String> ignoredProperties;
     private List<String> propertyToSynonym;
 
@@ -322,7 +323,7 @@ public class FileParser {
                         val = line.substring(6, spacePos);
                     else
                         val = line.substring(6);
-                    addRelationship(rec, val, Relation.IS_A, accIdPrefix);
+                    addRelationship(rec, val, Relation.IS_A, accIdPrefix, "is_a");
                 }
                 else {
                     parseRelationship(rec, line.substring(13).trim(), accIdPrefix);
@@ -714,7 +715,7 @@ public class FileParser {
             throw new Exception("Unexpected relationship: "+line);
 
         // parse relation name
-        String relName = line.substring(0, spacePos);
+        String relName = convertRelName(line.substring(0, spacePos));
         Relation rel = relations.get(relName);
         if( rel==null ) {
             // MONDO extra processing
@@ -751,7 +752,7 @@ public class FileParser {
             rec.addSynonym(relName+" "+accId2, "cyclic_relationship");
         }
         else {
-            addRelationship(rec, accId2, rel, ontId);
+            addRelationship(rec, accId2, rel, ontId, relName);
             if( rel.equals(Relation.NOT_SPECIFIED) ) {
                 handleUnexpectedRelation(line);
             }
@@ -770,7 +771,7 @@ public class FileParser {
         counters.increment("UNSPECIFIED_RELATION_"+relName);
     }
 
-    private void addRelationship(Record rec, String accId, Relation rel, String ontId) {
+    private void addRelationship(Record rec, String accId, Relation rel, String ontId, String relName) {
 
         // for EFO add 'EFO:' prefix to all terms coming from external ontologies
         if( !accId.startsWith(ontId) && ontId.equals("EFO:") ) {
@@ -789,7 +790,11 @@ public class FileParser {
 
         // acyclic relationship: check if accession id refers to external ontology
         if( addSynonym ) {
-            rec.addSynonym(rel+" "+accId, "external_ontology");
+            if( rel.equals(Relation.NOT_SPECIFIED) ) {
+                rec.addSynonym(relName + " " + accId, "external_ontology");
+            } else {
+                rec.addSynonym(rel + " " + accId, "external_ontology");
+            }
         }
         else {
             // acyclic relationship within same ontology; create relationship edge
@@ -797,10 +802,17 @@ public class FileParser {
         }
     }
 
+    /// convert some ontology accession ids into meaningful names
+
+    String convertRelName(String relName) {
+        String relName2 = relationshipSubstitutions.get(relName);
+        return relName2!=null ? relName2 : relName;
+    }
+
     synchronized private void deleteDagsForOntology(String ontId, Date cutoffDate) throws Exception {
         logger.debug("deleting dags for " + ontId);
 
-        // GO ontology is composed from 3 subontologies
+        // GO ontology is composed of 3 subontologies
         if( ontId.equals("GO") ) {
             deleteDagsForOntology("BP", cutoffDate);
             deleteDagsForOntology("CC", cutoffDate);
@@ -822,7 +834,7 @@ public class FileParser {
 
     synchronized private void dumpInsertedDagsForOntology(String ontId, Date cutoffDate) throws Exception {
 
-        // GO ontology is composed from 3 subontologies
+        // GO ontology is composed of 3 subontologies
         if( ontId.equals("GO") ) {
             dumpInsertedDagsForOntology("BP", cutoffDate);
             dumpInsertedDagsForOntology("CC", cutoffDate);
@@ -1148,5 +1160,13 @@ public class FileParser {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public Map<String, String> getRelationshipSubstitutions() {
+        return relationshipSubstitutions;
+    }
+
+    public void setRelationshipSubstitutions(Map<String, String> relationshipSubstitutions) {
+        this.relationshipSubstitutions = relationshipSubstitutions;
     }
 }

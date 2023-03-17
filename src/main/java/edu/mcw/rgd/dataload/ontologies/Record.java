@@ -147,6 +147,14 @@ public class Record {
         synonym.setType(type);
         synonym.setTermAcc(term.getAccId());
 
+        // strip comments from synonym name
+        // f.e.: synonym: "babesiosis" EXACT [] {comment="preferred label from MONDO"}
+        //       synonym: "babesiosis" EXACT []
+        int commentPos = synonym.getName().lastIndexOf("{comment=");
+        if( commentPos>0 ) {
+            synonym.setName(synonym.getName().substring(0, commentPos).trim());
+        }
+
         // CTD.obo could have suffix ", INCLUDED" in the last part of synonym --
         //   the suffix has to be removed and the synonym type is to be narrow
         int includedPos = synonym.getName().lastIndexOf(", INCLUDED");
