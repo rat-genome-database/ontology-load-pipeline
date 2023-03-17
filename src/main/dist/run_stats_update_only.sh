@@ -5,7 +5,7 @@ APPDIR=/home/rgddata/pipelines/OntologyLoad
 cd $APPDIR
 
 #update stats for all ontologies (affected table ONT_TERM_STATS2)
-ontologies=( "XCO" "MMO" "NBO" "MI" "SO" "CL" "PW" "ZFA" "CMO" "VT" "MA" "RS" "MP" "HP" "UBERON" "GO" "CHEBI" )
+ontologies=( "XCO" "MMO" "NBO" "MI" "SO" "CL" "PW" "ZFA" "EFO" "CMO" "VT" "MA" "RS" "MP" "HP" "UBERON" "GO" "CHEBI" )
 
 for ontology in "${ontologies[@]}"; do
     #update ontology and term stats

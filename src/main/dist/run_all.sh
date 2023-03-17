@@ -2,7 +2,7 @@
 #
 APP=/home/rgddata/pipelines/OntologyLoad
 
-ontologies=( "XCO" "MMO" "NBO" "MI" "SO" "CL" "PW" "ZFA" "CMO" "VT" "MA" "RS" "MP" "HP" "UBERON" "GO" "CHEBI" )
+ontologies=( "XCO" "MMO" "NBO" "MI" "SO" "CL" "PW" "ZFA" "EFO" "CMO" "VT" "MA" "RS" "MP" "HP" "UBERON" "GO" "CHEBI" )
 
 for ontology in "${ontologies[@]}"; do
     #update ontology and term stats
