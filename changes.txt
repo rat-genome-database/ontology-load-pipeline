@@ -1,3 +1,6 @@
+Apr 04, 2023
+  fixed generate_obo_file.sh
+
 Mar 17, 2023
   further improvements in loading EFO ontology
 

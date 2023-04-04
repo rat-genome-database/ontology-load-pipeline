@@ -11,5 +11,5 @@ $APPDIR/_run.sh -generate_obo_file=$1 -skip_downloads -skip_stats_update
 
 if [ "$1" == "RDO" ]; then
   #copy RDO.obo file to RDO_yyyymmdd.obo file and copy this file to data release dir for ontologies
-  scp $APPDIR/data/$1.obo $APPDIR/data/$1_`date +%Y%m%d`.obo
+  cp $APPDIR/data/ontology/disease/$1.obo $APPDIR/data/$1_`date +%Y%m%d`.obo
 fi
