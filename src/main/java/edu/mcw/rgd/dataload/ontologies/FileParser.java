@@ -246,9 +246,6 @@ public class FileParser {
 
                 // term accession id
                 String accId = line.substring(4).trim();
-if( accId.equals("GO:0000003")) {
-    System.out.println("stop");
-}
                 // skip terms not matching ontology prefix
                 if( !accIdPrefix.equals("*") && !accId.startsWith(accIdPrefix) ) {
 
