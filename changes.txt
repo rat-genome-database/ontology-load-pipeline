@@ -1,3 +1,6 @@
+Apr 05, 2023
+  fixed EFO ontology loading -- was spuriously adding 'EFO:GO:xxxxxxx' terms with 'BP','CC','MF' ont_id
+
 Apr 04, 2023
   fixed generate_obo_file.sh
 

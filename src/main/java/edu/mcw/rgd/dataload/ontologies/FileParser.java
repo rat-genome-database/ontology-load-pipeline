@@ -246,7 +246,9 @@ public class FileParser {
 
                 // term accession id
                 String accId = line.substring(4).trim();
-
+if( accId.equals("GO:0000003")) {
+    System.out.println("stop");
+}
                 // skip terms not matching ontology prefix
                 if( !accIdPrefix.equals("*") && !accId.startsWith(accIdPrefix) ) {
 
@@ -332,18 +334,22 @@ public class FileParser {
             // namespace
             else if( line.startsWith("namespace:") ) {
 
-                // override of namespaces for GO obo file
-                val = line.substring(11);
-                switch (val) {
-                    case "biological_process":
-                        rec.getTerm().setOntologyId("BP");
-                        break;
-                    case "molecular_function":
-                        rec.getTerm().setOntologyId("MF");
-                        break;
-                    case "cellular_component":
-                        rec.getTerm().setOntologyId("CC");
-                        break;
+                // do not override ontology id for EFO ontology! (i.e. skip the line when loading EFO ontology)
+                if( !defaultOntId.equals("EFO") ) {
+
+                    // override of namespaces for GO obo file
+                    val = line.substring(11);
+                    switch (val) {
+                        case "biological_process":
+                            rec.getTerm().setOntologyId("BP");
+                            break;
+                        case "molecular_function":
+                            rec.getTerm().setOntologyId("MF");
+                            break;
+                        case "cellular_component":
+                            rec.getTerm().setOntologyId("CC");
+                            break;
+                    }
                 }
             }
             // xref
