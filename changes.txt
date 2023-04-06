@@ -1,3 +1,6 @@
+Apr 06, 2023
+  better EFO ontology loading for EFO:BAO terms
+
 Apr 05, 2023
   fixed EFO ontology loading -- was spuriously adding 'EFO:GO:xxxxxxx' terms with 'BP','CC','MF' ont_id
 

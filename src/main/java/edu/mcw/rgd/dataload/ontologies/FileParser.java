@@ -252,7 +252,13 @@ public class FileParser {
                     boolean loadForeignOntologyTerms = accIdPrefix.equals("EFO:");
                     if( loadForeignOntologyTerms ) {
                         // load the original accession as a synonym
-                        String newAccId = accIdPrefix + accId;
+                        String accId2;
+                        if( accId.startsWith("BAO_") ) { // convert 'EFO:BAO_xxxxxxx' into 'EFO:BAO:xxxxxxx'
+                            accId2 = "BAO:"+accId.substring(4);
+                        } else {
+                            accId2 = accId;
+                        }
+                        String newAccId = accIdPrefix + accId2;
                         addAltIdSynonymIfValid(rec, newAccId, accId);
                         accId = newAccId;
 
