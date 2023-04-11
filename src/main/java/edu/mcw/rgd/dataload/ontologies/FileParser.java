@@ -376,9 +376,15 @@ public class FileParser {
             // creation_date
             else if( line.startsWith("creation_date:") || line.startsWith("date:")) {
                 int datePos = line.indexOf(": ") + 2;
+                String dt = line.substring(datePos);
+                if( dt.startsWith("\"") ) {
+                    dt = dt.substring(1).trim();
+                }
+                if( dt.endsWith("\"") ) {
+                    dt = dt.substring(0, dt.length()-1).trim();
+                }
                 synchronized(this) {
                     // creation_date: field in obo files:   '2011-01-04T12:01:33Z' or '2011-01-04'
-                    String dt = line.substring(datePos);
                     Date creationDate;
                     try {
                         creationDate = sdtCreationDate.parse(dt);

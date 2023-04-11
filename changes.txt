@@ -1,5 +1,6 @@
 Apr 11, 2023
   updated CL source to CL release v2023-03-21
+  enhanced parsing of date fields
 
 Apr 06, 2023
   better EFO ontology loading for EFO:BAO terms
