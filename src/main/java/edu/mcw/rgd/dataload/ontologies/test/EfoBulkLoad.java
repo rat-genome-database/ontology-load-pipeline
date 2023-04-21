@@ -17,6 +17,7 @@ public class EfoBulkLoad {
 
         String fname = "/Users/mtutaj/Documents/efo_bulk_load.txt";
         fname = "/Users/mtutaj/Documents/EFO-RDO-bulk-load.txt";
+        fname = "/tmp/EFO to HP-MP automapping bulk load.txt";
         BufferedReader in = Utils.openReader(fname);
 
         int linesWithIssues = 0;
@@ -25,60 +26,49 @@ public class EfoBulkLoad {
         int synonymsInserted = 0;
         int synonymsUpToDate = 0;
 
-        //EFO ID	DO ID	DO term synonym(optional) synonym_type(optional)
-        //EFO:0000094	DOID:0080630	B-lymphoblastic leukemia/lymphoma
-        //EFO:1000226	DOID:9004831	Colitis-Associated Neoplasms	Dysplasia in Ulcerative Colitis	related
+        //EFO:0004720	MP:0002654	prion disease	broad_synonym
         String line;
         int lineNr = 0;
         while( (line=in.readLine())!=null ) {
             lineNr++;
             String[] cols = line.split("[\\t]", -1);
-            if( cols.length<3 ) {
+            if( cols.length<=3 ) {
                 System.out.println(lineNr+". line skipped: "+line);
                 linesWithIssues++;
                 continue;
             }
             String xrefAcc = getText(cols[0]);
-            String doAcc = getText(cols[1]);
-            String doTermName = getText(cols[2]);
-            if( doTermName.startsWith("\"") && doTermName.endsWith("\"") ) {
-                doTermName = getText(doTermName.substring(1, doTermName.length()-1));
+            String hpMpAcc = getText(cols[1]);
+            String synonymName = getText(cols[2]);
+            if( synonymName.startsWith("\"") && synonymName.endsWith("\"") ) {
+                synonymName = getText(synonymName.substring(1, synonymName.length()-1));
             }
+            String synonymType = getText(cols[3]);
 
             if( !xrefAcc.startsWith("EFO:") && !xrefAcc.startsWith("MONDO:") ) {
                 System.out.println(lineNr+". not found EFO/MONDO acc in line "+line);
                 linesWithIssues++;
                 continue;
             }
-            if( !doAcc.startsWith("DOID:") && !doAcc.startsWith("MP:")) {
-                System.out.println(lineNr+". not found DOID/MP acc in line "+line);
+            if( !hpMpAcc.startsWith("HP:") && !hpMpAcc.startsWith("MP:")) {
+                System.out.println(lineNr+". not found HP/MP acc in line "+line);
                 linesWithIssues++;
                 continue;
             }
 
-            // optional synonym name and type
-            String synonymName = null;
-            String synonymType = null;
-            if( cols.length>=5 ) {
-                synonymName = getText(cols[3]);
-                synonymType = getText(cols[4]);
-            }
 
-            Term term = dao.getTerm(doAcc);
+            Term term = dao.getTerm(hpMpAcc);
             if( term==null ) {
-                System.out.println(lineNr+". "+doAcc+" not found in RGD!");
+                System.out.println(lineNr+". "+hpMpAcc+" not found in RGD!");
                 linesWithIssues++;
                 continue;
-            }
-            if( !term.getTerm().equalsIgnoreCase(doTermName) ) {
-                System.out.println(lineNr+". do name mismatch: "+doAcc+" ["+term.getTerm()+"], incoming ["+doTermName+"]");
             }
 
             boolean xrefAlreadyInRgd = false;
-            List<TermSynonym> synonyms = dao.getTermSynonyms(doAcc);
+            List<TermSynonym> synonyms = dao.getTermSynonyms(hpMpAcc);
             for( TermSynonym syn: synonyms ) {
                 if( syn.getName().equals(xrefAcc) ) {
-                    System.out.println(lineNr+". "+doAcc+" "+xrefAcc+" already in RGD!");
+                    System.out.println(lineNr+". "+hpMpAcc+" "+xrefAcc+" already in RGD!");
                     xrefAlreadyInRgd = true;
                     break;
                 }
@@ -89,9 +79,9 @@ public class EfoBulkLoad {
                 TermSynonym syn = new TermSynonym();
                 syn.setType("xref");
                 syn.setName(xrefAcc);
-                syn.setTermAcc(doAcc);
+                syn.setTermAcc(hpMpAcc);
                 dao.insertTermSynonym(syn, "BULKLOAD");
-                System.out.println(lineNr + ". inserted " + doAcc + " " + xrefAcc);
+                System.out.println(lineNr + ". inserted " + hpMpAcc + " " + xrefAcc);
                 xrefsInserted++;
             }
 
@@ -100,7 +90,7 @@ public class EfoBulkLoad {
                 boolean synonymAlreadyInRgd = false;
                 for( TermSynonym s: synonyms ) {
                     if( s.getName().equalsIgnoreCase(synonymName) ) {
-                        System.out.println(lineNr+". "+doAcc+" ["+synonymName+"] already in RGD!");
+                        System.out.println(lineNr+". "+hpMpAcc+" ["+synonymName+"] already in RGD!");
                         synonymAlreadyInRgd = true;
                         break;
                     }
@@ -112,9 +102,9 @@ public class EfoBulkLoad {
                     TermSynonym syn = new TermSynonym();
                     syn.setType(synonymType);
                     syn.setName(synonymName);
-                    syn.setTermAcc(doAcc);
+                    syn.setTermAcc(hpMpAcc);
                     dao.insertTermSynonym(syn, "BULKLOAD");
-                    System.out.println(lineNr + ". inserted " + doAcc + " [" + synonymName + "] (" + synonymType + ")");
+                    System.out.println(lineNr + ". inserted " + hpMpAcc + " [" + synonymName + "] (" + synonymType + ")");
                     synonymsInserted++;
                 }
             }
