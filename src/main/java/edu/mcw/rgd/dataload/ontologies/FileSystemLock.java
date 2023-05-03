@@ -34,7 +34,7 @@ public class FileSystemLock implements AutoCloseable {
             _lock = _channel.tryLock();
             if( _lock==null ) {
                 log.warn(" *** "+name+" *** cannot acquire lock to "+_fileName+";  sleeping "+ Utils.formatElapsedTime(0, sleepIntervalInMs)+"; attempt = "+attempt);
-                Thread.sleep(sleepIntervalInMs;
+                Thread.sleep(sleepIntervalInMs);
             } else {
                 log.info(" *** "+name+" *** acquired lock to "+_fileName+"; attempt = "+attempt);
                 break;
