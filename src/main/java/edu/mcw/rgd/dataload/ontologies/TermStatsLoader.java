@@ -57,41 +57,50 @@ public class TermStatsLoader {
      */
     public void run(Map<String,String> ontPrefixes) throws Exception {
 
-        if( getFilter()!=null ) {
-            TermStatsLoaderWithFilter.run(ontPrefixes.values(), filter, getDao());
-            return;
-        }
+        int maxLockAttempts = 20;
+        long lockSleepInMs = 1000*60; // 1 min
+        try( FileSystemLock fileSystemLock = new FileSystemLock(maxLockAttempts, lockSleepInMs) ) {
+            fileSystemLock.acquire(logger);
 
-        long time0 = System.currentTimeMillis();
-
-        // load species type keys to process (exclude non-public species like yeast, zebrafish etc)
-        List<Integer> speciesTypeKeys = new ArrayList<>();
-        for( int sp: SpeciesType.getSpeciesTypeKeys() ) {
-            if( SpeciesType.isSearchable(sp) ) {
-                speciesTypeKeys.add(sp);
+            if (getFilter() != null) {
+                TermStatsLoaderWithFilter.run(ontPrefixes.values(), filter, getDao());
+                fileSystemLock.release(logger);
+                return;
             }
-        }
 
-        CounterPool counters = new CounterPool();
+            long time0 = System.currentTimeMillis();
 
-        List<PRecord> records = loadRecordsToProcess(ontPrefixes);
-        records.parallelStream().forEach( rec -> {
-            try {
-                qc(rec, counters, speciesTypeKeys);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            // load species type keys to process (exclude non-public species like yeast, zebrafish etc)
+            List<Integer> speciesTypeKeys = new ArrayList<>();
+            for (int sp : SpeciesType.getSpeciesTypeKeys()) {
+                if (SpeciesType.isSearchable(sp)) {
+                    speciesTypeKeys.add(sp);
+                }
             }
-        });
 
-        // dump counter statistics
-        System.out.println(counters.dumpAlphabetically());
+            CounterPool counters = new CounterPool();
 
-        System.out.println("-- computing term stats -- DONE -- elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+            List<PRecord> records = loadRecordsToProcess(ontPrefixes);
+            records.parallelStream().forEach(rec -> {
+                try {
+                    qc(rec, counters, speciesTypeKeys);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-        logger.info("DONE!");
+            // dump counter statistics
+            System.out.println(counters.dumpAlphabetically());
+
+            System.out.println("-- computing term stats -- DONE -- elapsed " + Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+
+            fileSystemLock.release(logger);
+
+            logger.info("DONE!");
+        }
     }
 
-    public List<PRecord> loadRecordsToProcess(Map<String,String> ontPrefixes) throws Exception {
+    List<PRecord> loadRecordsToProcess(Map<String,String> ontPrefixes) throws Exception {
 
         List<PRecord> results = new ArrayList<>();
 
@@ -116,7 +125,7 @@ public class TermStatsLoader {
         return results;
     }
 
-    public void qc(PRecord rec, CounterPool counters, List<Integer> speciesTypeKeys) throws Exception {
+    void qc(PRecord rec, CounterPool counters, List<Integer> speciesTypeKeys) throws Exception {
 
         String accId = rec.stats.getTermAccId();
 
