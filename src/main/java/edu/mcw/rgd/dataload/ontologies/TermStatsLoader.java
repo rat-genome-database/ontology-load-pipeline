@@ -57,9 +57,10 @@ public class TermStatsLoader {
      */
     public void run(Map<String,String> ontPrefixes) throws Exception {
 
-        int maxLockAttempts = 20;
-        long lockSleepInMs = 1000*60; // 1 min
-        try( FileSystemLock fileSystemLock = new FileSystemLock(maxLockAttempts, lockSleepInMs) ) {
+        String lockName = Utils.concatenate(ontPrefixes.values(), "-");
+        int maxLockAttempts = 60*5; // 5 hours -- gave up after 5 hours
+        long lockSleepInMs = 1000*60; // 1 min interval to try acquire the lock
+        try( FileSystemLock fileSystemLock = new FileSystemLock(maxLockAttempts, lockSleepInMs, lockName) ) {
             fileSystemLock.acquire(logger);
 
             if (getFilter() != null) {

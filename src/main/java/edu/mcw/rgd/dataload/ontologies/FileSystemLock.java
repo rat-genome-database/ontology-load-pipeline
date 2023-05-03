@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
@@ -15,32 +16,37 @@ public class FileSystemLock implements AutoCloseable {
     private FileChannel _channel;
     private FileLock _lock;
 
+    private String name = "";
     private int maxAttempts = 12;
     private long sleepIntervalInMs = 1000*60*10; // 10 min
 
-    public FileSystemLock( int maxAttempts, long sleepIntervalInMs ) throws FileNotFoundException {
+    public FileSystemLock( int maxAttempts, long sleepIntervalInMs, String name ) throws FileNotFoundException {
         this.maxAttempts = maxAttempts;
         this.sleepIntervalInMs = sleepIntervalInMs;
+        this.name = name;
     }
 
     public synchronized void acquire( Logger log ) throws IOException, InterruptedException {
         _channel = _file.getChannel();
 
-        do {
+        int attempt;
+        for( attempt=0; attempt<maxAttempts; attempt++ ) {
             _lock = _channel.tryLock();
             if( _lock==null ) {
-                log.warn(" *** cannot acquire lock to "+_fileName+";  sleeping 10 min");
-                Thread.sleep(1000*60*10);
+                log.warn(" *** "+name+" *** cannot acquire lock to "+_fileName+";  sleeping "+ Utils.formatElapsedTime(0, sleepIntervalInMs)+"; attempt = "+attempt);
+                Thread.sleep(sleepIntervalInMs;
+            } else {
+                log.info(" *** "+name+" *** acquired lock to "+_fileName+"; attempt = "+attempt);
+                break;
             }
-        } while( _lock == null );
-        log.info(" *** acquired lock to "+_fileName);
+        }
     }
 
     public synchronized void release( Logger log ) throws IOException {
         if( _lock!=null ) {
             _lock.release();
             _lock = null;
-            log.info(" *** released lock to "+_fileName);
+            log.info(" *** "+name+" *** released lock to "+_fileName);
         }
     }
 
