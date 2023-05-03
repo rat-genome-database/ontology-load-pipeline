@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * @author mtutaj
@@ -21,6 +22,8 @@ public class TermStatsLoader {
     private OntologyDAO dao;
     private PhenominerDAO phenominerDAO = new PhenominerDAO();
     private String filter = "";
+
+    private int maxThreadCount;
 
     static int[] phenoSpeciesTypeKeys = new int[]{SpeciesType.RAT, SpeciesType.CHINCHILLA};
 
@@ -82,13 +85,29 @@ public class TermStatsLoader {
             CounterPool counters = new CounterPool();
 
             List<PRecord> records = loadRecordsToProcess(ontPrefixes);
+
+            /** original code -- use all available cores
+             *
             records.parallelStream().forEach(rec -> {
                 try {
                     qc(rec, counters, speciesTypeKeys);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            });
+            });*/
+
+            /// new code: do not use more than specified number of threads
+            {
+                ForkJoinPool customThreadPool = new ForkJoinPool(getMaxThreadCount());
+                customThreadPool.submit(() -> records.parallelStream().forEach(rec -> {
+                    try {
+                        qc(rec, counters, speciesTypeKeys);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
+                customThreadPool.shutdown();
+            }
 
             // dump counter statistics
             System.out.println(counters.dumpAlphabetically());
@@ -296,5 +315,13 @@ public class TermStatsLoader {
     // shared structure to be passed between processing queues
     class PRecord {
         public TermStats stats = new TermStats();
+    }
+
+    public int getMaxThreadCount() {
+        return maxThreadCount;
+    }
+
+    public void setMaxThreadCount(int maxThreadCount) {
+        this.maxThreadCount = maxThreadCount;
     }
 }

@@ -384,6 +384,8 @@
     </bean>
 
     <bean id="termStatLoader" class="edu.mcw.rgd.dataload.ontologies.TermStatsLoader">
+        <!-- some db queries are very resource consuming; we need to limit the nr of these queries executed in parallel-->
+        <property name="maxThreadCount" value="8" />
     </bean>
 
     <bean id="GViewerStatsLoader" class="edu.mcw.rgd.dataload.ontologies.GViewerStatsLoader">

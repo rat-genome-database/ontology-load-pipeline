@@ -1,5 +1,6 @@
 May 03, 2023
   implemented FileSystemLock in TermStatsLoader: only one instance of TermStatsLoader could be running in a JVM
+  TermStatsLoader: stats computation executes in parallel using no more than specified nr of threads
 
 Apr 25, 2023
   updated CL source to CL release v2023-04-20
