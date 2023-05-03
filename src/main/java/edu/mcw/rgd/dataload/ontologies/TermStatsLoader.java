@@ -105,7 +105,7 @@ public class TermStatsLoader {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                }));
+                })).get();
                 customThreadPool.shutdown();
             }
 
