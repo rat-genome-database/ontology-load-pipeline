@@ -13,6 +13,3 @@ for ontology in "${ontologies[@]}"; do
     echo ""
 done
 
-#update gviewer stats for all ontologies (affected table ONT_TERM_STATS)
-$APPDIR/gviewer_stats.sh
-cat $APPDIR/logs/gviewer_stats_summary.log

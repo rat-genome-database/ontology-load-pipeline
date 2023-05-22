@@ -63,7 +63,6 @@ public class Manager {
         int qcThreadCount = 5;
         boolean goTaxonConstraints = false;
         String filter = null;
-        boolean loadGViewerStats = false;
         boolean checkForCycles = false;
         boolean omimPsCustomDoMapper = false;
 
@@ -89,9 +88,7 @@ public class Manager {
             else if( arg.equals("-go_taxon_constraints") ) {
                 goTaxonConstraints = true;
             }
-            else if( arg.equals("-gviewer_stats") ) {
-                loadGViewerStats = true;
-            } else if (arg.startsWith("-filter=") ) {
+            else if (arg.startsWith("-filter=") ) {
                 filter = arg.substring(8);
                 if (filter.equals("")) {
                     filter=null;
@@ -120,18 +117,6 @@ public class Manager {
         }
 
         FileParser parser = null;
-
-        // update gviewer xml stats
-        if( loadGViewerStats ) {
-            parser = (FileParser) bf.getBean("fileParser");
-            parser.setDao(manager.dao);
-            parser.enforceSingleOntology(singleOntologyId);
-
-            GViewerStatsLoader loader2 = (GViewerStatsLoader) bf.getBean("GViewerStatsLoader");
-            loader2.setDao(manager.dao);
-            loader2.run(parser.getOntPrefixes(), qcThreadCount);
-            return;
-        }
 
         //download external files and setup file parser
         if( !skipDownloads ) {

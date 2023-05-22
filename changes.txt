@@ -1,3 +1,7 @@
+May 22, 2023
+  removed from scripts calls to GViewerStatsLoader -- this loader is obsolete and table ONT_TERM_STATS it populates
+    is not being used anymore (for quite awhile, already)
+
 May 03, 2023
   implemented FileSystemLock in TermStatsLoader: only one instance of TermStatsLoader could be running in a JVM
   TermStatsLoader: stats computation executes in parallel using no more than specified nr of threads

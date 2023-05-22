@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * populates/updates ONT_TERM_STATS table to be used by ontology report pages and GViewer;
  * if filter is NOT NULL, then GViewer XML data is NOT updated for performance reason
+ * <p>
+ * NOTE: code discontinued as of May 22, 2023
  */
 public class GViewerStatsLoader {
     private OntologyDAO dao;

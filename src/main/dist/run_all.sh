@@ -9,7 +9,3 @@ for ontology in "${ontologies[@]}"; do
     $APP/run_single.sh "$ontology" $1 $2 $3 $4 $5 $6 $7 $8
     echo ""
 done
-
-#update gviewer stats for all ontologies (affected table ONT_TERM_STATS)
-$APPDIR/gviewer_stats.sh
-cat $APP/logs/gviewer_stats_summary.log
