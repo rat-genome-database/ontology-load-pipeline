@@ -1,3 +1,6 @@
+May 23, 2023
+  updated CL source to CL release v2023-05-22
+
 May 22, 2023
   removed from scripts calls to GViewerStatsLoader -- this loader is obsolete and table ONT_TERM_STATS it populates
     is not being used anymore (for quite awhile, already)
