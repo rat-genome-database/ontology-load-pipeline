@@ -3,6 +3,7 @@
 . /etc/profile
 APPDIR=/home/rgddata/pipelines/OntologyLoad
 cd $APPDIR
+SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 
 ontologies=( "RDO" "GO" "MP" "HP" "MMO" "CMO" "XCO" "RS" "PW" )
 
