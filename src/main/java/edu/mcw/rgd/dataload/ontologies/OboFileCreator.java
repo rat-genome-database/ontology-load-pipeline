@@ -8,6 +8,7 @@ import edu.mcw.rgd.process.Utils;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author mtutaj
@@ -29,6 +30,8 @@ public class OboFileCreator {
     private Map<String,String> versionedFiles;
     private Set<String> emitObsoleteTermsFor;
     private boolean versionStringWritten = false;
+
+    private AtomicInteger spacesInDbXrefsReplaced = new AtomicInteger(0);
 
     /**
      * dump all terms (with definitions and synonyms) from given ontology into a obo file
@@ -61,6 +64,7 @@ public class OboFileCreator {
         }
 
         setOntId(ontId);
+        spacesInDbXrefsReplaced.set(0);
 
         StringBuffer versionedTerms = new StringBuffer();
         StringBuffer fileTrailer = new StringBuffer();
@@ -140,6 +144,9 @@ public class OboFileCreator {
         writer.close();
 
         System.out.println("   "+terms.size()+" terms written");
+        if( spacesInDbXrefsReplaced.get() != 0 ) {
+            System.out.println("   "+spacesInDbXrefsReplaced.get()+" spaces in db xrefs replaced");
+        }
     }
 
     StringBuffer initOboHeader(String dataVersion) throws Exception {
@@ -506,7 +513,13 @@ public class OboFileCreator {
             if( commaPos>=0 ) {
                 value = value.replace(",", "\\,");
             }
-            buf.append(value);
+
+            // 'value' must not contain spaces, because it breaks some obo parsers like Pronto
+            String valueWithoutSpaces = value.replace(" ", "_");
+            if( !valueWithoutSpaces.equals(value) ) {
+                spacesInDbXrefsReplaced.incrementAndGet();
+            }
+            buf.append(valueWithoutSpaces);
 
             // export description if any
             if( !Utils.isStringEmpty(xref.getXrefDescription()) ) {

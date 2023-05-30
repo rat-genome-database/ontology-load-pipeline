@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  May 23, 2023" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  May 30, 2023" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -313,7 +313,7 @@
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
-        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2022-01-04 --" />
+        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2023-05-30 --" />
         <property name="versionedFiles">
             <map>
                 <entry key="PW" value="https://download.rgd.mcw.edu/ontology/pathway/pathway.obo"/>
