@@ -1,5 +1,6 @@
 # ensure that OBO files are compliant with OBO spec
 # we do this by running robot tool: we try to convert the obo files to OWL format
+#   also we convert OBO to OFN format (OWL functional format)
 # note: robot.jar should be available in pipeline directory
 #
 . /etc/profile
@@ -46,6 +47,23 @@ owl_tmp_files+=("/tmp/XCO.owl")
 owl_tmp_files+=("/tmp/RDO.owl")
 owl_tmp_files+=("/tmp/RS.owl")
 
+#generated ofn files (owl functional files)
+ofn_files=()
+ofn_files+=("$ONT_DIR/pathway/pathway.ofn")
+ofn_files+=("$ONT_DIR/clinical_measurement/clinical_measurement.ofn")
+ofn_files+=("$ONT_DIR/measurement_method/measurement_method.ofn")
+ofn_files+=("$ONT_DIR/experimental_condition/experimental_condition.ofn")
+ofn_files+=("$ONT_DIR/disease/RDO.ofn")
+ofn_files+=("$ONT_DIR/rat_strain/rat_strain.ofn")
+
+ofn_tmp_files=()
+ofn_tmp_files+=("/tmp/PW.ofn")
+ofn_tmp_files+=("/tmp/CMO.ofn")
+ofn_tmp_files+=("/tmp/MMO.ofn")
+ofn_tmp_files+=("/tmp/XCO.ofn")
+ofn_tmp_files+=("/tmp/RDO.ofn")
+ofn_tmp_files+=("/tmp/RS.ofn")
+
 
 error_file="$APPDIR/robot.errors"
 echo " " > $error_file
@@ -55,10 +73,15 @@ cd $APPDIR
 for i in ${!obo_files[@]}; do
   infile=${obo_tmp_files[$i]}
   outfile="${owl_tmp_files[$i]}"
+  ofnfile="${ofn_tmp_files[$i]}"
 
   scp -p "${obo_files[$i]}" $infile
+
   java -jar robot.jar convert --input $infile --output $outfile >> $error_file
   scp -p $outfile "${owl_files[$i]}"
+
+  java -jar robot.jar convert --input $infile --output $ofnfile >> $error_file
+  scp -p $ofnfile "${ofn_files[$i]}"
 done
 
 if [ -s $error_file ]; then

@@ -1,3 +1,6 @@
+Jul 05, 2023
+  obo validator script: added generation of ofn file (owl functional) in addition to owl file
+
 Jun 23, 2023
   updated CL source to CL release 2023-06-22
 
