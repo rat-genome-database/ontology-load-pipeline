@@ -136,6 +136,7 @@
 
                 <entry key="symbol" value="synonym" />
                 <entry key="alternative:term" value="synonym" />
+                <entry key="IAO:0000028" value="synonym" /><!-- IAO:0000028 == symbol -->
                 <entry key="http://www.ebi.ac.uk/efo/definition" value="def" />
                 <entry key="definition:citation" value="comment" />
                 <entry key="http://www.ebi.ac.uk/efo/reason_for_obsolescence" value="definition" />
