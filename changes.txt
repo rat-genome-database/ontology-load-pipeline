@@ -1,3 +1,7 @@
+Jun 24, 2023
+  updated CL source to CL release 2023-07-20
+  EfoLoader: limits input to GWAS records having a single EFO entry
+
 Jul 05, 2023
   obo validator script: added generation of ofn file (owl functional) in addition to owl file
 

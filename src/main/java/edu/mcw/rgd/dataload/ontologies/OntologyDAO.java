@@ -360,7 +360,7 @@ public class OntologyDAO {
         return StringListQuery.execute(dao, sql, prefix+"%");
     }
 
-    public Collection<String> getEfoIdsFromGWAS() throws Exception {
+    public Collection<String> getEfoIdsFromGWAS( boolean efoSinglets ) throws Exception {
         String sql = "SELECT DISTINCT efo_ids FROM GWAS_CATALOG";
         List<String> efoIds = StringListQuery.execute(dao, sql);
         Set<String> uniqueEfoIds = new HashSet<>();
@@ -369,6 +369,11 @@ public class OntologyDAO {
                 continue;
             }
             String[] ids = s.split("[,]");
+
+            if( efoSinglets && ids.length!=1 ) {
+                continue;
+            }
+
             for( String id: ids ) {
                 String id2 = id.trim().replace("_", ":");
                 if( id2.startsWith("EFO:") && id2.length()==11 ) {

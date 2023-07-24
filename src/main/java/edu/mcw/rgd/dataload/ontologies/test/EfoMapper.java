@@ -24,16 +24,18 @@ public class EfoMapper {
 
         String ontId;
 
+        /*
         ontId = "MP";
         run(ontId, limitEfoToGWAS);
 
         ontId = "HP";
         run(ontId, limitEfoToGWAS);
+        */
+
+        ontId = "CMO";
+        run(ontId, limitEfoToGWAS);
 
         /*
-        ontId = "CMO";
-        run(ontId);
-
         ontId = "RDO";
         run(ontId);
         */
@@ -52,7 +54,12 @@ public class EfoMapper {
         List<String> efoIds1 = dao.getAllTermAccIds("EFO");
 
         if( limitEfoToGWAS ) {
-            Collection<String> gwasEfoIds = dao.getEfoIdsFromGWAS();
+            boolean efoSinglets = false;
+            if( ontId.equals("CMO") ) {
+                efoSinglets = true;
+            }
+
+            Collection<String> gwasEfoIds = dao.getEfoIdsFromGWAS(efoSinglets);
 
             List<String> efoIdsNotInRgd = new ArrayList<>(gwasEfoIds);
             efoIdsNotInRgd.removeAll(efoIds1);
