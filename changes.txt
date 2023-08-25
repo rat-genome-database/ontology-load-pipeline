@@ -1,3 +1,6 @@
+Aug 25, 2023
+  updated CL source to CL release 2023-08-24
+
 Jul 24, 2023
   updated CL source to CL release 2023-07-20
   EfoLoader: limits input to GWAS records having a single EFO entry

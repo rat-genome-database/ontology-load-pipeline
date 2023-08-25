@@ -18,6 +18,7 @@ public class EfoBulkLoad {
         String fname = "/Users/mtutaj/Documents/efo_bulk_load.txt";
         fname = "/Users/mtutaj/Documents/EFO-RDO-bulk-load.txt";
         fname = "/tmp/EFO to HP-MP automapping bulk load.txt";
+        fname = "/tmp/EFO-HP-MP list for bulk load.txt";
         BufferedReader in = Utils.openReader(fname);
 
         int linesWithIssues = 0;
@@ -26,24 +27,25 @@ public class EfoBulkLoad {
         int synonymsInserted = 0;
         int synonymsUpToDate = 0;
 
-        //EFO:0004720	MP:0002654	prion disease	broad_synonym
+        //old: EFO:0004720	MP:0002654	prion disease	broad_synonym
+        //new: EFO:0000771	bacterial disease	Opportunistic bacterial infection	HP:0032260	broad_synonym
         String line;
         int lineNr = 0;
         while( (line=in.readLine())!=null ) {
             lineNr++;
             String[] cols = line.split("[\\t]", -1);
-            if( cols.length<=3 ) {
+            if( cols.length<5 ) {
                 System.out.println(lineNr+". line skipped: "+line);
                 linesWithIssues++;
                 continue;
             }
             String xrefAcc = getText(cols[0]);
-            String hpMpAcc = getText(cols[1]);
-            String synonymName = getText(cols[2]);
+            String hpMpAcc = getText(cols[3]);
+            String synonymName = getText(cols[1]); // EFO term name will be the synonym name
             if( synonymName.startsWith("\"") && synonymName.endsWith("\"") ) {
                 synonymName = getText(synonymName.substring(1, synonymName.length()-1));
             }
-            String synonymType = getText(cols[3]);
+            String synonymType = getText(cols[4]);
 
             if( !xrefAcc.startsWith("EFO:") && !xrefAcc.startsWith("MONDO:") ) {
                 System.out.println(lineNr+". not found EFO/MONDO acc in line "+line);
