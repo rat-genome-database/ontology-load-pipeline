@@ -2,7 +2,6 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.datamodel.ontologyx.TermStat;
 import edu.mcw.rgd.datamodel.ontologyx.TermWithStats;
-import edu.mcw.rgd.process.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +13,9 @@ import java.util.Map;
  */
 public class TermStats {
     private String termAccId;
-    private String[] xmlForTerm = new String[7]; // gviewer xml for term only
-    private String[] xmlWithChilds = new String[7]; // gviewer xml for term with childs
 
     public TermWithStats term;
 
-    public boolean xmlIsDirty = false;
     public boolean statsAreDirty = false;
 
     public List<TermStat> statsToBeAdded;
@@ -45,34 +41,6 @@ public class TermStats {
 
     public String getFilter() {
         return term.getFilter();
-    }
-
-    public String getXmlForTerm(int speciesTypeKey) {
-        return xmlForTerm[speciesTypeKey-1];
-    }
-
-    public void setXmlForTerm(String xml, int speciesTypeKey) {
-        xmlForTerm[speciesTypeKey-1] = xml;
-    }
-
-    public String getXmlWithChilds(int speciesTypeKey) {
-        return xmlWithChilds[speciesTypeKey-1];
-    }
-
-    public void setXmlWithChilds(String xml, int speciesTypeKey) {
-        xmlWithChilds[speciesTypeKey-1] = xml;
-    }
-
-    public boolean equalsForGViewer(TermStats statsInRgd) {
-        xmlIsDirty = false;
-        for (int i = 0; i < 3; i++) {
-            if (!Utils.stringsAreEqual(this.xmlForTerm[i], statsInRgd.xmlForTerm[i]) ||
-                    !Utils.stringsAreEqual(this.xmlWithChilds[i], statsInRgd.xmlWithChilds[i])) {
-                xmlIsDirty = true;
-                break;
-            }
-        }
-        return !xmlIsDirty;
     }
 
     public boolean equals(TermStats statsInRgd) {

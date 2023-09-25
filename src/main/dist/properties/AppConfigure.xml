@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Aug 25, 2023" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Sep 25, 2023" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -391,33 +391,6 @@
     <bean id="termStatLoader" class="edu.mcw.rgd.dataload.ontologies.TermStatsLoader">
         <!-- some db queries are very resource consuming; we need to limit the nr of these queries executed in parallel-->
         <property name="maxThreadCount" value="8" />
-    </bean>
-
-    <bean id="GViewerStatsLoader" class="edu.mcw.rgd.dataload.ontologies.GViewerStatsLoader">
-        <property name="version" value="--GViewer Stats Loader -- build Jul 06, 2020 --" />
-        <property name="maxAnnotCountPerTerm" value="2500" />
-        <property name="processedOntologyPrefixes">
-            <set>
-                <value>GO:</value>
-                <value>MP:</value>
-                <value>PW:</value>
-                <value>CMO:</value>
-                <value>MMO:</value>
-                <value>XCO:</value>
-                <value>RS:</value>
-                <value>SO:</value>
-                <value>CL:</value>
-                <value>MA:</value>
-                <value>*</value><!-- DOID -->
-                <value>NBO:</value>
-                <value>HP:</value>
-                <value>CHEBI:</value>
-                <value>VT:</value>
-                <value>UBERON:</value>
-                <value>CS:</value>
-            </set>
-        </property>
-
     </bean>
 
     <bean id="omimPsCustomDoMapper" class="edu.mcw.rgd.dataload.ontologies.OmimPsCustomDoMapper">

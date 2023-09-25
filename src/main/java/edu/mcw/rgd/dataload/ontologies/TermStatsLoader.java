@@ -15,8 +15,7 @@ import java.util.concurrent.ForkJoinPool;
  * @author mtutaj
  * Date: Apr 19, 2011
  * <p>
- * populates/updates ONT_TERM_STATS table to be used by ontology report pages and GViewer;
- * if filter is NOT NULL, then GViewer XML data is NOT updated for performance reason
+ * populates/updates ONT_TERM_STATS2 table to be used by ontology report pages
  */
 public class TermStatsLoader {
     private OntologyDAO dao;

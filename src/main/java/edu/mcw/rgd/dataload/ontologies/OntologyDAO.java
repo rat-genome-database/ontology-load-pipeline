@@ -27,7 +27,6 @@ public class OntologyDAO {
     boolean readOnlyMode = false;
 
     AnnotationDAO annotDAO = new AnnotationDAO();
-    MapDAO mapDAO = new MapDAO();
     OmimDAO omimDAO = new OmimDAO();
     OntologyXDAO dao = new OntologyXDAO();
     PathwayDAO pathwayDAO = new PathwayDAO();
@@ -336,15 +335,6 @@ public class OntologyDAO {
         return StringListQuery.execute(dao, sql, termAcc);
     }
 
-    public Map<String,String> getAnchorTerms(String rdoTermAcc, String anchorTerm) throws Exception {
-
-        Map<String,String> results = new TreeMap<>();
-        for( StringMapQuery.MapPair pair: dao.getAnchorTerms(rdoTermAcc, anchorTerm) ) {
-            results.put(pair.keyValue, pair.stringValue);
-        }
-        return results;
-    }
-
     /**
      * get list of accession ids for terms matching the prefix
      * @param prefix term acc prefix
@@ -459,37 +449,6 @@ public class OntologyDAO {
         }
 
         return cnt;
-    }
-
-    public TermStats getGViewerStats(String termAcc) throws Exception {
-        TermStats ts = getTermWithStats(termAcc);
-
-        String sql = "SELECT rat_gviewer_for_term, rat_gviewer_with_children, " +
-                "human_gviewer_for_term, human_gviewer_with_children, " +
-                "mouse_gviewer_for_term, mouse_gviewer_with_children " +
-                "FROM ont_term_stats WHERE term_acc=?";
-
-        Connection conn = null;
-        try {
-            conn = dao.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, termAcc);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                ts.setXmlForTerm(rs.getString("rat_gviewer_for_term"), SpeciesType.RAT);
-                ts.setXmlWithChilds(rs.getString("rat_gviewer_with_children"), SpeciesType.RAT);
-                ts.setXmlForTerm(rs.getString("human_gviewer_for_term"), SpeciesType.HUMAN);
-                ts.setXmlWithChilds(rs.getString("human_gviewer_with_children"), SpeciesType.HUMAN);
-                ts.setXmlForTerm(rs.getString("mouse_gviewer_for_term"), SpeciesType.MOUSE);
-                ts.setXmlWithChilds(rs.getString("mouse_gviewer_with_children"), SpeciesType.MOUSE);
-            }
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception ignored) {
-            }
-        }
-        return ts;
     }
 
     public TermStats getTermWithStats(String termAcc) throws Exception {
@@ -617,48 +576,6 @@ public class OntologyDAO {
         }
     }
 
-    // return 0: up-to-date, -1: inserted, 1:updated
-    public int updateGViewerStats(TermStats stats) throws Exception {
-
-        if( !stats.xmlIsDirty ) {
-            return 0;
-        }
-
-        // xml gviewer update
-        String sql =
-            "UPDATE ont_term_stats SET "+
-            "rat_gviewer_for_term=?, rat_gviewer_with_children=?, "+
-            "human_gviewer_for_term=?, human_gviewer_with_children=?, "+
-            "mouse_gviewer_for_term=?, mouse_gviewer_with_children=?, "+
-            "last_modified_date=SYSDATE WHERE term_acc=?";
-
-        int rowsAffected = dao.update(sql,
-            stats.getXmlForTerm(SpeciesType.RAT), stats.getXmlWithChilds(SpeciesType.RAT),
-            stats.getXmlForTerm(SpeciesType.HUMAN), stats.getXmlWithChilds(SpeciesType.HUMAN),
-            stats.getXmlForTerm(SpeciesType.MOUSE), stats.getXmlWithChilds(SpeciesType.MOUSE),
-            stats.getTermAccId());
-
-        // if no rows affected, we can insert new stats
-        if( rowsAffected==0 ) {
-            sql =
-                "INSERT INTO ont_term_stats ("+
-                "rat_gviewer_for_term, rat_gviewer_with_children, "+
-                "human_gviewer_for_term, human_gviewer_with_children, "+
-                "mouse_gviewer_for_term, mouse_gviewer_with_children, "+
-                "term_acc) " +
-                "values(?,?,?,?,?,?,?)";
-
-            dao.update( sql,
-                stats.getXmlForTerm(SpeciesType.RAT), stats.getXmlWithChilds(SpeciesType.RAT),
-                stats.getXmlForTerm(SpeciesType.HUMAN), stats.getXmlWithChilds(SpeciesType.HUMAN),
-                stats.getXmlForTerm(SpeciesType.MOUSE), stats.getXmlWithChilds(SpeciesType.MOUSE),
-                stats.getTermAccId());
-
-            return -1;
-        }
-        return 1;
-    }
-
     /**
      * examines all terms and all active terms that do not appear in ontology dag trees
      * receive 'obsolete' status = 2
@@ -715,41 +632,6 @@ public class OntologyDAO {
             }
         }
     }
-
-    /**
-     * get map key for primary ref assembly
-     * @param speciesTypeKey species type key
-     * @return map key for primary ref assembly
-     * @throws Exception if something wrong happens in spring framework
-     */
-    public int getPrimaryRefAssemblyMapKey(int speciesTypeKey) throws Exception {
-
-        return mapDAO.getPrimaryRefAssembly(speciesTypeKey, "NCBI").getKey();
-    }
-
-    /** get map data for given rgd id and map key;
-     * internally we use cache to reduce number of requests to database
-     * @param rgdId object rgd id
-     * @param mapKey object map key
-     * @return list of MapData objects
-     * @throws Exception if something wrong happens in spring framework
-     */
-    synchronized public List<MapData> getMapData(int rgdId, int mapKey) throws Exception {
-
-        // make cache key=RgdId:MapKey
-        String cacheKey = rgdId+":"+mapKey;
-        // retrieve data from cache
-        List<MapData> results = _cacheMapData.get(cacheKey);
-        if( results==null ) {
-            // not in cache -- retrieve data from database
-            results = mapDAO.getMapData(rgdId, mapKey);
-            // put data to cache
-            _cacheMapData.put(cacheKey, results);
-        }
-        return results;
-    }
-    static private Map<String, List<MapData>> _cacheMapData = new HashMap<>(50003);
-
 
     public List<TermXRef> getTermXRefs(String termAcc) throws Exception {
         return dao.getTermXRefs(termAcc);
