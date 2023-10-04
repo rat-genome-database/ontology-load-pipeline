@@ -9,9 +9,10 @@ tasks.whenTaskAdded { task ->
 apply plugin: 'java'
 apply plugin: 'application'
 
-// JDK 8
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 mainClassName = 'edu.mcw.rgd.dataload.ontologies.Manager'
 String myAppName = 'OntologyLoad'
 
