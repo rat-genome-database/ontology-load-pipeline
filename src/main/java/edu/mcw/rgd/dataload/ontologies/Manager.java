@@ -31,14 +31,6 @@ public class Manager {
         try {
             main2(args);
 
-            /*
-            String[] ontIds = {"XCO", "MMO", "NBO", "MI", "SO", "CL", "PW", "ZFA", "CMO", "VT", "MA", "RS", "MP", "HP", "UBERON", "GO", "CHEBI"};
-            String[] args2 = {"-single_ontology=", "-skip_stats_update"};
-            for( String ontId: ontIds ) {
-                args2[0] = "-single_ontology="+ontId;
-                main2(args2);
-            }
-             */
         } catch(Exception e) {
             Utils.printStackTrace(e, LogManager.getLogger("status"));
             throw e;

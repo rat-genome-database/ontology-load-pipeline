@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Oct 23, 2023" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Oct 30, 2023" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -118,6 +118,7 @@
                 <entry key="created:by" value="created_by" />
                 <entry key="http://purl.org/dc/elements/1.1/creator" value="created_by" />
                 <entry key="dc-contributor" value="created_by" />
+                <entry key="http://www.ebi.ac.uk/efo/creator" value="created_by" />
 
                 <entry key="creation:date" value="creation_date" />
                 <entry key="http://purl.org/dc/elements/1.1/date" value="creation_date" />
@@ -190,16 +191,59 @@
                 <entry key="http://purl.obolibrary.org/obo/chebi/monoisotopicmass" value="chebi_ignored" />
 
                 <!-- EFO ontology -->
-                <entry key="IAO:0000117" value="created_by" />
-                <entry key="dc-creator" value="created_by" />
-                <entry key="createdBy" value="created_by" />
-                <entry key="exactMatch" value="efo_ignored" />
+                <entry key="ArrayExpress:label" value="efo_ignored" />
+                <entry key="branch:class" value="efo_ignored" />
+                <entry key="broadMatch" value="broad_synonym" />
                 <entry key="closeMatch" value="efo_ignored" />
-                <entry key="narrowMatch" value="efo_ignored" />
-                <entry key="organizational:class" value="efo_ignored" />
-                <entry key="gwas:trait" value="efo_ignored" />
-                <entry key="http://www.ebi.ac.uk/efo/obsoleted_in_version" value="efo_ignored" />
+                <entry key="createdBy" value="created_by" />
+                <entry key="dc-creator" value="created_by" />
+                <entry key="depicted:by" value="efo_ignored" />
+                <entry key="EFO:URI" value="efo_ignored" />
+                <entry key="exactMatch" value="efo_ignored" />
+                <entry key="excluded_from_qc_check" value="efo_ignored" />
                 <entry key="excluded_subClassOf" value="efo_ignored" />
+                <entry key="excluded_synonym" value="efo_ignored" />
+                <entry key="gwas:trait" value="efo_ignored" />
+                <entry key="http://purl.org/dc/elements/1.1/contributor" value="efo_ignored"/>
+                <entry key="http://purl.org/dc/terms/conformsTo" value="efo_ignored"/>
+                <entry key="http://purl.org/dc/terms/contributor" value="efo_ignored"/>
+                <entry key="http://purl.org/dc/terms/creator" value="created_by"/>
+                <entry key="http://purl.org/dc/terms/date" value="efo_ignored"/>
+                <entry key="http://www.ebi.ac.uk/efo/obsoleted_in_version" value="efo_ignored" />
+                <entry key="https://w3id.org/semapv/vocab/crossSpeciesExactMatch" value="efo_ignored" />
+                <entry key="IAO:0000111" value="efo_ignored" /><!-- editor preferred label/term -->
+                <entry key="IAO:0000112" value="efo_ignored" /><!-- example of usage -->
+                <entry key="IAO:0000114" value="efo_ignored" /><!-- has curation status -->
+                <entry key="IAO:0000116" value="external_comment" /><!-- editor note -->
+                <entry key="IAO:0000117" value="created_by" />
+                <entry key="IAO:0000118" value="efo_ignored" /><!-- alternative label/term -->
+                <entry key="IAO:0000119" value="efo_ignored" /><!-- definition source -->
+                <entry key="IAO:0000231" value="efo_ignored" /><!-- has obsolescence reason -->
+                <entry key="IAO:0000232" value="efo_ignored" /><!-- curator note -->
+                <entry key="IAO:0000233" value="efo_ignored" /><!-- term tracker item -->
+                <entry key="IAO:0000412" value="efo_ignored" /><!-- imported from -->
+                <entry key="IAO:0000589" value="efo_ignored" /><!-- obo foundry unique label -->
+                <entry key="IAO:0006012" value="efo_ignored" /><!-- scheduled for obsoletion on or after -->
+                <entry key="narrowMatch" value="efo_ignored" />
+                <entry key="OBI:0001847" value="synonym" /><!-- ISA alternative term -->
+                <entry key="organizational:class" value="efo_ignored" />
+                <entry key="primary:source" value="efo_ignored" />
+                <entry key="relatedMatch" value="xref" />
+                <entry key="RO:0002171" value="efo_ignored" /> <!-- mutually spatially disjoint with -->
+                <entry key="RO:0002175" value="present_in_taxon" />
+                <entry key="should_conform_to" value="efo_ignored" />
+                <entry key="source:definition" value="efo_ignored" />
+                <entry key="SRA:label" value="efo_ignored" />
+                <entry key="UBPROP:0000004" value="efo_ignored" /><!-- provenance notes -->
+                <entry key="UBPROP:0000005" value="efo_ignored" /><!-- external comment -->
+                <entry key="UBPROP:0000006" value="efo_ignored" /><!-- implements design pattern -->
+                <entry key="UBPROP:0000009" value="efo_ignored" /><!-- function notes -->
+                <entry key="UBPROP:0000010" value="efo_ignored" /><!-- structure notes -->
+                <entry key="UBPROP:0000011" value="efo_ignored" /><!-- development notes -->
+                <entry key="UBPROP:0000012" value="efo_ignored" /><!-- external ontology notes -->
+                <entry key="UBPROP:0000013" value="efo_ignored" /><!-- terminology notes -->
+                <entry key="UBPROP:0000108" value="efo_ignored" /><!-- somite number -->
+                <entry key="UBPROP:0000112" value="efo_ignored" /><!-- tooth number -->
             </map>
         </property>
 
@@ -283,10 +327,12 @@
                 <entry key="RO:0001000" value="derives_from" />
                 <entry key="RO:0002104" value="has_plasma_membrane_part" />
                 <entry key="RO:0002174" value="dubious_for_taxon" />
+                <entry key="RO:0002175" value="present_in_taxon" />
                 <entry key="RO:0002200" value="has_phenotype" />
                 <entry key="RO:0002201" value="phenotype_of" />
                 <entry key="RO:0002211" value="regulates" />
                 <entry key="RO:0002314" value="characteristic_of_part_of" />
+                <entry key="UBPROP:0000005" value="external_comment" />
                 <entry key="UBPROP:0000202" value="fma_set_term" />
             </map>
         </property>
@@ -342,11 +388,6 @@
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
         <property name="version" value="--GO Taxon Constraints   -- build Jun 21, 2022 --" />
-
-        <!-- obsolete urls: they don't work anymore
-        <property name="taxonUnionOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_union_terms.obo" />
-        <property name="taxonConstraintOboFile" value="http://www.geneontology.org/quality_control/annotation_checks/taxon_checks/taxon_go_triggers.obo" />
-        -->
 
         <property name="taxonUnionOboFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/ontology/imports/go-taxon-groupings.obo" />
         <property name="neverInTaxonFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/taxon_constraints/never_in_taxon.tsv" />

@@ -1,3 +1,6 @@
+Oct 30, 2023
+  better parsing for EFO ontology
+
 Oct 23, 2023
   updated CL source to CL release 2023-10-19
 
