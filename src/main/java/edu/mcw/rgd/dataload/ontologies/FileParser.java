@@ -550,9 +550,10 @@ public class FileParser {
         }
         rec.getTerm().setTerm(termName);
 
+        // are there any UTF-8 characters
         byte[] b = termName.getBytes();
         if( b.length!=termName.length() ) {
-            System.out.println("xxx");
+            System.out.println(" utf8 characters in term name: "+termName);
         }
     }
 
