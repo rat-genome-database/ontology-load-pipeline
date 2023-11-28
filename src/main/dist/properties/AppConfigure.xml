@@ -36,7 +36,7 @@
                 <entry key="CHEBI" value="ftp://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.obo"/>
 
                 <!-- OLD source: http://data.bioontology.org/ontologies/VT/download/?apikey=##APIKEY## -->
-                <entry key="VT" value="https://github.com/AnimalGenome/vertebrate-trait-ontology/blob/master/current_release/vt.obo" />
+                <entry key="VT" value="https://raw.githubusercontent.com/AnimalGenome/vertebrate-trait-ontology/master/current_release/vt.obo" />
 
                 <entry key="ORDO" value="http://data.bioontology.org/ontologies/ORDO_OBO/download/?apikey=##APIKEY##" />
 
