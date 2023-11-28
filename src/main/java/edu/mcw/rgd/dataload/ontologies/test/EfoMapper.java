@@ -30,9 +30,12 @@ public class EfoMapper {
 
         ontId = "HP";
         run(ontId, limitEfoToGWAS);
-        */
 
         ontId = "CMO";
+        run(ontId, limitEfoToGWAS);
+        */
+
+        ontId = "VT";
         run(ontId, limitEfoToGWAS);
 
         /*
@@ -43,7 +46,7 @@ public class EfoMapper {
 
     static void run(String ontId, boolean limitEfoToGWAS) throws Exception {
 
-        TermNameMatcher matcher = populateTermNameMatcher(ontId);
+        TermNameMatcher matcher = populateTermNameMatcher(ontId, " trait");
 
         BufferedWriter out = Utils.openWriter("EFO_to_"+ontId+"_mappings.txt");
         out.write("EFO ID\tEFO term\tmatch by\t"+ontId+" ID\t"+ontId+" term\n");
@@ -55,7 +58,7 @@ public class EfoMapper {
 
         if( limitEfoToGWAS ) {
             boolean efoSinglets = false;
-            if( ontId.equals("CMO") ) {
+            if( ontId.equals(ontId) ) {
                 efoSinglets = true;
             }
 
@@ -261,6 +264,22 @@ public class EfoMapper {
         matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "related_synonym"));
 
         matcher.loadTerms(odao.getActiveTerms(ontId));
+
+        System.out.println("term name matcher populated!");
+        return matcher;
+    }
+
+    static TermNameMatcher populateTermNameMatcher(String ontId, String suffix) throws Exception {
+
+        System.out.println("initializing term name matcher ...");
+
+        TermNameMatcher matcher = new TermNameMatcher();
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "exact_synonym"), suffix);
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "broad_synonym"), suffix);
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "narrow_synonym"), suffix);
+        matcher.loadSynonyms(dao.getActiveSynonymsByType(ontId, "related_synonym"), suffix);
+
+        matcher.loadTerms(odao.getActiveTerms(ontId), suffix);
 
         System.out.println("term name matcher populated!");
         return matcher;

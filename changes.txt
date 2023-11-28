@@ -1,3 +1,7 @@
+Nov 28, 2023
+  better mapper for EFO-VT
+  new source for VT ontology
+
 Nov 07, 2023
   EFO-CMO loader
 

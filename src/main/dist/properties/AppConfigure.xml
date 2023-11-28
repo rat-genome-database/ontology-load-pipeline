@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Nov 07, 2023" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Nov 28, 2023" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -22,13 +22,6 @@
                 <entry key="MP" value="http://www.informatics.jax.org/downloads/reports/MPheno_OBO.ontology"/>
                 <!--<entry key="MP" value="https://build.obolibrary.io/job/obofoundry/job/pipeline-mp/job/master/lastSuccessfulBuild/artifact/src/ontology/mp.obo"/>-->
 
-
-                <!--<entry key="PW" value="ftp://ftp.rgd.mcw.edu/pub/ontology/pathway/pathway.obo"/>
-                <entry key="CMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/clinical_measurement/clinical_measurement.obo"/>
-                <entry key="MMO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/measurement_method/measurement_method.obo"/>
-                <entry key="XCO" value="ftp://ftp.rgd.mcw.edu/pub/ontology/experimental_condition/experimental_condition.obo"/>
-                <entry key="RS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/rat_strain/rat_strain.obo"/>
-                -->
                 <entry key="CS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/chinchilla/CS.obo"/>
 
                 <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
@@ -41,7 +34,10 @@
                 <entry key="NBO" value="http://ontologies.berkeleybop.org/nbo/nbo-simple.obo"/>
                 <entry key="HP" value="https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo"/>
                 <entry key="CHEBI" value="ftp://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.obo"/>
-                <entry key="VT" value="http://data.bioontology.org/ontologies/VT/download/?apikey=##APIKEY##" />
+
+                <!-- OLD source: http://data.bioontology.org/ontologies/VT/download/?apikey=##APIKEY## -->
+                <entry key="VT" value="https://github.com/AnimalGenome/vertebrate-trait-ontology/blob/master/current_release/vt.obo" />
+
                 <entry key="ORDO" value="http://data.bioontology.org/ontologies/ORDO_OBO/download/?apikey=##APIKEY##" />
 
                 <!-- http://uberon.github.io/downloads.html -->

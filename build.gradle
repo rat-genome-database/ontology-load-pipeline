@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation 'commons-collections:commons-collections:3.2.2'
-    implementation ('org.apache.commons:commons-dbcp2:2.10.0') {
+    implementation ('org.apache.commons:commons-dbcp2:2.11.0') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     implementation 'commons-net:commons-net:3.10.0'

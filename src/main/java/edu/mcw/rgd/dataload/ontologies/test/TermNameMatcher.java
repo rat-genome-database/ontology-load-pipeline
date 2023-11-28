@@ -23,6 +23,24 @@ public class TermNameMatcher {
         }
     }
 
+    public void loadTerms(List<Term> terms, String excludedSuffix) {
+        for( Term t: terms ) {
+            String termName = t.getTerm().endsWith(excludedSuffix) ?
+                    t.getTerm().substring(0, t.getTerm().length() - excludedSuffix.length()) :
+                    t.getTerm();
+            addName(termName, t.getAccId());
+        }
+    }
+
+    public void loadSynonyms(List<TermSynonym> synonyms, String excludedSuffix) {
+        for( TermSynonym syn: synonyms ) {
+            String synName = syn.getName().endsWith(excludedSuffix) ?
+                    syn.getName().substring(0, syn.getName().length() - excludedSuffix.length()) :
+                    syn.getName();
+            addName(synName, syn.getTermAcc());
+        }
+    }
+
     public Set<String> getMatches(String name) {
         String normalizedName = normalizeTerm(name);
         return map.get(normalizedName);
