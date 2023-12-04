@@ -1,3 +1,7 @@
+Dec 04, 2023
+  implemented EfoXrefCreator: to create xrefs for EFO ontology
+    based on xrefs in other ontologies referencing EFO
+
 Nov 28, 2023
   better mapper for EFO-VT
   new source for VT ontology

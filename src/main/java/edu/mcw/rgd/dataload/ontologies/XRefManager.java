@@ -2,7 +2,7 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.datamodel.ontologyx.TermXRef;
 import edu.mcw.rgd.process.Utils;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.ListUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

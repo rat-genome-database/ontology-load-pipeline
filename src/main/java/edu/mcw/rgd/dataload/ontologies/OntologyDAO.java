@@ -259,6 +259,9 @@ public class OntologyDAO {
         return dao.getActiveSynonymsByName(ontologyId, synonymName);
     }
 
+    public List<TermSynonym> getActiveSynonymsByNamePattern(String ontId, String pattern) throws Exception {
+        return dao.getActiveSynonymsByNamePattern(ontId, pattern);
+    }
     /**
      * insert new synonym for given term
      * @param synonym OntTermSynonym object to be inserted
