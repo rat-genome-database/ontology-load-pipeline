@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Dec 08, 2023" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Jan 08, 2024" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -26,7 +26,7 @@
 
                 <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
 
-                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2023-12-05/cl-basic.obo"/>
+                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2024-01-04/cl-basic.obo"/>
 
                 <entry key="MA" value="http://www.informatics.jax.org/downloads/reports/adult_mouse_anatomy.obo"/>
                 <!--<entry key="RDO" value="http://ctdbase.org/reports/CTD_diseases.obo.gz"/>-->
