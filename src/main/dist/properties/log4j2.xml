@@ -23,23 +23,6 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="gviewer_stats" append="true" fileName="logs/gviewer_stats.log" filePattern="logs/gviewer_stats.log.%d{yyyy-MM}">
-            <PatternLayout pattern="%d %p [%c] - %m%n"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1"/>
-            </Policies>
-        </RollingFile>
-        <File name="gviewer_stats_summary" append="false" fileName="logs/gviewer_stats_summary.log">
-            <PatternLayout pattern="%m%n"/>
-            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-        </File>
-        <RollingFile name="gviewer_stats_monthly" append="true" fileName="logs/gviewer_stats_monthly.log" filePattern="logs/gviewer_stats_monthly.log.%d{yyyy-MM}">
-            <PatternLayout pattern="%d %p [%c] - %m%n"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1"/>
-            </Policies>
-        </RollingFile>
-
         <RollingFile name="goTaxonConstraints" append="true" fileName="logs/goTaxonConstraints.log" filePattern="logs/goTaxonConstraints.log.%d{yyyy-MM}">
             <PatternLayout pattern="[%d] - %m%n"/>
             <Policies>
@@ -147,13 +130,6 @@
             <AppenderRef ref="status" level="info"/>
             <AppenderRef ref="summary" level="info"/><!-- human readable -->
             <AppenderRef ref="detail"/>
-            <AppenderRef ref="Console" level="info"/>
-        </Logger>
-
-        <Logger name="gviewer_stats" level="debug" additivity="false">
-            <AppenderRef ref="gviewer_stats_summary" level="info"/>
-            <AppenderRef ref="gviewer_stats_monthly" level="info"/>
-            <AppenderRef ref="gviewer_stats"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
 

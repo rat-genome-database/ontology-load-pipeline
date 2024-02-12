@@ -302,7 +302,7 @@ public class TaxonConstraints {
             if( t != null ) {
                 dao.insertTermSynonym(syn, "GO");
             } else {
-                logStatus.warn(" TaxonConstraint: term "+syn.getTermAcc()+" not present in GO obo file");
+                logger.warn(" TaxonConstraint: term "+syn.getTermAcc()+" not present in GO obo file -- synonym insertion ignored");
             }
         }
 

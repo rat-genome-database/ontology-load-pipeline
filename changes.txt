@@ -1,5 +1,6 @@
 Feb 12, 2024
   TaxonConstraints loader: added qc to ensure GO terms are in RGD db
+  cleanup: removed unused 'gviewer_stats' logger
 
 Jan 08, 2024
   updated CL source to CL release 2024-01-04
