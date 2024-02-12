@@ -292,9 +292,18 @@ public class TaxonConstraints {
         }
         dao.updateTermSynonymLastModifiedDate(synonymsMatching);
 
-        // perform synonym operations on database
+        // insert synonyms
         for( TermSynonym syn: synonymsForInsert ) {
-            dao.insertTermSynonym(syn, "GO");
+
+            // NOTE: we download taxon constraints file from live github repo
+            //       and there is a chance that some new GO terms did not end up in the official
+            //       GO snapshot release file (i.e. the GO term is not officially released yet)
+            Term t = dao.getTerm(syn.getTermAcc());
+            if( t != null ) {
+                dao.insertTermSynonym(syn, "GO");
+            } else {
+                logStatus.warn(" TaxonConstraint: term "+syn.getTermAcc()+" not present in GO obo file");
+            }
         }
 
         // delete term synonyms scheduled for delete if and only if they are older than 10 days
