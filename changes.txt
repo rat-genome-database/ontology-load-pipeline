@@ -1,3 +1,6 @@
+Feb 13, 2024
+  CL ontology: updated to release v2024-02-13
+
 Feb 12, 2024
   TaxonConstraints loader: added qc to ensure GO terms are in RGD db
   cleanup: removed unused 'gviewer_stats' logger
