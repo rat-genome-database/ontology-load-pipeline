@@ -111,7 +111,7 @@ public class Record {
             return;
         }
 
-        // synonym name must be different than its accession id
+        // synonym name must be different from its accession id
         if( Utils.stringsAreEqual(syn.getName(), syn.getTermAcc()) ) {
             return;
         }

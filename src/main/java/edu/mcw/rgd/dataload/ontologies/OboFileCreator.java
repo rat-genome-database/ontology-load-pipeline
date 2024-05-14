@@ -95,10 +95,19 @@ public class OboFileCreator {
 
             try {
                 for (TermSynonym synonym : dao.getTermSynonyms(rec.getTerm().getAccId())) {
-                    // convert synonyms of type 'primary_id' into 'alt_id'
+                    // convert synonyms of type 'primary_id' into 'xref'
                     if (Utils.stringsAreEqual(synonym.getType(), "primary_id")) {
-                        synonym.setType("alt_id");
+                        synonym.setType("xref");
                     }
+
+                    // synonyms of type 'alt_id' and 'xref' must be a valid accession (curie)
+                    if( synonym.getType().equals("xref") || synonym.getType().equals("alt_id") ) {
+                        if( !isStringACurie(synonym.getName()) ) {
+                            System.out.println("  WARNING! synonym skipped for "+synonym.getTermAcc()+": ["+synonym.getName()+"] is not a valid accession!");
+                            continue;
+                        }
+                    }
+
                     rec.addSynonym(synonym);
                 }
 
@@ -147,6 +156,34 @@ public class OboFileCreator {
         if( spacesInDbXrefsReplaced.get() != 0 ) {
             System.out.println("   "+spacesInDbXrefsReplaced.get()+" spaces in db xrefs replaced");
         }
+    }
+
+    // f.e. 'OMIM:PS123456', 'CHEBI:1234'
+    boolean isStringACurie( String s ) {
+
+        // rule 1: it must have a colon
+        int colonPos = s.indexOf(':');
+        if( colonPos <= 0  && colonPos < s.length()-1 ) {
+            return false;
+        }
+
+        // rule 2: before colon, only upper-case letters are allowed
+        for( int i=0; i<colonPos; i++ ) {
+            char c = s.charAt(i);
+            if( !( Character.isLetter(c) && Character.isUpperCase(c) ) ) {
+                return false;
+            }
+        }
+
+        // rule 2: after colon, only upper-case letters and digits are allowed
+        for( int i=colonPos+1; i<s.length(); i++ ) {
+            char c = s.charAt(i);
+            if( !( Character.isDigit(c) || (Character.isLetter(c) && Character.isUpperCase(c)) ) ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     StringBuffer initOboHeader(String dataVersion) throws Exception {

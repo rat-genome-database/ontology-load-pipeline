@@ -1,3 +1,7 @@
+May 14, 2024
+  OboFileCreator: 'primary_id' synonyms are exported as 'xref', not ad 'alt_id'
+    also malformed accessions in 'xref' and 'alt_id' fields are no longer exported
+
 Apr 11, 2024
   CL ontology: updated to release v2024-04-05
 

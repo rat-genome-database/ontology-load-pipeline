@@ -51,7 +51,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20240328_doid.obo";
+        String fileName = "h:/do/20240430_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -218,8 +218,10 @@ public class DoIdQC {
             else if( line.startsWith("xref: GARD:") ||
                      line.startsWith("xref: ORDO:") ||
                      line.startsWith("xref: ICD-O:") ||
+                     line.startsWith("xref: ICDO:") ||
                      line.startsWith("xref: ICD10CM:") ||
                      line.startsWith("xref: ICD10:") ||
+                     line.startsWith("xref: ICD11:") ||
                      line.startsWith("xref: ICD9CM:") ||
                      line.startsWith("xref: NCI:")) {
                 oboTerm.parseXrefSynonym(line.substring(6).trim());
