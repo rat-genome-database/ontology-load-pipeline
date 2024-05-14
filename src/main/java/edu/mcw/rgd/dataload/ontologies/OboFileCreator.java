@@ -159,31 +159,36 @@ public class OboFileCreator {
     }
 
     // f.e. 'OMIM:PS123456', 'CHEBI:1234'
+
     boolean isStringACurie( String s ) {
 
-        // rule 1: it must have a colon
-        int colonPos = s.indexOf(':');
-        if( colonPos <= 0  && colonPos < s.length()-1 ) {
-            return false;
-        }
+        int colonCount = 0;
 
-        // rule 2: before colon, only upper-case letters are allowed
-        for( int i=0; i<colonPos; i++ ) {
+        // letters, digits and punctuation is allowed
+        for( int i=0; i<s.length(); i++ ) {
             char c = s.charAt(i);
-            if( !( Character.isLetter(c) && Character.isUpperCase(c) ) ) {
-                return false;
+            if( Character.isLetterOrDigit(c) ) {
+                continue;
+            }
+
+            switch( c ) {
+                case '-':
+                case '_':
+                case '.':
+                case '/':
+                case '+':
+                case '*':
+                    continue;
+
+                    // there must be at least one colon in the middle of a string
+                case ':': if( i>0 && i < s.length()-1 ) { colonCount++; } continue;
+
+                // unsupported punctuation: 's' is not a curie
+                default: return false;
             }
         }
 
-        // rule 2: after colon, only upper-case letters and digits are allowed
-        for( int i=colonPos+1; i<s.length(); i++ ) {
-            char c = s.charAt(i);
-            if( !( Character.isDigit(c) || (Character.isLetter(c) && Character.isUpperCase(c)) ) ) {
-                return false;
-            }
-        }
-
-        return true;
+        return colonCount > 0;
     }
 
     StringBuffer initOboHeader(String dataVersion) throws Exception {
