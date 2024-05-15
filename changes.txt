@@ -1,3 +1,6 @@
+May 15, 2024
+  TermStatsLoader: updating to include rgdvariant type for GWAS variant annotations
+
 May 14, 2024
   OboFileCreator: 'primary_id' synonyms are exported as 'xref', not ad 'alt_id'
     also malformed accessions in 'xref' and 'alt_id' fields are no longer exported
