@@ -34,7 +34,6 @@ public class TermStatsLoader {
         RgdId.OBJECT_KEY_STRAINS,
         RgdId.OBJECT_KEY_VARIANTS,
         RgdId.OBJECT_KEY_CELL_LINES,
-        RgdId.OBJECT_KEY_RGDVARIANT,
     };
 
     public String getFilter() {
