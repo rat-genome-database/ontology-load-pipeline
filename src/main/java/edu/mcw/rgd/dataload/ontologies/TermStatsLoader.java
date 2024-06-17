@@ -29,11 +29,11 @@ public class TermStatsLoader {
     private final Logger logger = LogManager.getLogger("stats");
 
     public static int[] PROCESSED_OBJECT_KEYS = { // processed objects
-        RgdId.OBJECT_KEY_GENES,
-        RgdId.OBJECT_KEY_QTLS,
-        RgdId.OBJECT_KEY_STRAINS,
-        RgdId.OBJECT_KEY_VARIANTS,
-        RgdId.OBJECT_KEY_CELL_LINES,
+            RgdId.OBJECT_KEY_GENES,
+            RgdId.OBJECT_KEY_QTLS,
+            RgdId.OBJECT_KEY_STRAINS,
+            RgdId.OBJECT_KEY_VARIANTS,
+            RgdId.OBJECT_KEY_CELL_LINES,
     };
 
     public String getFilter() {
@@ -75,14 +75,10 @@ public class TermStatsLoader {
 
             // load species type keys to process (exclude non-public species like yeast, zebrafish etc)
             List<Integer> speciesTypeKeys = new ArrayList<>();
-            if( false ) {
-                for (int sp : SpeciesType.getSpeciesTypeKeys()) {
-                    if (SpeciesType.isSearchable(sp)) {
-                        speciesTypeKeys.add(sp);
-                    }
+            for (int sp : SpeciesType.getSpeciesTypeKeys()) {
+                if (SpeciesType.isSearchable(sp)) {
+                    speciesTypeKeys.add(sp);
                 }
-            } else {
-                speciesTypeKeys.add(1);
             }
 
             CounterPool counters = new CounterPool();
@@ -91,15 +87,14 @@ public class TermStatsLoader {
 
             /** original code -- use all available cores
              *
-            records.parallelStream().forEach(rec -> {
-                try {
-                    qc(rec, counters, speciesTypeKeys);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });*/
+             records.parallelStream().forEach(rec -> {
+             try {
+             qc(rec, counters, speciesTypeKeys);
+             } catch (Exception e) {
+             throw new RuntimeException(e);
+             }
+             });*/
 
-            /*
             /// new code: do not use more than specified number of threads
             {
                 ForkJoinPool customThreadPool = new ForkJoinPool(getMaxThreadCount());
@@ -111,18 +106,6 @@ public class TermStatsLoader {
                     }
                 })).get();
                 customThreadPool.shutdown();
-            }
-*/
-            /// debug -- enforce 1-thread
-            {
-                PRecord p = new PRecord();
-
-                p.stats.setTermAccId("DOID:1712");
-                qc(p, counters, speciesTypeKeys);
-
-                for( PRecord rec: records ) {
-                    qc(rec, counters, speciesTypeKeys);
-                }
             }
 
             // dump counter statistics
