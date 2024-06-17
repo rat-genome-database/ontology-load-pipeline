@@ -76,10 +76,14 @@ public class TermStatsLoader {
 
             // load species type keys to process (exclude non-public species like yeast, zebrafish etc)
             List<Integer> speciesTypeKeys = new ArrayList<>();
-            for (int sp : SpeciesType.getSpeciesTypeKeys()) {
-                if (SpeciesType.isSearchable(sp)) {
-                    speciesTypeKeys.add(sp);
+            if( false ) {
+                for (int sp : SpeciesType.getSpeciesTypeKeys()) {
+                    if (SpeciesType.isSearchable(sp)) {
+                        speciesTypeKeys.add(sp);
+                    }
                 }
+            } else {
+                speciesTypeKeys.add(1);
             }
 
             CounterPool counters = new CounterPool();
@@ -96,6 +100,7 @@ public class TermStatsLoader {
                 }
             });*/
 
+            /*
             /// new code: do not use more than specified number of threads
             {
                 ForkJoinPool customThreadPool = new ForkJoinPool(getMaxThreadCount());
@@ -107,6 +112,18 @@ public class TermStatsLoader {
                     }
                 })).get();
                 customThreadPool.shutdown();
+            }
+*/
+            /// debug -- enforce 1-thread
+            {
+                PRecord p = new PRecord();
+
+                p.stats.setTermAccId("DOID:1712");
+                qc(p, counters, speciesTypeKeys);
+
+                for( PRecord rec: records ) {
+                    qc(rec, counters, speciesTypeKeys);
+                }
             }
 
             // dump counter statistics

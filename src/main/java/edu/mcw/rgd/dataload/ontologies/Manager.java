@@ -246,20 +246,49 @@ public class Manager {
         // TODO: this hard-coded exceptions should be put in property file
         int cyclesDeleted = 0;
         for (String ontPrefix: ontPrefixes) {
-            // so far we know about cyclic relations in UBERON, that started appearing in July 2021
-            if( !ontPrefix.equals("UBERON") ) {
-                continue;
+            // cyclic relations in UBERON, that started appearing in July 2021
+            if( ontPrefix.equals("UBERON") ) {
+                try {
+                    // verify if this is still a problem
+                    dao.getAncestorCount("UBERON:8000009");
+                } catch(Exception e) {
+                    TermDagEdge dag = new TermDagEdge();
+                    dag.setParentTermAcc("UBERON:8000009");
+                    dag.setChildTermAcc("UBERON:0002354");
+                    dag.setRel(Relation.PART_OF);
+                    dao.deleteDag(dag);
+                    cyclesDeleted++;
+                }
             }
-            try {
-                // verify if this is still a problem
-                dao.getAncestorCount("UBERON:8000009");
-            } catch(Exception e) {
-                TermDagEdge dag = new TermDagEdge();
-                dag.setParentTermAcc("UBERON:8000009");
-                dag.setChildTermAcc("UBERON:0002354");
-                dag.setRel(Relation.PART_OF);
-                dao.deleteDag(dag);
-                cyclesDeleted++;
+            // cyclic relations in GO CC, that started appearing in June 2024
+            if( ontPrefix.equals("GO") ) {
+                try {
+                    // verify if this is still a problem
+                    dao.getAncestorCount("GO:0045258");
+                } catch(Exception e) {
+                    TermDagEdge dag = new TermDagEdge();
+                    dag.setRel(Relation.PART_OF);
+
+                    dag.setParentTermAcc("GO:0045258");
+                    dag.setChildTermAcc( "GO:0045282");
+                    dao.deleteDag(dag);
+                    cyclesDeleted++;
+
+                    dag.setParentTermAcc("GO:0045257");
+                    dag.setChildTermAcc( "GO:0045281");
+                    dao.deleteDag(dag);
+                    cyclesDeleted++;
+
+                    dag.setParentTermAcc("GO:0045274");
+                    dag.setChildTermAcc( "GO:0045282");
+                    dao.deleteDag(dag);
+                    cyclesDeleted++;
+
+                    dag.setParentTermAcc("GO:0045273");
+                    dag.setChildTermAcc( "GO:0045281");
+                    dao.deleteDag(dag);
+                    cyclesDeleted++;
+                }
             }
         }
         if( cyclesDeleted!=0 ) {

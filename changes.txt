@@ -1,3 +1,6 @@
+Jun 17, 2024
+  patch to remove cyclic GO CC relationships
+
 May 15, 2024
   TermStatsLoader: updating to include rgdvariant type for GWAS variant annotations
 
