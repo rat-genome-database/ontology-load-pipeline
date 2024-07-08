@@ -459,9 +459,9 @@ public class FileParser {
             xref = "MESH:"+xref.substring(5);
         }
 
-        // 3. 'OMIMPS:xxx' --> 'OMIM:PSxxx'
+        // 3. 'OMIMPS:xxx' --> 'MIM:PSxxx'
         else if( xref.startsWith("OMIMPS:") ) {
-            xref = "OMIM:PS"+xref.substring(7);
+            xref = "MIM:PS"+xref.substring(7);
         }
 
         // 4. 'NCIt:xxx' --> 'NCI:xxx'
@@ -480,6 +480,11 @@ public class FileParser {
                 }
             }
             xref = "GARD:"+xref.substring(pos);
+        }
+
+        // 6. 'OMIM:xxx' --> 'MIM:xxx'
+        else if( xref.startsWith("OMIM:") ) {
+            xref = xref.substring(1);
         }
 
         rec.addSynonym(xref, "xref");

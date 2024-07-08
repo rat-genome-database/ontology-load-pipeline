@@ -782,25 +782,27 @@ public class OntologyDAO {
         System.out.println("===DONE=== "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
-    public boolean isOmimIdInactive(String omimId) throws Exception {
-        Omim omim = omimDAO.getOmimByNr(omimId.substring(5));
+    public boolean isMimIdInactive(String mimId) throws Exception {
+        Omim omim = omimDAO.getOmimByNr(mimId.substring(4));
         return omim!=null && !omim.getStatus().equals("live");
     }
 
     public Set<String> getOmimIdsInRdo() throws Exception {
-        List<TermSynonym> syns = dao.getActiveSynonymsByNamePattern("RDO", "OMIM:%");
-        Set<String> omimIds = new HashSet<>();
+        List<TermSynonym> syns = dao.getActiveSynonymsByNamePattern("RDO", "MIM:%");
+        Set<String> mimIds = new HashSet<>();
         for( TermSynonym tsyn: syns ) {
-            omimIds.add(tsyn.getName());
+            mimIds.add(tsyn.getName());
         }
-        return omimIds;
+        return mimIds;
     }
 
     public List<String> getOmimPSTermAccForChildTerm(String childTermAcc, CounterPool counters) throws Exception {
-        String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name IN\n" +
-                "(SELECT phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN\n"+
-                " (SELECT synonym_name FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
-                ")";
+        String sql = """
+                SELECT term_acc FROM ont_synonyms WHERE synonym_name IN
+                (SELECT phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN
+                 (SELECT synonym_name FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'MIM:______')
+                )
+                """;
         List<String> termAccIds = StringListQuery.execute(dao, sql, childTermAcc);
         return termAccIds;
     }

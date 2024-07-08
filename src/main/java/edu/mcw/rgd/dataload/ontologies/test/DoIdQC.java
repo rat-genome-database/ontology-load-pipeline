@@ -51,7 +51,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20240430_doid.obo";
+        String fileName = "h:/do/20240628_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -103,7 +103,7 @@ public class DoIdQC {
                 qcDef(oboTerm.def, ts.term);
                 qcDefXRefs(oboTerm.xrefs, ts.term);
                 qcRels(oboTerm.parentAccIds, ts.term);
-                qcOmimPs(oboTerm.omimPSIds, ts.term);
+                qcOmimPs(oboTerm.mimPSIds, ts.term);
                 qcSynonyms(oboTerm, ts.term);
             }
         }
@@ -165,7 +165,7 @@ public class DoIdQC {
     Map<String, OboTerm> parseOboFile(String fileName) throws Exception {
 
         Set<String> omimIdsInRdo = dao.getOmimIdsInRdo();
-        System.out.println("OMIM IDs in RDO: "+omimIdsInRdo.size());
+        System.out.println("MIM IDs in RDO: "+omimIdsInRdo.size());
 
         BufferedReader reader = Utils.openReaderUtf8(fileName);
         Map<String, OboTerm> oboTerms = new HashMap<>();
@@ -208,9 +208,9 @@ public class DoIdQC {
                     oboTerm.parentAccIds.add(parentAccId);
                 }
             }
-            else if( line.startsWith("xref: OMIM:PS") ) {
-                String omimPsId = line.substring(6).trim();
-                oboTerm.omimPSIds.add(omimPsId);
+            else if( line.startsWith("xref: MIM:PS") ) {
+                String mimPsId = line.substring(6).trim();
+                oboTerm.mimPSIds.add(mimPsId);
             }
             else if( line.startsWith("synonym: ") ) {
                 oboTerm.parseSynonym(line.substring(9).trim());
@@ -226,13 +226,13 @@ public class DoIdQC {
                      line.startsWith("xref: NCI:")) {
                 oboTerm.parseXrefSynonym(line.substring(6).trim());
             }
-            else if( line.startsWith("xref: OMIM:") ) {
-                String omimId = line.substring(6).trim();
-                if( dao.isOmimIdInactive(omimId) ) {
-                    System.out.println("obsolete "+omimId+" for term "+oboTerm.id+" "+oboTerm.name);
+            else if( line.startsWith("xref: MIM:") ) {
+                String mimId = line.substring(6).trim();
+                if( dao.isMimIdInactive(mimId) ) {
+                    System.out.println("obsolete "+mimId+" for term "+oboTerm.id+" "+oboTerm.name);
                 }
-                if( !omimIdsInRdo.contains(omimId) ) {
-                    System.out.println("WARNING: "+omimId+" NOT IN RGD!");
+                if( !omimIdsInRdo.contains(mimId) ) {
+                    System.out.println("WARNING: "+mimId+" NOT IN RGD!");
                     omimIdsNotInRdo++;
                 }
             }
@@ -592,7 +592,7 @@ public class DoIdQC {
         public String def;
         public boolean isObsolete;
         public Set<String> parentAccIds = new TreeSet<>();
-        public Set<String> omimPSIds = new TreeSet<>();
+        public Set<String> mimPSIds = new TreeSet<>();
         public Map<String, TermSynonym> synonyms = new HashMap<>();
         public List<TermXRef> xrefs;
 

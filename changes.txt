@@ -1,3 +1,6 @@
+Jul 08, 2024
+  CL ontology: updated to release v2024-05-15
+
 Jun 17, 2024
   patch to remove cyclic GO CC relationships
 
