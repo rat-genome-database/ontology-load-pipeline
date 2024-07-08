@@ -112,6 +112,7 @@
             becomes    created_by: "George Gkoutos"
             -->
             <map>
+                <entry key="note" value="comment" />
                 <entry key="has_rank" value="comment" />
                 <entry key="created:by" value="created_by" />
                 <entry key="http://purl.org/dc/elements/1.1/creator" value="created_by" />
@@ -147,9 +148,13 @@
                 <entry key="present_in_taxon" value="present_in_taxon" />
                 <entry key="dubious_for_taxon" value="dubious_for_taxon" />
                 <entry key="ambiguous_for_taxon" value="ambiguous_for_taxon" />
+                <entry key="never_in_taxon" value="never_in_taxon" />
+                <entry key="RO:0002161" value="never_in_taxon" />
                 <entry key="homologous_in" value="homologous_in" />
                 <entry key="sexually_homologous_to" value="sexual_homolog_to" />
                 <entry key="has_relational_adjective" value="relational_adjective" />
+
+                <entry key="http://xmlns.com/foaf/0.1/depiction" value="depiction" />
 
                 <!-- ignored properties -->
                 <entry key="vertebra_number" value="xxx_number" />
@@ -262,6 +267,7 @@
                 <value>present_in_taxon</value>
                 <value>dubious_for_taxon</value>
                 <value>ambiguous_for_taxon</value>
+                <value>never_in_taxon</value>
                 <value>homologous_in</value>
                 <value>sexual_homolog_to</value>
                 <value>relational_adjective</value>
@@ -272,6 +278,7 @@
                 <value>chebi_formula</value>
                 <value>chebi_inchi</value>
                 <value>chebi_inchikey</value>
+                <value>depiction</value>
             </list>
         </property>
 

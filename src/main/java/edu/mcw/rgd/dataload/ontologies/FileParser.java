@@ -48,6 +48,8 @@ public class FileParser {
             // in obo file, all relation names use underscores between words; our toString() uses '-'
             relations.put(rel.toString().replace("-","_"), rel);
         }
+        // aliases
+        relations.put("RO:0002202", Relation.DEVELOPS_FROM);
     }
 
     public List<Record> process(String ontId, String path, CounterPool counters) throws Exception {
