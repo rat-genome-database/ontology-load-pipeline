@@ -1,3 +1,6 @@
+Jul 16, 2024
+  CL ontology: updated to release v2024-07-10
+
 Jul 08, 2024
   CL ontology: updated to release v2024-05-15
   CL ontology: improved loading of 'develops-from' relations
