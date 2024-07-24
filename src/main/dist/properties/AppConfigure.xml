@@ -444,4 +444,7 @@
     <bean id="omimPsCustomDoMapper" class="edu.mcw.rgd.dataload.ontologies.OmimPsCustomDoMapper">
     </bean>
 
+    <bean id="sssomGenerator" class="edu.mcw.rgd.dataload.ontologies.SSSOMGenerator">
+        <property name="version" value="RGD SSSOM File Generator -- build 2024-07-24" />
+    </bean>
 </beans>

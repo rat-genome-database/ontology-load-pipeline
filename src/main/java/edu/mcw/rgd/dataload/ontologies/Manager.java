@@ -57,6 +57,7 @@ public class Manager {
         String filter = null;
         boolean checkForCycles = false;
         boolean omimPsCustomDoMapper = false;
+        boolean sssomGenerator = false;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -89,6 +90,8 @@ public class Manager {
                 checkForCycles = true;
             } else if (arg.startsWith("-omim_ps_custom_do_mapper")) {
                 omimPsCustomDoMapper = true;
+            } else if (arg.startsWith("-sssom_generator")) {
+                sssomGenerator = true;
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -149,6 +152,11 @@ public class Manager {
         if( omimPsCustomDoMapper ) {
             OmimPsCustomDoMapper psDoMapper = (OmimPsCustomDoMapper) bf.getBean("omimPsCustomDoMapper");
             psDoMapper.run();
+        }
+
+        if( sssomGenerator ) {
+            SSSOMGenerator _sssomGenerator = (SSSOMGenerator) bf.getBean("sssomGenerator");
+            _sssomGenerator.run();
         }
     }
 

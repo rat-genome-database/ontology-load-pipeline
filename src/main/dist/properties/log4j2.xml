@@ -119,6 +119,12 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
         </RollingFile>
+        <RollingFile name="sssomMappings" append="true" fileName="logs/sssom_mappings.log" filePattern="logs/sssom_mappings.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
@@ -196,6 +202,10 @@
         </Logger>
         <Logger name="file_parser" level="debug" additivity="false">
             <AppenderRef ref="file_parser"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="sssomMappings" level="debug" additivity="false">
+            <AppenderRef ref="sssomMappings"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
     </Loggers>
