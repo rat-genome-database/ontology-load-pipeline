@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Jul 10, 2024" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Jul 26, 2024" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -446,5 +446,8 @@
 
     <bean id="sssomGenerator" class="edu.mcw.rgd.dataload.ontologies.SSSOMGenerator">
         <property name="version" value="RGD SSSOM File Generator -- build 2024-07-24" />
+    </bean>
+
+    <bean id="sssomValidator" class="edu.mcw.rgd.dataload.ontologies.test.SSSOMValidator">
     </bean>
 </beans>

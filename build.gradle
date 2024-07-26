@@ -32,9 +32,13 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
-    implementation 'com.oracle.database.jdbc:ojdbc10:19.23.0.0'
-    implementation 'org.springframework:spring-jdbc:6.1.7'
+    implementation 'com.oracle.database.jdbc:ojdbc11:23.4.0.24.05'
+    implementation 'org.springframework:spring-jdbc:6.1.8'
 
+    /*
+    implementation 'org.incenp:sssom-core:0.7.9'
+    implementation 'org.incenp:sssom-java:0.7.9'
+    */
     implementation fileTree(dir: 'lib', include: '*.jar')
 }
 

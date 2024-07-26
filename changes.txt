@@ -1,5 +1,6 @@
-Jul 24, 2024
-  draft version of SSSOM file generator -- currently for EFO to CMO
+Jul 25, 2024
+  added SSOM TSV file validator
+  draft version of SSSOM file generator
 
 Jul 16, 2024
   CL ontology: updated to release v2024-07-10

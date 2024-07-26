@@ -66,6 +66,10 @@ order by length(p) desc
 </pre>
 then drop the offending relationship from ONT_DAG table
 
+NEW FEATURES
+
+1) as of July 26, 2024 we have: 
+    SSSOM TSV generator of ontology mappings for EFO->CMO, EFO->MP, EFO->HP, EFO->RDO and EFO->VT
 
 OBSOLETE FEATURES
 

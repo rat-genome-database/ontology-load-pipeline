@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+import edu.mcw.rgd.dataload.ontologies.test.SSSOMValidator;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
@@ -58,6 +59,7 @@ public class Manager {
         boolean checkForCycles = false;
         boolean omimPsCustomDoMapper = false;
         boolean sssomGenerator = false;
+        String sssomFile = null;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -92,6 +94,8 @@ public class Manager {
                 omimPsCustomDoMapper = true;
             } else if (arg.startsWith("-sssom_generator")) {
                 sssomGenerator = true;
+            } else if (arg.startsWith("-sssom_file=")) {
+                sssomFile = arg.substring(12);
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -157,6 +161,11 @@ public class Manager {
         if( sssomGenerator ) {
             SSSOMGenerator _sssomGenerator = (SSSOMGenerator) bf.getBean("sssomGenerator");
             _sssomGenerator.run();
+        }
+
+        if( sssomFile!=null ) {
+            SSSOMValidator sssomValidator = (SSSOMValidator) bf.getBean("sssomValidator");
+            sssomValidator.run(sssomFile);
         }
     }
 
