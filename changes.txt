@@ -1,3 +1,6 @@
+Jul 29, 2024
+  added EfoXrefGenerator to generate reciprocal EFO xrefs for VT, MP, HP, CMP and RDO ontologies
+
 Jul 25, 2024
   added SSOM TSV file validator
   draft version of SSSOM file generator

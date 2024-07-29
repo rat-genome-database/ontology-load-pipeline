@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+import edu.mcw.rgd.dataload.ontologies.test.EfoXrefCreator;
 import edu.mcw.rgd.dataload.ontologies.test.SSSOMValidator;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
@@ -60,6 +61,7 @@ public class Manager {
         boolean omimPsCustomDoMapper = false;
         boolean sssomGenerator = false;
         String sssomFile = null;
+        boolean generateEfoXrefs = false;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -96,6 +98,8 @@ public class Manager {
                 sssomGenerator = true;
             } else if (arg.startsWith("-sssom_file=")) {
                 sssomFile = arg.substring(12);
+            } else if (arg.startsWith("-efo_xrefs")) {
+                generateEfoXrefs = true;
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -166,6 +170,11 @@ public class Manager {
         if( sssomFile!=null ) {
             SSSOMValidator sssomValidator = (SSSOMValidator) bf.getBean("sssomValidator");
             sssomValidator.run(sssomFile);
+        }
+
+        if( generateEfoXrefs ) {
+            EfoXrefCreator efoXrefCreator = (EfoXrefCreator) bf.getBean("efoXrefGenerator");
+            efoXrefCreator.run();
         }
     }
 
