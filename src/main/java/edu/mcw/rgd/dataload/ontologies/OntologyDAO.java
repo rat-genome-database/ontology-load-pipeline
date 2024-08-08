@@ -2,6 +2,7 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
+import edu.mcw.rgd.dao.spring.OmimQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
 import edu.mcw.rgd.datamodel.*;
@@ -783,8 +784,21 @@ public class OntologyDAO {
     }
 
     public boolean isMimIdInactive(String mimId) throws Exception {
-        Omim omim = omimDAO.getOmimByNr(mimId.substring(4));
+        Omim omim = getOmimByNr(mimId);
         return omim!=null && !omim.getStatus().equals("live");
+    }
+
+    // mimNr paramaeter could be '123456', 'MIM:123456' or 'OMIM:123456'
+    public Omim getOmimByNr(String mimNr) throws Exception {
+
+        // mim nr must be exactly 6 digits
+        if( mimNr==null || mimNr.length()<6 ) {
+            return null;
+        }
+        if( mimNr.length()>6 ) {
+            mimNr = mimNr.substring( mimNr.length()-6 );
+        }
+        return omimDAO.getOmimByNr(mimNr);
     }
 
     public Set<String> getOmimIdsInRdo() throws Exception {

@@ -51,7 +51,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20240628_doid.obo";
+        String fileName = "h:/do/20240731_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -59,7 +59,7 @@ public class DoIdQC {
 
     void run(String fileName, String synQcFileName) throws Exception {
 
-        synQcFile = new BufferedWriter(new FileWriter(synQcFileName));
+        synQcFile = Utils.openWriter(synQcFileName);
 
         Map<String, OboTerm> oboTerms = parseOboFile(fileName);
 

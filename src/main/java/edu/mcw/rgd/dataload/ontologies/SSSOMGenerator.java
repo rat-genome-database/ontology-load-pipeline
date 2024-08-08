@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dataload.ontologies;
 
+import edu.mcw.rgd.datamodel.Omim;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.Utils;
@@ -21,6 +22,8 @@ public class SSSOMGenerator {
     static SimpleDateFormat sdtCreationDate = new SimpleDateFormat("yyyy-MM-dd");
 
     public void run() throws Exception {
+
+        run("RDO", "MIM");
 
         run("EFO", "CMO");
         run("EFO", "MP");
@@ -100,13 +103,13 @@ public class SSSOMGenerator {
                 continue;
             }
 
-            Term term = dao.getTerm(tsyn.getTermAcc());
+            Term term = getTermByAcc(tsyn.getTermAcc());
             if( term==null ) {
                 continue;
             }
             objectLabel = term.getTerm();
 
-            term = dao.getTerm(tsyn.getName());
+            term = getTermByAcc(tsyn.getName());
             if( term==null ) {
                 continue;
             }
@@ -151,6 +154,22 @@ public class SSSOMGenerator {
 
         logger.info("written "+mappingsWritten+" mappings to "+fileName);
         logger.info(duplicateLines+" duplicate lines skipped");
+    }
+
+    Term getTermByAcc( String termAcc ) throws Exception {
+
+        // MIM workaround
+        if( termAcc.startsWith("MIM:") || termAcc.startsWith("OMIM:") ) {
+            Omim omim = dao.getOmimByNr(termAcc);
+            if( omim != null ) {
+                Term term = new Term();
+                term.setAccId(termAcc);
+                term.setTerm(omim.getPhenotype());
+                return term;
+            }
+        }
+
+        return dao.getTerm(termAcc);
     }
 
     String getObjectId( String acc ) {
