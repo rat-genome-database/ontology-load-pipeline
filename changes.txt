@@ -1,3 +1,7 @@
+Aug 09, 2024
+  loader: added security check to prevent processing (loading) of ontologies developed and maintained in RGD
+          (CMO, MMO, XCO, PW, RS and RDO)
+
 Aug 08, 2024
   SSSOMGenerator: added generation of RDO to MIM file
 

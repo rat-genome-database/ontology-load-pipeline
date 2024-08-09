@@ -29,6 +29,9 @@ public class Manager {
     private String malformedRsSynonymsEmailList;
     private String apiKeyFile;
 
+    static private Set<String> ONTOLOGIES_EXCLUDED_FROM_PROCESSING = Set.of("CMO", "MMO", "XCO", "RS", "PW", "RDO");
+
+
     public static void main(String[] args) throws Exception {
         try {
             main2(args);
@@ -235,6 +238,11 @@ public class Manager {
         for( Map.Entry<String,String> entry: getOboFiles().entrySet() ) {
             String ontId = entry.getKey();
             String path = entry.getValue();
+
+            if( ONTOLOGIES_EXCLUDED_FROM_PROCESSING.contains(ontId) ) {
+                System.out.println("*** ontology excluded from processing: "+ontId);
+                continue;
+            }
 
             CounterPool counters = new CounterPool();
 
