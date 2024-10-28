@@ -30,10 +30,10 @@ public class EfoXrefCreator {
 
     public void run() throws Exception {
 
-        //run( "CMO", "CMO:%");
-        //run( "MP", "MP:%");
-        //run( "HP", "HP:%");
-        //run( "VT", "VT:%");
+        run( "CMO", "CMO:%");
+        run( "MP", "MP:%");
+        run( "HP", "HP:%");
+        run( "VT", "VT:%");
         run( "RDO", "DOID:%");
 
         System.out.println(" === ");
