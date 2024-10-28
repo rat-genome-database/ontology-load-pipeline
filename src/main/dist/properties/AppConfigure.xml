@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Aug 09, 2024" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Oct 28, 2024" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -26,7 +26,7 @@
 
                 <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
 
-                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2024-07-10/cl-basic.obo"/>
+                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2024-09-26/cl-basic.obo"/>
 
                 <entry key="MA" value="http://www.informatics.jax.org/downloads/reports/adult_mouse_anatomy.obo"/>
                 <!--<entry key="RDO" value="http://ctdbase.org/reports/CTD_diseases.obo.gz"/>-->
@@ -116,9 +116,11 @@
                 <entry key="http://purl.org/dc/elements/1.1/creator" value="created_by" />
                 <entry key="dc-contributor" value="created_by" />
                 <entry key="http://www.ebi.ac.uk/efo/creator" value="created_by" />
+                <entry key="terms:contributor" value="created_by" />
 
                 <entry key="creation:date" value="creation_date" />
                 <entry key="http://purl.org/dc/elements/1.1/date" value="creation_date" />
+                <entry key="terms:date" value="creation_date" />
 
                 <entry key="alt:id" value="alt_id" />
                 <entry key="fma_set_term" value="alt_id" />
@@ -153,6 +155,7 @@
                 <entry key="has_relational_adjective" value="relational_adjective" />
 
                 <entry key="http://xmlns.com/foaf/0.1/depiction" value="depiction" />
+                <entry key="foaf:depiction" value="depiction" />
 
                 <!-- ignored properties -->
                 <entry key="vertebra_number" value="xxx_number" />

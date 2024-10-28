@@ -1,3 +1,6 @@
+Oct 28, 2024
+  CL ontology: updated to release v2024-09-26
+
 Aug 09, 2024
   loader: added security check to prevent processing (loading) of ontologies developed and maintained in RGD
           (CMO, MMO, XCO, PW, RS and RDO)
