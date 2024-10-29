@@ -141,7 +141,7 @@
                 <entry key="http://www.ebi.ac.uk/efo/definition" value="def" />
                 <entry key="definition:citation" value="comment" />
                 <entry key="http://www.ebi.ac.uk/efo/reason_for_obsolescence" value="definition" />
-                <entry key="term:description" value="def" />
+                <entry key="terms:description" value="def" />
 
                 <entry key="external_definition" value="external_def" />
                 <entry key="dc-description" value="external_def" />
