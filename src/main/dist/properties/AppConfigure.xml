@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Aug 09, 2024" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Oct 28, 2024" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -26,7 +26,7 @@
 
                 <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
 
-                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2024-07-10/cl-basic.obo"/>
+                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2024-09-26/cl-basic.obo"/>
 
                 <entry key="MA" value="http://www.informatics.jax.org/downloads/reports/adult_mouse_anatomy.obo"/>
                 <!--<entry key="RDO" value="http://ctdbase.org/reports/CTD_diseases.obo.gz"/>-->
@@ -116,9 +116,11 @@
                 <entry key="http://purl.org/dc/elements/1.1/creator" value="created_by" />
                 <entry key="dc-contributor" value="created_by" />
                 <entry key="http://www.ebi.ac.uk/efo/creator" value="created_by" />
+                <entry key="terms:contributor" value="created_by" />
 
                 <entry key="creation:date" value="creation_date" />
                 <entry key="http://purl.org/dc/elements/1.1/date" value="creation_date" />
+                <entry key="terms:date" value="creation_date" />
 
                 <entry key="alt:id" value="alt_id" />
                 <entry key="fma_set_term" value="alt_id" />
@@ -139,6 +141,7 @@
                 <entry key="http://www.ebi.ac.uk/efo/definition" value="def" />
                 <entry key="definition:citation" value="comment" />
                 <entry key="http://www.ebi.ac.uk/efo/reason_for_obsolescence" value="definition" />
+                <entry key="terms:description" value="def" />
 
                 <entry key="external_definition" value="external_def" />
                 <entry key="dc-description" value="external_def" />
@@ -153,6 +156,8 @@
                 <entry key="has_relational_adjective" value="relational_adjective" />
 
                 <entry key="http://xmlns.com/foaf/0.1/depiction" value="depiction" />
+                <entry key="foaf:depiction" value="depiction" />
+                <entry key="foaf-depicted_by" value="depiction" />
 
                 <!-- ignored properties -->
                 <entry key="vertebra_number" value="xxx_number" />
@@ -163,7 +168,6 @@
                 <entry key="phalanx_number" value="xxx_number" />
                 <entry key="rhombomere_number" value="xxx_number" />
                 <entry key="pharyngeal_arch_number" value="xxx_number" />
-                <entry key="foaf-depicted_by" value="xxx_number" />
                 <entry key="term_tracker_item" value="xxx_number" />
 
                 <entry key="seeAlso" value="see_also" />
@@ -196,12 +200,12 @@
                 <entry key="ArrayExpress:label" value="efo_ignored" />
                 <entry key="branch:class" value="efo_ignored" />
                 <entry key="broadMatch" value="broad_synonym" />
-                <entry key="closeMatch" value="efo_ignored" />
+                <entry key="closeMatch" value="synonym" />
                 <entry key="createdBy" value="created_by" />
                 <entry key="dc-creator" value="created_by" />
-                <entry key="depicted:by" value="efo_ignored" />
+                <entry key="depicted:by" value="depiction" />
                 <entry key="EFO:URI" value="efo_ignored" />
-                <entry key="exactMatch" value="efo_ignored" />
+                <entry key="exactMatch" value="exact_synonym" />
                 <entry key="excluded_from_qc_check" value="efo_ignored" />
                 <entry key="excluded_subClassOf" value="efo_ignored" />
                 <entry key="excluded_synonym" value="efo_ignored" />
@@ -226,7 +230,7 @@
                 <entry key="IAO:0000412" value="efo_ignored" /><!-- imported from -->
                 <entry key="IAO:0000589" value="efo_ignored" /><!-- obo foundry unique label -->
                 <entry key="IAO:0006012" value="efo_ignored" /><!-- scheduled for obsoletion on or after -->
-                <entry key="narrowMatch" value="efo_ignored" />
+                <entry key="narrowMatch" value="narrow_synonym" />
                 <entry key="OBI:0001847" value="synonym" /><!-- ISA alternative term -->
                 <entry key="organizational:class" value="efo_ignored" />
                 <entry key="primary:source" value="efo_ignored" />
@@ -306,7 +310,7 @@
             </list>
         </property>
 
-        <!-- all synonyms that start with given prefix, will have their prefix prefix substituted with a different one -->
+        <!-- all synonyms that start with given prefix, will have their prefix substituted with a different one -->
         <property name="synonymPrefixSubstitutions">
             <map>
                 <entry key="DO:DOID:" value="DOID:" />
