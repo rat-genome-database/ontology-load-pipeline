@@ -1,3 +1,6 @@
+Nov 12, 2024
+  EfoXrefGenerator: fixed -- created synonyms should always have type set to 'xref'
+
 Oct 28, 2024
   CL ontology: updated to release v2024-09-26
 
