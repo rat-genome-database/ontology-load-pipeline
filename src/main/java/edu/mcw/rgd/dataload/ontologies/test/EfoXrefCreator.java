@@ -91,7 +91,16 @@ public class EfoXrefCreator {
 
         Set<TermSynonym> inRgdSynonyms = new HashSet<>();
         for( TermSynonym termSynonym: synonyms1 ) {
-            inRgdSynonyms.add(termSynonym);
+
+            // create a copy of the synonym
+            TermSynonym ts = new TermSynonym();
+            ts.setKey(termSynonym.getKey());
+            ts.setTermAcc(termSynonym.getTermAcc());
+            ts.setName(termSynonym.getName());
+            ts.setSource(termSynonym.getSource());
+            ts.setType("xref");
+
+            inRgdSynonyms.add(ts);
         }
 
         Set<TermSynonym> incomingSynonyms = new HashSet<>();
@@ -123,7 +132,7 @@ public class EfoXrefCreator {
 
             TermSynonym tsyn = new TermSynonym();
             tsyn.setTermAcc(name);
-            tsyn.setType(termSynonym.getType());
+            tsyn.setType("xref");
             tsyn.setName(acc);
             incomingSynonyms.add(tsyn);
         }
