@@ -293,6 +293,7 @@ public class TaxonConstraints {
         dao.updateTermSynonymLastModifiedDate(synonymsMatching);
 
         // insert synonyms
+        List<TermSynonym> synonymsInserted = new ArrayList<>();
         for( TermSynonym syn: synonymsForInsert ) {
 
             // NOTE: we download taxon constraints file from live github repo
@@ -304,6 +305,7 @@ public class TaxonConstraints {
                     logger.warn(" TaxonConstraint: term "+syn.getTermAcc()+" is obsolete -- synonym insertion ignored");
                 } else {
                     dao.insertTermSynonym(syn, "GO");
+                    synonymsInserted.add(syn);
                 }
             } else {
                 logger.warn(" TaxonConstraint: term "+syn.getTermAcc()+" not present in GO obo file -- synonym insertion ignored");
@@ -321,7 +323,7 @@ public class TaxonConstraints {
         logStatus.info("synonyms for delete: "+synonymsForDelete.size()+", but only "+obsoleteSynonyms.size()+" are obsolete (not modified in the last 10 days) and only those will be deleted");
         dao.deleteTermSynonyms(obsoleteSynonyms);
 
-        printStats("inserted", synonymsForInsert);
+        printStats("inserted", synonymsInserted);
         printStats("deleted", obsoleteSynonyms);
         printStats("matching", synonymsMatching);
     }
