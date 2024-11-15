@@ -300,7 +300,11 @@ public class TaxonConstraints {
             //       GO snapshot release file (i.e. the GO term is not officially released yet)
             Term t = dao.getTerm(syn.getTermAcc());
             if( t != null ) {
-                dao.insertTermSynonym(syn, "GO");
+                if( t.isObsolete() ) {
+                    logger.warn(" TaxonConstraint: term "+syn.getTermAcc()+" is obsolete -- synonym insertion ignored");
+                } else {
+                    dao.insertTermSynonym(syn, "GO");
+                }
             } else {
                 logger.warn(" TaxonConstraint: term "+syn.getTermAcc()+" not present in GO obo file -- synonym insertion ignored");
             }
