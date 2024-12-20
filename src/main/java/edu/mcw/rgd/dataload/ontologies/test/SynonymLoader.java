@@ -15,10 +15,12 @@ public class SynonymLoader {
 
     public static void main(String[] args) throws Exception {
 
+        boolean dryRun = false;
+
         OntologyDAO dao = new OntologyDAO();
         System.out.println(dao.getConnectionInfo());
 
-        String fname = "/Users/mtutaj/Downloads/Bulk list clinvar-RDO REDO final 2-26-24.txt";
+        String fname = "/tmp/w/clinvar-rdo.txt";
         BufferedReader in = Utils.openReader(fname);
 
         int linesWithIssues = 0;
@@ -55,6 +57,37 @@ public class SynonymLoader {
                 linesWithIssues++;
                 continue;
             }
+            boolean lineWithProblem = false;
+            while( term.isObsolete() ) {
+
+                List<TermSynonym> synonyms = dao.getTermSynonyms(termAcc);
+                String replacedBy = null;
+                for( TermSynonym s: synonyms ) {
+                    if( s.getType().equals("replaced_by") ) {
+                        replacedBy = s.getName().trim().toUpperCase();
+                        break;
+                    }
+                }
+                if( replacedBy==null ) {
+                    System.out.println(lineNr + ". ### " + termAcc + " is obsolete in RGD!");
+                    lineWithProblem = true;
+                    break;
+                }
+
+                System.out.println(lineNr+". ### "+termAcc+" has been replaced by "+replacedBy);
+                termAcc = replacedBy;
+
+                term = dao.getTerm(termAcc);
+                if( term==null ) {
+                    System.out.println(lineNr+". ### "+termAcc+" not found in RGD!");
+                    lineWithProblem = true;
+                    break;
+                }
+            }
+            if( lineWithProblem ) {
+                linesWithIssues++;
+                continue;
+            }
 
             if( synonymName!=null && synonymType!=null ) {
 
@@ -75,7 +108,9 @@ public class SynonymLoader {
                     syn.setType(synonymType);
                     syn.setName(synonymName);
                     syn.setTermAcc(termAcc);
-                    dao.insertTermSynonym(syn, "BULKLOAD");
+                    if( !dryRun ) {
+                        dao.insertTermSynonym(syn, "BULKLOAD");
+                    }
                     System.out.println(lineNr + ". inserted " + termAcc + " [" + synonymName + "] (" + synonymType + ")");
                     synonymsInserted++;
                 }

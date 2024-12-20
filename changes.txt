@@ -1,3 +1,6 @@
+Dec 20, 2024
+  DO synonym loader: updated to resolve obsolete terms
+
 Nov 15, 2024
   GO taxon constrains: added handling of obsolete terms
 
