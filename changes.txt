@@ -1,3 +1,6 @@
+Jan 10, 2025
+  CL ontology: updated to release v2025-01-08
+
 Dec 20, 2024
   DO synonym loader: updated to resolve obsolete terms
 
