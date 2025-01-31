@@ -40,6 +40,12 @@ public class QualityChecker {
             return;
         }
 
+        if( termAcc.equals("CL:0000584")) {
+            // as of Jan 05, 2025: drop cyclic relationship 'develops-from CL:4047019'
+            if( rec.getEdges().remove("CL:4047019", Relation.DEVELOPS_FROM) ) {
+                LogManager.getLogger("status").warn("  WARNING! removed relationship 'develops-from CL:4047019' from CL:0000584 to avoid cycles!");
+            }
+        }
         // ensure that both the term being processed
         // and all terms being parent terms of the processed term
         // are in the database
