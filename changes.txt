@@ -1,3 +1,6 @@
+Feb 17, 2025
+  CL ontology: updated to release v2025-02-13
+
 Jan 31, 2025
   CL ontology: updated to release v2025-01-08
 
