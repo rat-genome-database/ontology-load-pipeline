@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 17, 2025" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 19, 2025" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -117,10 +117,13 @@
                 <entry key="dc-contributor" value="created_by" />
                 <entry key="http://www.ebi.ac.uk/efo/creator" value="created_by" />
                 <entry key="terms:contributor" value="created_by" />
+                <entry key="terms:creator" value="created_by" />
+                <entry key="dc:creator" value="created_by" />
 
                 <entry key="creation:date" value="creation_date" />
                 <entry key="http://purl.org/dc/elements/1.1/date" value="creation_date" />
                 <entry key="terms:date" value="creation_date" />
+                <entry key="dc:date" value="creation_date" />
 
                 <entry key="alt:id" value="alt_id" />
                 <entry key="fma_set_term" value="alt_id" />

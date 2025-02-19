@@ -1,3 +1,6 @@
+Feb 19, 2025
+  added handling of several new synonym types for MP/HP ontologies
+
 Feb 17, 2025
   CL ontology: updated to release v2025-02-13
 
