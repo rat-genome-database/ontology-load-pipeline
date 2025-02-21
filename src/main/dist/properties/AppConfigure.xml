@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 19, 2025" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 21, 2025" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -49,6 +49,8 @@
                 <entry key="NCBITaxon" value="file:///tmp/ncbitaxon.obo"/>
                 <entry key="CVCL" value="ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo"/>
                 <entry key="MONDO" value="http://purl.obolibrary.org/obo/mondo/mondo.obo"/>
+                <entry key="OBA" value="http://purl.obolibrary.org/obo/oba.obo"/>
+
             </map>
         </property>
         <property name="qualityChecker" ref="qualityChecker" />
@@ -84,6 +86,7 @@
                 <entry key="CS" value="CS:"/>
                 <entry key="CVCL" value="CVCL_"/>
                 <entry key="MONDO" value="MONDO"/>
+                <entry key="OBA" value="OBA"/>
             </map>
         </property>
 
@@ -117,6 +120,7 @@
                 <entry key="dc-contributor" value="created_by" />
                 <entry key="http://www.ebi.ac.uk/efo/creator" value="created_by" />
                 <entry key="terms:contributor" value="created_by" />
+                <entry key="terms1:contributor" value="created_by" />
                 <entry key="terms:creator" value="created_by" />
                 <entry key="dc:creator" value="created_by" />
 
@@ -323,6 +327,7 @@
 
         <property name="relationshipSubstitutions">
             <map>
+                <entry key="BFO:0000050" value="part_of" />
                 <entry key="BFO:0000066" value="occurs_in" />
                 <entry key="EFO:0000784" value="has_disease_location" />
                 <entry key="EFO:0001697" value="is_unit_of" />
@@ -333,6 +338,7 @@
                 <entry key="OBI:0000293" value="has_specified_input" />
                 <entry key="OBI:0000295" value="is_specified_input_of" />
                 <entry key="OBI:0000299" value="has_specified_output" />
+                <entry key="RO:0000052" value="characteristic_of" />
                 <entry key="RO:0000056" value="participates_in" />
                 <entry key="RO:0000057" value="has_participant" />
                 <entry key="RO:0000081" value="role_of" />
@@ -345,6 +351,8 @@
                 <entry key="RO:0002201" value="phenotype_of" />
                 <entry key="RO:0002211" value="regulates" />
                 <entry key="RO:0002314" value="characteristic_of_part_of" />
+                <entry key="RO:0020202" value="has_numerator" />
+                <entry key="RO:0020203" value="has_denominator" />
                 <entry key="UBPROP:0000005" value="external_comment" />
                 <entry key="UBPROP:0000202" value="fma_set_term" />
             </map>

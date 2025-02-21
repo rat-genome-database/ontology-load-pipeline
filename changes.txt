@@ -1,3 +1,6 @@
+Feb 21, 2025
+  added loading of OBA ontology
+
 Feb 19, 2025
   added handling of several new synonym types for MP/HP ontologies
 
