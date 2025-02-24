@@ -248,6 +248,7 @@ public class FileParser {
 
                 // term accession id
                 String accId = line.substring(4).trim();
+
                 // skip terms not matching ontology prefix
                 if( !accIdPrefix.equals("*") && !accId.startsWith(accIdPrefix) ) {
 
@@ -279,6 +280,12 @@ public class FileParser {
                 }
 
                 rec.getTerm().setAccId(accId);
+
+                // generate VT xrefs for OBA:VTxxxxxx terms
+                if( accId.startsWith("OBA:VT") && accId.startsWith(accIdPrefix) ) {
+                    String xrefLine = "xref: VT:"+accId.substring(6);
+                    parseXrefAsSynonym(xrefLine, rec);
+                }
 
                 // add relations to artificial root term
                 if( rootTermRelations!=null ) {
