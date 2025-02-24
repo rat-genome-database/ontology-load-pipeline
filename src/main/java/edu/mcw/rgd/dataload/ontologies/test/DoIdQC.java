@@ -47,6 +47,7 @@ public class DoIdQC {
     int xrefsInserted = 0;
     int xrefsDeleted = 0;
     int xrefsUpdated = 0;
+    int normalizedPubMedIds = 0;
 
     public static void main(String[] args) throws Exception {
 
@@ -159,6 +160,9 @@ public class DoIdQC {
         }
         if( xrefsUpdated!=0 ) {
             System.out.println("def xrefs updated: " + xrefsUpdated);
+        }
+        if( normalizedPubMedIds!=0 ) {
+            System.out.println("def xrefs normalized PMIDs: " + normalizedPubMedIds);
         }
     }
 
@@ -406,16 +410,11 @@ public class DoIdQC {
 
         XRefManager xrefManager = new XRefManager();
         xrefManager.addIncomingXRefs(incomingXRefs);
+        normalizedPubMedIds += xrefManager.normalizeIncomingUrls();
 
         // filter out any xrefs with source other than DO
         List<TermXRef> inRgdXrefs = dao.getTermXRefs(termInRgd.getAccId());
-        Iterator<TermXRef> it = inRgdXrefs.iterator();
-        while( it.hasNext() ) {
-            TermXRef xref = it.next();
-            if( !Utils.stringsAreEqual(xref.getXrefDescription(), "DO") ) {
-                it.remove();
-            }
-        }
+        inRgdXrefs.removeIf(xref -> !Utils.stringsAreEqual(xref.getXrefDescription(), "DO"));
 
         xrefManager.qc(termInRgd.getAccId(), inRgdXrefs);
 

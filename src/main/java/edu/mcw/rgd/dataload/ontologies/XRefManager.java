@@ -90,4 +90,79 @@ public class XRefManager {
         }
         return null;
     }
+
+    // return nr of incoming urls normalized
+    public int normalizeIncomingUrls() {
+
+        int normalizedCount = 0;
+        for( TermXRef xref: incomingXRefs ) {
+
+            // remove 'url:' prefix from urls like 'url:httpxxxx'
+            if( xref.getXrefValue().startsWith("url:http") ) {
+                xref.setXrefValue( xref.getXrefValue().substring(4) );
+            }
+
+            // convert "https://pubmed.ncbi.nlm.nih.gov/32701516/" into "PMID:32701516"
+            if( normalize(xref, "https://pubmed.ncbi.nlm.nih.gov/", "PMID:") ) {
+                normalizedCount++;
+            }
+            else
+            if( normalize(xref, "https://www.ncbi.nlm.nih.gov/pubmed/", "PMID:") ) {
+                normalizedCount++;
+            }
+            else
+            if( normalize(xref, "https://www.omim.org/entry/", "MIM:") ) {
+                normalizedCount++;
+            }
+            else
+            if( normalize(xref, "http://omim.org/entry/", "MIM:") ) {
+                normalizedCount++;
+            }
+            else
+            if( xref.getXrefValue().contains("//www.orpha.net/consor/cgi-bin/OC_Exp.php") ) {
+                String url = xref.getXrefValue();
+                int beginPos = url.indexOf("Expert=");
+                if( beginPos > 0 ) {
+                    String acc = "";
+                    for (int pos = beginPos + "Expert=".length(); pos < url.length(); pos++) {
+                        char c = url.charAt(pos);
+                        if (Character.isDigit(c)) {
+                            acc += c;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (!acc.isEmpty()) {
+                        xref.setXrefValue("ORDO:" + acc);
+                        normalizedCount++;
+                    }
+                }
+            }
+        }
+        return normalizedCount;
+    }
+
+    private boolean normalize( TermXRef xref, String urlPrefix, String accPrefix ) {
+        if( xref.getXrefValue().startsWith(urlPrefix) ) {
+            int pmidStartPos = urlPrefix.length();
+            int pmidEndPos = xref.getXrefValue().indexOf('/', pmidStartPos);
+            if( pmidEndPos<0 ) {
+                pmidEndPos = xref.getXrefValue().indexOf('?', pmidStartPos);
+            }
+            if( pmidEndPos<0 ) {
+                pmidEndPos = xref.getXrefValue().indexOf('&', pmidStartPos);
+            }
+
+            String pmid;
+            if( pmidEndPos<0 ) {
+                pmid = xref.getXrefValue().substring(pmidStartPos);
+            } else {
+                pmid = xref.getXrefValue().substring(pmidStartPos, pmidEndPos);
+            }
+            xref.setXrefValue(accPrefix + pmid);
+            return true;
+        }
+        return false;
+    }
+
 }

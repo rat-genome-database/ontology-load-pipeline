@@ -1,5 +1,6 @@
 Feb 24, 2025
   OBA ontology: added loading of VT xrefs
+  DO ontology loader: human friendly loading of definition xrefs
 
 Feb 21, 2025
   added loading of OBA ontology
