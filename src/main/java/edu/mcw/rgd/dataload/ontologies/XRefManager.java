@@ -102,6 +102,10 @@ public class XRefManager {
                 xref.setXrefValue( xref.getXrefValue().substring(4) );
             }
 
+            if( normalize(xref, "https://www.ncbi.nlm.nih.gov/pubmed/?term=", "PMID:") ) {
+                normalizedCount++;
+            }
+            else
             // convert "https://pubmed.ncbi.nlm.nih.gov/32701516/" into "PMID:32701516"
             if( normalize(xref, "https://pubmed.ncbi.nlm.nih.gov/", "PMID:") ) {
                 normalizedCount++;

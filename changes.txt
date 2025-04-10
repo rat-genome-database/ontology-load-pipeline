@@ -1,3 +1,6 @@
+Apr 09, 2025
+  DO ontology loader: fixed parsing of some PMIDs
+
 Feb 24, 2025
   OBA ontology: added loading of VT xrefs
   DO ontology loader: human friendly loading of definition xrefs
