@@ -1,3 +1,6 @@
+Apr 15, 2025
+  CL ontology: updated to release v2025-04-10
+
 Apr 09, 2025
   DO ontology loader: fixed parsing of some PMIDs
 
