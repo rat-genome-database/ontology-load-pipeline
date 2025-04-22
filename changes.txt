@@ -1,3 +1,6 @@
+Apr 22, 2025
+  EFO xref loader: improved qc to skip loading of duplicates
+
 Apr 15, 2025
   CL ontology: updated to release v2025-04-10
 

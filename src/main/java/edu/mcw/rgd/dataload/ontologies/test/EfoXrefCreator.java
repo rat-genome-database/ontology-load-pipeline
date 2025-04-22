@@ -152,28 +152,6 @@ public class EfoXrefCreator {
         xrefsToBeDeleted = new ArrayList<>(CollectionUtils.subtract(inRgdSynonyms, incomingSynonyms));
 
 
-        // to-be-inserted qc: remove synonyms for obsolete terms
-        List<TermSynonym> xrefsToBeInsertedFinal = null;
-        if( !xrefsToBeInserted.isEmpty() ) {
-
-            xrefsToBeInsertedFinal = new ArrayList<>();
-            int obsoleteTerms = 0;
-
-            for( TermSynonym termSynonym: xrefsToBeInserted ) {
-
-                // do not insert to obsolete terms
-                Term t = dao.getTerm(termSynonym.getTermAcc());
-                if( t==null || t.isObsolete() ) {
-                    obsoleteTerms++;
-                    continue;
-                }
-                xrefsToBeInsertedFinal.add(termSynonym);
-            }
-            if( obsoleteTerms>0 ) {
-                System.out.println("to-be-inserted xrefs: skipped "+obsoleteTerms+" term synonyms because their terms are obsolete" );
-            }
-        }
-
         List<TermSynonym> xrefsToBeDeletedFinal = null;
         if( !xrefsToBeDeleted.isEmpty() ) {
 
@@ -191,27 +169,7 @@ public class EfoXrefCreator {
             }
         }
 
-        /////////////////
-
-        // loading
-        if( xrefsToBeInsertedFinal != null ) {
-
-            for( TermSynonym termSynonym: xrefsToBeInsertedFinal ) {
-
-                try {
-                    dao.insertTermSynonym(termSynonym, SOURCE);
-                } catch( Exception e) {
-                    System.out.println("error");
-                }
-            }
-            if( xrefsToBeInsertedFinal.size() > 0 ) {
-                System.out.println("inserted xrefs: " + Utils.formatThousands(xrefsToBeInsertedFinal.size()));
-                totalXrefsInserted += xrefsToBeInsertedFinal.size();
-            }
-        }
-
         if( xrefsToBeDeletedFinal != null ) {
-
 
             BufferedWriter out = Utils.openWriter("/tmp/to_be_deleted.txt");
             Collections.sort(xrefsToBeDeletedFinal, new Comparator<TermSynonym>() {
@@ -253,6 +211,57 @@ public class EfoXrefCreator {
             if( xrefsMatching.size() > 0 ) {
                 System.out.println("last-modified-date updated for xrefs: " + Utils.formatThousands(xrefsMatching.size()));
                 totalXrefsUpToDate += xrefsMatching.size();
+            }
+        }
+
+
+        // to-be-inserted qc: remove synonyms for obsolete terms
+        List<TermSynonym> xrefsToBeInsertedFinal = null;
+        if( !xrefsToBeInserted.isEmpty() ) {
+
+            xrefsToBeInsertedFinal = new ArrayList<>();
+            int obsoleteTerms = 0;
+            int xrefsAlreadyInDb = 0;
+
+            for( TermSynonym termSynonym: xrefsToBeInserted ) {
+
+                // do not insert to obsolete terms
+                Term t = dao.getTerm(termSynonym.getTermAcc());
+                if( t==null || t.isObsolete() ) {
+                    obsoleteTerms++;
+                    continue;
+                }
+
+                // do not insert a synonym if it is already in a different term
+                List<TermSynonym> xrefsAlreadyInDbList = dao.getActiveSynonymsByName(t.getOntologyId(), termSynonym.getName());
+                if( !xrefsAlreadyInDbList.isEmpty() ) {
+                    xrefsAlreadyInDb++;
+                    continue;
+                }
+
+                xrefsToBeInsertedFinal.add(termSynonym);
+            }
+            if( obsoleteTerms>0 ) {
+                System.out.println("to-be-inserted xrefs: skipped "+obsoleteTerms+" term synonyms because their terms are obsolete" );
+            }
+            if( xrefsAlreadyInDb>0 ) {
+                System.out.println("to-be-inserted xrefs: skipped "+xrefsAlreadyInDb+" term synonyms because they are already assigned to different terms" );
+            }
+        }
+
+        if( xrefsToBeInsertedFinal != null ) {
+
+            for( TermSynonym termSynonym: xrefsToBeInsertedFinal ) {
+
+                try {
+                    dao.insertTermSynonym(termSynonym, SOURCE);
+                } catch( Exception e) {
+                    System.out.println("error");
+                }
+            }
+            if( xrefsToBeInsertedFinal.size() > 0 ) {
+                System.out.println("inserted xrefs: " + Utils.formatThousands(xrefsToBeInsertedFinal.size()));
+                totalXrefsInserted += xrefsToBeInsertedFinal.size();
             }
         }
 
