@@ -259,12 +259,9 @@ public class TermStatsLoaderWithFilter {
                 rgdIdsWithChildren = rgdIds;
                 return rgdIdsWithChildren;
             }
-
-            System.out.println("Children size = " + children.size());
-
+            s
             Set<Integer> result = new HashSet<>(rgdIds);
             for (TermData td : children) {
-                System.out.println(td.getRgdIdsWithChildren());
                 result.addAll(td.getRgdIdsWithChildren());
             }
             return result;
