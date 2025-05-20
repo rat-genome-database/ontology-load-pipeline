@@ -259,7 +259,7 @@ public class TermStatsLoaderWithFilter {
                 rgdIdsWithChildren = rgdIds;
                 return rgdIdsWithChildren;
             }
-            s
+            
             Set<Integer> result = new HashSet<>(rgdIds);
             for (TermData td : children) {
                 result.addAll(td.getRgdIdsWithChildren());
