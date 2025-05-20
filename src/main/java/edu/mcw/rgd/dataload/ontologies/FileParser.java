@@ -262,6 +262,9 @@ public class FileParser {
                             accId2 = accId;
                         }
                         String newAccId = accIdPrefix + accId2;
+                        if( newAccId.startsWith("EFO:efo:EFO_") && newAccId.length()==19 ) {
+                            newAccId = "EFO:"+newAccId.substring(12);
+                        }
                         addAltIdSynonymIfValid(rec, newAccId, accId);
                         accId = newAccId;
 
