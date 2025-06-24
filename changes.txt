@@ -1,3 +1,6 @@
+Jun 24, 2025
+  CL ontology: updated to release v2025-06-20
+
 May 20, 2025
   EFO loader: fixed file parser to properly translate EFO:efo:EFO_xxxxxxx accessions
 
