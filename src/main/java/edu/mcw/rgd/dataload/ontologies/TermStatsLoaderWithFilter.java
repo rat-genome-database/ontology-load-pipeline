@@ -210,11 +210,15 @@ public class TermStatsLoaderWithFilter {
         log.debug("  rgd ids for ontology loaded");
 
         // compute for-children stats
+        int ll=0;
         for (TermData td : dag.values()) {
+            ll++;
+            log.debug("## "+ll+" compute children stats for "+td.getTermAcc());
             // collect data for children
             if (td.rgdIdsWithChildren == null) {
                 td.rgdIdsWithChildren = td.getRgdIdsWithChildren();
             }
+            log.debug("## "+ll+" compute children stats for "+td.getTermAcc()+" OK!");
         }
         log.debug("  rgd ids for term with children computed");
 
@@ -246,6 +250,8 @@ public class TermStatsLoaderWithFilter {
                 children = new ArrayList<>();
             }
             children.add(child);
+            final Logger log = LogManager.getLogger("stats");
+            log.debug("ADD_CHILD "+getTermAcc()+"   <===   "+child.getTermAcc());
         }
 
         Collection<Integer> getRgdIdsWithChildren() {
@@ -260,11 +266,11 @@ public class TermStatsLoaderWithFilter {
                 return rgdIdsWithChildren;
             }
 
-            System.out.println("Children size = " + children.size());
+            final Logger log = LogManager.getLogger("stats");
+            log.debug(stats.term.getAccId()+" Children size = " + children.size());
 
             Set<Integer> result = new HashSet<>(rgdIds);
             for (TermData td : children) {
-                System.out.println(td.getRgdIdsWithChildren());
                 result.addAll(td.getRgdIdsWithChildren());
             }
             return result;

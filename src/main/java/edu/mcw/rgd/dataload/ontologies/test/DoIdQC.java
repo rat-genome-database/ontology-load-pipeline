@@ -52,7 +52,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20250429_doid.obo";
+        String fileName = "h:/do/20250530_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -200,6 +200,11 @@ public class DoIdQC {
             }
             else if( line.startsWith("name: ") ) {
                 oboTerm.name = line.substring(6).trim().replace("  "," ");
+                // replace UTF-8 encoding for '-' with ASCII7 '-'
+                if( oboTerm.name.contains("–") ) {
+                    oboTerm.name = oboTerm.name.replace("–", "-");
+                    System.out.println("AHA!  replaced extended UTF-8 with ASCII-7 equivalent of '-'");
+                }
             }
             else if( line.startsWith("def: ") ) {
                 String def = line.substring(5).trim();

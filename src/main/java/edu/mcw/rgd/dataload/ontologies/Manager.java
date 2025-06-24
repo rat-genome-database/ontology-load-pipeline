@@ -186,27 +186,27 @@ public class Manager {
      */
     public static void usage() {
 
-        System.out.println(
-            "Usage: OntologyLoad pipeline\n"+
-            "   You can use any combination of following arguments:\n"+
-            "   -skip_downloads       no downloads and no file parsing is performed\n"+
-            "                         and no new data will be loaded/updated in database\n"+
-            "   -skip_stats_update    ontology statistics is not recomputed\n"+
-            "                         this is not recommended when data has been updated or loaded\n"+
-            "   -single_ontology=?    run the load only for single ontology as specified after '='\n"+
-            "                         f.e. '-single_ontology=PW'\n"+
-            "   -generate_obo_file=?  generate .obo file from database for given ontology\n"+
-            "                         f.e. '-generate_obo_file=RDO'\n"+
-            "                              '-generate_obo_file='  generates .obo files for all ontologies as specified in AppConfigure.xml\n"+
-            "   -go_taxon_constraints load taxon constraints for GO terms into RGD\n"+
-            "                         f.e. '-go_taxon_constraints'\n"+
-            "   -qc_thread_count=?    specify count of qc threads; default is 5\n"+
-            "                         f.e. '-qc_thread_count=2'\n"+
-            "   -update_ps_do_custom_mappings update OMIM_PS_DO_CUSTOM table\n"+
-            "   -?                    print usage and exit\n"+
-            "   -help                 print usage and exit\n"+
-            "   --help                print usage and exit\n"+
-            "");
+        System.out.println("""
+            Usage: OntologyLoad pipeline
+               You can use any combination of following arguments:
+               -skip_downloads       no downloads and no file parsing is performed
+                                     and no new data will be loaded/updated in database
+               -skip_stats_update    ontology statistics is not recomputed
+                                     this is not recommended when data has been updated or loaded
+               -single_ontology=?    run the load only for single ontology as specified after '='
+                                     f.e. '-single_ontology=PW'
+               -generate_obo_file=?  generate .obo file from database for given ontology
+                                     f.e. '-generate_obo_file=RDO'
+                                          '-generate_obo_file='  generates .obo files for all ontologies as specified in AppConfigure.xml
+               -go_taxon_constraints load taxon constraints for GO terms into RGD
+                                     f.e. '-go_taxon_constraints'
+               -qc_thread_count=?    specify count of qc threads; default is 5
+                                     f.e. '-qc_thread_count=2'
+               -update_ps_do_custom_mappings update OMIM_PS_DO_CUSTOM table
+               -?                    print usage and exit
+               -help                 print usage and exit
+               --help                print usage and exit
+            """);
     }
 
     /**
