@@ -1,3 +1,6 @@
+Jul 14, 2025
+  stats: removed logging of dbg info (stats.log file was growing too much)
+
 Jun 24, 2025
   CL ontology: updated to release v2025-06-20
 
