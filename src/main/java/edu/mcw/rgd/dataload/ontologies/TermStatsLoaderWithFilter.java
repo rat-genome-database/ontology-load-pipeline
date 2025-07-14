@@ -250,8 +250,8 @@ public class TermStatsLoaderWithFilter {
                 children = new ArrayList<>();
             }
             children.add(child);
-            final Logger log = LogManager.getLogger("stats");
-            log.debug("ADD_CHILD "+getTermAcc()+"   <===   "+child.getTermAcc());
+            //final Logger log = LogManager.getLogger("stats");
+            //log.debug("ADD_CHILD "+getTermAcc()+"   <===   "+child.getTermAcc());
         }
 
         Collection<Integer> getRgdIdsWithChildren() {
@@ -266,8 +266,8 @@ public class TermStatsLoaderWithFilter {
                 return rgdIdsWithChildren;
             }
 
-            final Logger log = LogManager.getLogger("stats");
-            log.debug(stats.term.getAccId()+" Children size = " + children.size());
+            //final Logger log = LogManager.getLogger("stats");
+            //log.debug(stats.term.getAccId()+" Children size = " + children.size());
 
             Set<Integer> result = new HashSet<>(rgdIds);
             for (TermData td : children) {
