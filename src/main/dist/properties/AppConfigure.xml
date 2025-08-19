@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Jul 14, 2025" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Aug 18, 2025" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -26,7 +26,7 @@
 
                 <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
 
-                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/2025-06-20/cl-basic.obo"/>
+                <entry key="CL" value="https://github.com/obophenotype/cell-ontology/releases/download/v2025-07-30/cl-basic.obo"/>
 
                 <entry key="MA" value="http://www.informatics.jax.org/downloads/reports/adult_mouse_anatomy.obo"/>
                 <!--<entry key="RDO" value="http://ctdbase.org/reports/CTD_diseases.obo.gz"/>-->
@@ -150,6 +150,7 @@
                 <entry key="http://www.ebi.ac.uk/efo/reason_for_obsolescence" value="definition" />
                 <entry key="terms:description" value="def" />
                 <entry key="http://purl.org/dc/terms/description" value="def" />
+                <entry key="skos:prefLabel" value="synonym" />
 
                 <entry key="external_definition" value="external_def" />
                 <entry key="dc-description" value="external_def" />
@@ -177,6 +178,8 @@
                 <entry key="rhombomere_number" value="xxx_number" />
                 <entry key="pharyngeal_arch_number" value="xxx_number" />
                 <entry key="term_tracker_item" value="xxx_number" />
+                <entry key="CLM:0010001" value="xxx_number" />
+                <entry key="CLM:0010003" value="xxx_number" />
 
                 <entry key="seeAlso" value="see_also" />
                 <entry key="implements_design_pattern" value="design_pattern" />
