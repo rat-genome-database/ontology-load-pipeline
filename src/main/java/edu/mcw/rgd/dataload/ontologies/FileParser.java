@@ -265,6 +265,9 @@ public class FileParser {
                         if( newAccId.startsWith("EFO:efo:EFO_") && newAccId.length()==19 ) {
                             newAccId = "EFO:"+newAccId.substring(12);
                         }
+                        else if( newAccId.startsWith("efo:EFO_") && newAccId.length()==15 ) {
+                            newAccId = "EFO:"+newAccId.substring(8);
+                        }
                         addAltIdSynonymIfValid(rec, newAccId, accId);
                         accId = newAccId;
 
@@ -806,6 +809,15 @@ public class FileParser {
 
     private void addRelationship(Record rec, String accId, Relation rel, String ontId, String relName) {
 
+        if( ontId.equals("EFO:") ) {
+            if( accId.startsWith("efo:EFO_") ) {
+                accId = "EFO:" + accId.substring(8);
+            }
+            else if( accId.startsWith("EFO:efo:EFO_") ) {
+                accId = "EFO:" + accId.substring(12);
+            }
+        }
+
         // for EFO add 'EFO:' prefix to all terms coming from external ontologies
         if( !accId.startsWith(ontId) && ontId.equals("EFO:") ) {
             accId = ontId + accId;
@@ -813,6 +825,12 @@ public class FileParser {
 
         // if true, add the relationship as synonym, not a dag
         boolean addSynonym = !ontId.equals("*") && !accId.startsWith(ontId);
+
+        // add NCBITaxon relationships as a synonym
+        if( accId.startsWith("EFO:NCBITaxon:") ) {
+            accId = accId.substring(4);
+            addSynonym = true;
+        }
 
         if( ontId.equals("EFO:") ) {
             // for EFO, not-specified relationships load as synonyms: they cause cycles

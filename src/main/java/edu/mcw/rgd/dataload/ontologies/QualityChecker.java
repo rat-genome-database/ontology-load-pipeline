@@ -34,6 +34,12 @@ public class QualityChecker {
         String termAcc = rec.getTerm().getAccId();
         logger.debug("processing recno="+rec.getRecNo()+" "+termAcc);
 
+        // do not load obsolete terms for EFO ontology
+        if( rec.getTerm().getOntologyId().equals("EFO") && rec.getTerm().isObsolete() ) {
+            rec.setFlag("OBSOLETE_EFO_TERM");
+            return;
+        }
+
         // report terms with missing accession ids (possible for new unmapped RDO terms)
         if( termAcc==null ) {
             rec.setFlag("NO_ACC_ID");

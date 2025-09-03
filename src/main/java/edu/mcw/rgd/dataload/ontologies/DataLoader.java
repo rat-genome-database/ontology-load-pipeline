@@ -23,6 +23,11 @@ public class DataLoader {
 
         logger.debug("processing ["+rec.getRecNo()+".] "+term.getAccId());
 
+        if( rec.isFlagSet("OBSOLETE_EFO_TERM") ) {
+            counters.increment("OBSOLETE_EFO_TERMS");
+            return;
+        }
+
         if( rec.isFlagSet("NO_ACC_ID") ) {
             counters.increment("TERMS_MISSING_ACC_ID");
             return;

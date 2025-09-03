@@ -1,3 +1,6 @@
+Sep 03, 2025
+  EFO ontology: fixed ontology parser
+
 Aug 19, 2025
   CL ontology: updated to release v2025-07-30
 

@@ -20,7 +20,7 @@ public class SynonymLoader {
         OntologyDAO dao = new OntologyDAO();
         System.out.println(dao.getConnectionInfo());
 
-        String fname = "/tmp/w/clinvar-rdo.txt";
+        String fname = "/tmp/ClinVar 8_21_25.txt";
         BufferedReader in = Utils.openReader(fname);
 
         int linesWithIssues = 0;
