@@ -2,23 +2,56 @@ package edu.mcw.rgd.dataload.ontologies.test;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.StringListQuery;
-import edu.mcw.rgd.dao.spring.ontologyx.OntologyQuery;
-import edu.mcw.rgd.dao.spring.ontologyx.TermQuery;
 import edu.mcw.rgd.dataload.ontologies.OntologyDAO;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.Utils;
 
+import java.util.Date;
 import java.util.List;
 
 public class ObsoleteEfoHandler {
     public static void main(String[] args) throws Exception {
 
+        AbstractDAO adao = new AbstractDAO();
+        OntologyDAO dao = new OntologyDAO();
+
+        for(;;) {
+            String sql = "select term_acc from ont_terms where is_obsolete<>0 and ont_id='EFO' order by dbms_random.random";
+            List<String> list = StringListQuery.execute(adao, sql);
+            String termAcc = null;
+            int it = 0;
+            for( String t: list ) {
+                if( t.length()>11 ) {
+                    termAcc = t;
+                    break;
+                }
+                it++;
+            }
+            if( termAcc==null ) {
+                break;
+            }
+            System.out.println(list.size()+"["+it+"].  deleting  "+termAcc+"   "+new Date());
+
+            String sql2 = "delete from ont_synonyms where term_acc=?";
+            int cnt = adao.update(sql2, termAcc);
+            if( cnt!=0 ) System.out.println("  synonyms deleted: "+cnt);
+
+            String sql3 = "delete from ont_terms where term_acc=?";
+            adao.update(sql3, termAcc);
+            System.out.println("ok");
+
+            Thread.sleep(1111);
+        }
+
+        System.exit(0);
+
+
+
+
         int successfulReplacements = 0;
         int failedReplacements = 0;
 
-        AbstractDAO adao = new AbstractDAO();
-        OntologyDAO dao = new OntologyDAO();
 
         String sql = """
                 select term_acc from ont_terms t where exists (

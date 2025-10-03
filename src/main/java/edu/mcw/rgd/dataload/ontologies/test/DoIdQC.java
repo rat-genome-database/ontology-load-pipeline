@@ -52,7 +52,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20250829_doid.obo";
+        String fileName = "h:/do/20250930_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -299,7 +299,7 @@ public class DoIdQC {
             return null;
         }
 
-        List<TermXRef> incomingXrefs = new ArrayList<>();
+        HashSet<String> uniqueXrefValues = new HashSet<>();
         String[] xrefs = xrefStr.split("\\,\\ ");
         for( String xref: xrefs ) {
             String value = xref.replace("\\:", ":");
@@ -317,9 +317,6 @@ public class DoIdQC {
                 }
             }
 
-            TermXRef x = new TermXRef();
-            x.setXrefDescription("DO");
-
             // commas could be escaped in the source -- unescape it
             String unescapedValue = value.replace("\\,", ",");
             // also, value should not end with a comma (looks like a typo)
@@ -329,10 +326,18 @@ public class DoIdQC {
             //if( unescapedValue.length()!= value.length() ) {
             //    System.out.println("unescaped");
             //}
-            x.setXrefValue(unescapedValue);
+            uniqueXrefValues.add(unescapedValue);
+       }
+
+        List<TermXRef> incomingXrefs = new ArrayList<>();
+        for( String uniqueXrefValue: uniqueXrefValues ) {
+            TermXRef x = new TermXRef();
+            x.setXrefDescription("DO");
+            x.setXrefValue(uniqueXrefValue);
 
             incomingXrefs.add(x);
         }
+
         return incomingXrefs;
     }
 

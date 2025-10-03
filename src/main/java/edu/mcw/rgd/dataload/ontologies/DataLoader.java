@@ -70,12 +70,19 @@ public class DataLoader {
 
         // insert new synonyms
         if( !rec.getSynonymsForInsert().isEmpty() ) {
-            for( TermSynonym synonym: rec.getSynonymsForInsert() ) {
 
-                if( dao.insertTermSynonym(synonym, null) ) {
-                    counters.increment("SYNONYMS_INSERTED");
-                } else {
-                    counters.increment("SYNONYMS_FOR_INSERT_SKIPPED");
+            // do not insert synonyms to EFO:NCBITaxon terms
+            if( rec.getTerm().getAccId().startsWith("EFO:NCBITaxon") ) {
+                counters.add("EFO_NCBITAXON_SYNONYMS_FOR_INSERT_SKIPPED", rec.getSynonymsForInsert().size());
+            }
+            else {
+                for (TermSynonym synonym : rec.getSynonymsForInsert()) {
+
+                    if (dao.insertTermSynonym(synonym, null)) {
+                        counters.increment("SYNONYMS_INSERTED");
+                    } else {
+                        counters.increment("SYNONYMS_FOR_INSERT_SKIPPED");
+                    }
                 }
             }
         }

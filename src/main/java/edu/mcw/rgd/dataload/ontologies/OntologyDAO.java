@@ -2,7 +2,6 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
-import edu.mcw.rgd.dao.spring.OmimQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
 import edu.mcw.rgd.datamodel.*;
@@ -490,9 +489,11 @@ public class OntologyDAO {
         // stats to be added
         if( !stats.statsToBeAdded.isEmpty() ) {
             BatchSqlUpdate bsu = new BatchSqlUpdate(annotDAO.getDataSource(),
-                "INSERT INTO ont_term_stats2 "+
-                "(term_acc,last_modified_date,species_type_key,object_key,with_children,stat_name,stat_value,filter) "+
-                "VALUES(?,SYSDATE,?,?,?,?,?,NULL)",
+            """
+                INSERT INTO ont_term_stats2
+                (term_acc,last_modified_date,species_type_key,object_key,with_children,stat_name,stat_value,filter)
+                VALUES(?,SYSDATE,?,?,?,?,?,NULL)
+                """,
                 new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER});
             bsu.compile();
             for( TermStat ts: stats.statsToBeAdded ) {

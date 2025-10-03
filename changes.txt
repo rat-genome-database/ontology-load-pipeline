@@ -1,3 +1,6 @@
+Oct 03, 2025
+  DO ontology loader: fixed loading of def xrefs
+
 Sep 03, 2025
   EFO ontology: fixed ontology parser
 

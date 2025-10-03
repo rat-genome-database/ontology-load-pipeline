@@ -19,8 +19,8 @@ public class TermStatsLoaderWithFilter {
 
     public static void main(String[] args) throws Exception {
 
-        String ontPrefix = "PW";
-        String filter = "RDO:0003591";
+        String ontPrefix = "DOID";
+        String filter = "DOID:9007801";
 
         List<String> ontPrefixes = new ArrayList<>();
         ontPrefixes.add(ontPrefix);

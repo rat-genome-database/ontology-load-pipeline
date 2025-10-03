@@ -11,6 +11,11 @@ public class TermNameMatcher {
     // map of normalized term names / synonyms to set of term acc
     Map<String, Set<String>> map = new HashMap<>();
 
+    public static void main( String[] args ) throws Exception {
+
+        // testing cases
+    }
+
     public void loadTerms(List<Term> terms) {
         for( Term t: terms ) {
             addName(t.getTerm(), t.getAccId());
