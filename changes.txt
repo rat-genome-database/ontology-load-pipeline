@@ -1,5 +1,6 @@
 Oct 03, 2025
   DO ontology loader: fixed loading of def xrefs
+  stats logger: changed logging level from 'debug' to 'info' to avoid creation of 100GB+ logs
 
 Sep 03, 2025
   EFO ontology: fixed ontology parser

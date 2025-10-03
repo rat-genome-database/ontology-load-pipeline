@@ -188,7 +188,7 @@
             <AppenderRef ref="synonymsInserted"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
-        <Logger name="stats" level="debug" additivity="false">
+        <Logger name="stats" level="info" additivity="false">
             <AppenderRef ref="stats"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
