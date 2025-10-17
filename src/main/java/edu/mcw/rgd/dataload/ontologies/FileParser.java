@@ -517,8 +517,9 @@ public class FileParser {
         //  [Deafness, Autosomal Dominant 22] - term name
         //  [DFNA22 Deafness, Autosomal Dominant 22, with Hypertrophic Cardiomyopathy,] -- synonym
         int semicolonPos = termNameIncoming.indexOf(';');
-        // note: do not split term name for CVCL ontology!
-        if( semicolonPos>=0 && !rec.getTerm().getAccId().startsWith("CVCL_") ) {
+        // note: do not split term name for CVCL ontology or CHEBI ontology!
+        if( semicolonPos>=0
+                && !(rec.getTerm().getAccId().startsWith("CVCL_") || rec.getTerm().getAccId().startsWith("CHEBI")) ) {
 
             // ';' must not be surrounded in parentheses, like this:
             // [renal neoplasm with t(6;11)(p21;q12)]
@@ -975,6 +976,16 @@ public class FileParser {
         else
         if( ontId.equals("UBERON") ) {
             Record.addCyclicRelationship("UBERON", "mutually_spatially_disjoint_with");
+        }
+        else
+        if( ontId.equals("CHEBI") ) {
+            Record.addCyclicRelationship("CHEBI", "has_parent_hybride");
+            Record.addCyclicRelationship("CHEBI", "is_conjugate_acid_of");
+            Record.addCyclicRelationship("CHEBI", "is_conjugate_base_of");
+            Record.addCyclicRelationship("CHEBI", "is_enantiomer_of");
+            Record.addCyclicRelationship("CHEBI", "is_substituent_group_from");
+            Record.addCyclicRelationship("CHEBI", "is_tautomer_of");
+            Record.addCyclicRelationship("CHEBI", "has_functional_parent");
         }
     }
 

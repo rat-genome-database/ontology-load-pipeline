@@ -209,15 +209,14 @@
                 <entry key="http://purl.obolibrary.org/obo/chebi/monoisotopicmass" value="chebi_ignored" />
 
                 <!-- new mappings as of Oct 2025 -->
-                <entry key="chemrof:smiles_string" value="chebi_smiles" />
-                <entry key="chemrof:generalized_empirical_formula" value="chebi_formula" />
-                <entry key="chemrof:inchi_key_string" value="chebi_inchikey" />
-                <entry key="chemrof:inchi" value="chebi_inchi" />
-                <entry key="chemrof:wurcs_representation" value="chebi_wurcs" />
-
-                <entry key="chemrof:mass" value="chebi_ignored" />
-                <entry key="chemrof:charge" value="chebi_ignored" />
-                <entry key="chemrof:monoisotopicmass" value="chebi_ignored" />
+                <entry key="chemrof:smiles_string" value="chemrof_smiles" />
+                <entry key="chemrof:generalized_empirical_formula" value="chemrof_formula" />
+                <entry key="chemrof:inchi_key_string" value="chemrof_inchikey" />
+                <entry key="chemrof:inchi_string" value="chemrof_inchi" />
+                <entry key="chemrof:wurcs_representation" value="chemrof_wurcs" />
+                <entry key="chemrof:mass" value="chemrof_mass" />
+                <entry key="chemrof:monoisotopic_mass" value="chemrof_monoisotopicmass" />
+                <entry key="chemrof:charge" value="chemrof_charge" />
 
 
                 <!-- EFO ontology -->
@@ -305,6 +304,16 @@
                 <value>chebi_inchi</value>
                 <value>chebi_inchikey</value>
                 <value>chebi_wurcs</value>
+
+                <value>chemrof_smiles</value>
+                <value>chemrof_formula</value>
+                <value>chemrof_inchi</value>
+                <value>chemrof_inchikey</value>
+                <value>chemrof_wurcs</value>
+                <value>chemrof_mass</value>
+                <value>chemrof_monoisotopicmass</value>
+                <value>chemrof_charge</value>
+
                 <value>depiction</value>
             </list>
         </property>
@@ -369,7 +378,7 @@
                 <entry key="RO:0002211" value="regulates" />
                 <entry key="RO:0002314" value="characteristic_of_part_of" />
 
-                <!-- new relationships with cycles
+                <!-- new CHEBI relationships with cycles -->
                 <entry key="RO:0018040" value="has_parent_hybride" />
                 <entry key="RO:0018034" value="is_conjugate_acid_of" />
                 <entry key="RO:0018033" value="is_conjugate_base_of" />
@@ -377,7 +386,6 @@
                 <entry key="RO:0018037" value="is_substituent_group_from" />
                 <entry key="RO:0018036" value="is_tautomer_of" />
                 <entry key="RO:0018038" value="has_functional_parent" />
-                -->
 
                 <entry key="RO:0020202" value="has_numerator" />
                 <entry key="RO:0020203" value="has_denominator" />
