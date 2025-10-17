@@ -1,3 +1,6 @@
+Oct 16, 2025
+  chebi: updated synonym and relationship handling due to new major release of CHEBI ontology
+
 Oct 06, 2025
   FileSystemLock: changed logging levels to reduce amount of messages in the logs
 

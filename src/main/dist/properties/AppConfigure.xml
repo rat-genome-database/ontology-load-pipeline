@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Oct 06, 2025" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Oct 17, 2025" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -198,6 +198,7 @@
                 <entry key="terminology_notes" value="note_terminology" />
                 <entry key="HP:0040005" value="external_comment" />
 
+                <!-- old mappings -->
                 <entry key="http://purl.obolibrary.org/obo/chebi/smiles" value="chebi_smiles" />
                 <entry key="http://purl.obolibrary.org/obo/chebi/formula" value="chebi_formula" />
                 <entry key="http://purl.obolibrary.org/obo/chebi/inchikey" value="chebi_inchikey" />
@@ -206,6 +207,18 @@
                 <entry key="http://purl.obolibrary.org/obo/chebi/mass" value="chebi_ignored" />
                 <entry key="http://purl.obolibrary.org/obo/chebi/charge" value="chebi_ignored" />
                 <entry key="http://purl.obolibrary.org/obo/chebi/monoisotopicmass" value="chebi_ignored" />
+
+                <!-- new mappings as of Oct 2025 -->
+                <entry key="chemrof:smiles_string" value="chebi_smiles" />
+                <entry key="chemrof:generalized_empirical_formula" value="chebi_formula" />
+                <entry key="chemrof:inchi_key_string" value="chebi_inchikey" />
+                <entry key="chemrof:inchi" value="chebi_inchi" />
+                <entry key="chemrof:wurcs_representation" value="chebi_wurcs" />
+
+                <entry key="chemrof:mass" value="chebi_ignored" />
+                <entry key="chemrof:charge" value="chebi_ignored" />
+                <entry key="chemrof:monoisotopicmass" value="chebi_ignored" />
+
 
                 <!-- EFO ontology -->
                 <entry key="ArrayExpress:label" value="efo_ignored" />
@@ -291,6 +304,7 @@
                 <value>chebi_formula</value>
                 <value>chebi_inchi</value>
                 <value>chebi_inchikey</value>
+                <value>chebi_wurcs</value>
                 <value>depiction</value>
             </list>
         </property>
@@ -354,6 +368,17 @@
                 <entry key="RO:0002201" value="phenotype_of" />
                 <entry key="RO:0002211" value="regulates" />
                 <entry key="RO:0002314" value="characteristic_of_part_of" />
+
+                <!-- new relationships with cycles
+                <entry key="RO:0018040" value="has_parent_hybride" />
+                <entry key="RO:0018034" value="is_conjugate_acid_of" />
+                <entry key="RO:0018033" value="is_conjugate_base_of" />
+                <entry key="RO:0018039" value="is_enantiomer_of" />
+                <entry key="RO:0018037" value="is_substituent_group_from" />
+                <entry key="RO:0018036" value="is_tautomer_of" />
+                <entry key="RO:0018038" value="has_functional_parent" />
+                -->
+
                 <entry key="RO:0020202" value="has_numerator" />
                 <entry key="RO:0020203" value="has_denominator" />
                 <entry key="UBPROP:0000005" value="external_comment" />
