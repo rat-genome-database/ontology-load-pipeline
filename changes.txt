@@ -1,3 +1,6 @@
+Oct 21, 2025
+  CL ontology: updated to release v2025-10-16
+
 Oct 16, 2025
   chebi: updated synonym and relationship handling due to new major release of CHEBI ontology
 
