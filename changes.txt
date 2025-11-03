@@ -1,3 +1,6 @@
+Nov 03, 2025
+  added xref loader for CMO-VT cross-ontology synonyms
+
 Oct 21, 2025
   CL ontology: updated to release v2025-10-16
 
