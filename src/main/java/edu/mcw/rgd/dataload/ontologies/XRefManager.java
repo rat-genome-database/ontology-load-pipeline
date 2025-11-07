@@ -4,28 +4,20 @@ import edu.mcw.rgd.datamodel.ontologyx.TermXRef;
 import edu.mcw.rgd.process.Utils;
 import org.apache.commons.collections4.ListUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
  * User: mtutaj
  * Date: 8/21/13
- * Time: 3:38 PM
  * class to handle dbxrefs from obo term definitions
  */
 public class XRefManager {
 
-    private List<TermXRef> incomingXRefs = new ArrayList<>();
+    private final Set<TermXRef> incomingXRefs = new HashSet<>();
     private List<TermXRef> matchingXRefs;
     private List<TermXRef> forInsertXRefs;
     private List<TermXRef> forDeleteXRefs;
     private List<TermXRef> descChangedXRefs;
-
-    public List<TermXRef> getIncomingXRefs() {
-        return incomingXRefs;
-    }
 
     public void addIncomingXRefs(List<TermXRef> incomingXRefs) {
         if( incomingXRefs!=null )
@@ -52,26 +44,19 @@ public class XRefManager {
 
         descChangedXRefs = null;
 
-        if( incomingXRefs==null ) {
-
-            forInsertXRefs = Collections.emptyList();
-            forDeleteXRefs = inRgdXRefs;
-            matchingXRefs = Collections.emptyList();
-            return;
-        }
-
         // set term acc for incoming xrefs
         for( TermXRef xref: incomingXRefs ) {
             xref.setTermAcc(termAcc);
         }
 
-        forInsertXRefs = ListUtils.subtract(incomingXRefs, inRgdXRefs);
-        forDeleteXRefs = ListUtils.subtract(inRgdXRefs, incomingXRefs);
-        matchingXRefs = ListUtils.intersection(incomingXRefs, inRgdXRefs);
+        List<TermXRef> incomingXRefsList = new ArrayList<>(inRgdXRefs);
+        forInsertXRefs = ListUtils.subtract(incomingXRefsList, inRgdXRefs);
+        forDeleteXRefs = ListUtils.subtract(inRgdXRefs, incomingXRefsList);
+        matchingXRefs = ListUtils.intersection(incomingXRefsList, inRgdXRefs);
 
         // find any xrefs with changed definitions
         for( TermXRef inRgdXRef: matchingXRefs ) {
-            TermXRef incomingXRef = getMatchingXRef(inRgdXRef, incomingXRefs);
+            TermXRef incomingXRef = getMatchingXRef(inRgdXRef, incomingXRefsList);
             if( !Utils.stringsAreEqualIgnoreCase(inRgdXRef.getXrefDescription(), incomingXRef.getXrefDescription()) ) {
                 // xref with changed description found
                 if( descChangedXRefs==null )

@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Nov 03, 2025" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Nov 07, 2025" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -123,6 +123,7 @@
                 <entry key="terms1:contributor" value="created_by" />
                 <entry key="terms:creator" value="created_by" />
                 <entry key="dc:creator" value="created_by" />
+                <entry key="patterns:createdBy" value="created_by" />
 
                 <entry key="creation:date" value="creation_date" />
                 <entry key="http://purl.org/dc/elements/1.1/date" value="creation_date" />
@@ -228,11 +229,21 @@
                 <entry key="dc-creator" value="created_by" />
                 <entry key="depicted:by" value="depiction" />
                 <entry key="EFO:URI" value="efo_ignored" />
+                <entry key="efo:EFO_URI" value="efo_ignored" />
                 <entry key="exactMatch" value="exact_synonym" />
                 <entry key="excluded_from_qc_check" value="efo_ignored" />
                 <entry key="excluded_subClassOf" value="efo_ignored" />
                 <entry key="excluded_synonym" value="efo_ignored" />
                 <entry key="gwas:trait" value="efo_ignored" />
+                <entry key="efo:gwas_trait" value="efo_ignored" />
+                <entry key="curated_content_resource" value="efo_ignored" />
+                <entry key="terms:conformsTo" value="efo_ignored" />
+                <entry key="efo:organizational_class" value="efo_ignored" />
+                <entry key="efo:obsoleted_in_version" value="efo_ignored" />
+                <entry key="efo:definition_citation" value="efo_ignored" />
+                <entry key="efo:reason_for_obsolescence" value="efo_ignored" />
+                <entry key="terms:isReferencedBy" value="efo_ignored" />
+                <entry key="terms:replaces" value="replaces" />
                 <entry key="http://purl.org/dc/elements/1.1/contributor" value="efo_ignored"/>
                 <entry key="http://purl.org/dc/terms/conformsTo" value="efo_ignored"/>
                 <entry key="http://purl.org/dc/terms/contributor" value="efo_ignored"/>
@@ -258,11 +269,19 @@
                 <entry key="organizational:class" value="efo_ignored" />
                 <entry key="primary:source" value="efo_ignored" />
                 <entry key="relatedMatch" value="xref" />
+                <entry key="skos:closeMatch" value="related_synonym" />
+                <entry key="skos:exactMatch" value="exact_synonym" />
+                <entry key="skos:narrowMatch" value="narrow_synonym" />
+                <entry key="skos:relatedMatch" value="related_synonym" />
+                <entry key="skos:broadMatch" value="broad_synonym" />
                 <entry key="RO:0002171" value="efo_ignored" /> <!-- mutually spatially disjoint with -->
                 <entry key="RO:0002175" value="present_in_taxon" />
                 <entry key="should_conform_to" value="efo_ignored" />
                 <entry key="source:definition" value="efo_ignored" />
                 <entry key="SRA:label" value="efo_ignored" />
+                <entry key="efo:SRA_label" value="efo_ignored" />
+                <entry key="efo:ArrayExpress_label" value="efo_ignored" />
+                <entry key="efo:branch_class" value="efo_ignored" />
                 <entry key="UBPROP:0000004" value="efo_ignored" /><!-- provenance notes -->
                 <entry key="UBPROP:0000005" value="efo_ignored" /><!-- external comment -->
                 <entry key="UBPROP:0000006" value="efo_ignored" /><!-- implements design pattern -->
