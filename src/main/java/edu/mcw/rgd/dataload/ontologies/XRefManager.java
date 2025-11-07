@@ -49,7 +49,7 @@ public class XRefManager {
             xref.setTermAcc(termAcc);
         }
 
-        List<TermXRef> incomingXRefsList = new ArrayList<>(inRgdXRefs);
+        List<TermXRef> incomingXRefsList = new ArrayList<>(incomingXRefs);
         forInsertXRefs = ListUtils.subtract(incomingXRefsList, inRgdXRefs);
         forDeleteXRefs = ListUtils.subtract(inRgdXRefs, incomingXRefsList);
         matchingXRefs = ListUtils.intersection(incomingXRefsList, inRgdXRefs);

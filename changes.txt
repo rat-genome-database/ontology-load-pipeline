@@ -1,5 +1,6 @@
 Nov 07, 2025
   improved parser for EFO ontology
+  XRefManager: auto removal of duplicates
 
 Nov 03, 2025
   added xref loader for CMO-VT cross-ontology synonyms

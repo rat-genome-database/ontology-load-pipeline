@@ -269,11 +269,13 @@
                 <entry key="organizational:class" value="efo_ignored" />
                 <entry key="primary:source" value="efo_ignored" />
                 <entry key="relatedMatch" value="xref" />
-                <entry key="skos:closeMatch" value="related_synonym" />
-                <entry key="skos:exactMatch" value="exact_synonym" />
-                <entry key="skos:narrowMatch" value="narrow_synonym" />
-                <entry key="skos:relatedMatch" value="related_synonym" />
-                <entry key="skos:broadMatch" value="broad_synonym" />
+
+                <entry key="skos:closeMatch" value="efo_ignored" /><!-- they are just duplicates in slightly different format, of other xrefs -->
+                <entry key="skos:exactMatch" value="efo_ignored" />
+                <entry key="skos:narrowMatch" value="efo_ignored" />
+                <entry key="skos:relatedMatch" value="efo_ignored" />
+                <entry key="skos:broadMatch" value="efo_ignored" />
+
                 <entry key="RO:0002171" value="efo_ignored" /> <!-- mutually spatially disjoint with -->
                 <entry key="RO:0002175" value="present_in_taxon" />
                 <entry key="should_conform_to" value="efo_ignored" />
