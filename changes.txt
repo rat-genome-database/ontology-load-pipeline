@@ -1,3 +1,6 @@
+Nov 11, 2025
+  CL ontology: updated to release v2025-11-04
+
 Nov 07, 2025
   improved parser for EFO ontology
   XRefManager: auto removal of duplicates
