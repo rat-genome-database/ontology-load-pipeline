@@ -6,10 +6,8 @@ import edu.mcw.rgd.process.Utils;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
  * User: mtutaj
  * Date: 1/29/13
- * Time: 10:39 AM
  * class to handle all incoming synonyms and to remove duplicate synonyms;
  * two synonyms are equal only if their names stripped of whitespace and punctuation are identical
  * for example "Abdominal Injuries", "Injuries, Abdominal" "Abdominal-Injuries" "ABDOMINAL--INJURIES"
@@ -20,6 +18,8 @@ import java.util.*;
  * <p>
  * if parameter 'exactMatchSynonyms' is set to true, this behavior is changed:
  * 'processed' form only makes synonyms lowercase for purpose of uniqueness determination
+ * <p>
+ * also, 'xref' synonyms are stored 'as-is'
  */
 public class SynonymManager {
 
@@ -29,7 +29,7 @@ public class SynonymManager {
         if( synonym==null )
             return "";
         String processedName = synonym.toLowerCase();
-        if( !exactMatchSynonyms ) {
+        if( !exactMatchSynonyms && !synonymType.equals("xref") ) {
             String[] words = synonym.toLowerCase().split("\\W");
             Arrays.sort(words);
             processedName = Utils.concatenate(words, ".");

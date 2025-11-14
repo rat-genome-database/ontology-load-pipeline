@@ -1,3 +1,6 @@
+Nov 14, 2025
+  parser: fixed handling of 'xref' synonyms
+
 Nov 11, 2025
   CL ontology: updated to release v2025-11-04
 
