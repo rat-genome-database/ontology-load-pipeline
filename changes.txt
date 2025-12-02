@@ -1,3 +1,6 @@
+Dec 02, 2025
+  loader: EFO ontology: added exception to prevent loading of a cyclical relationship
+
 Nov 14, 2025
   parser: fixed handling of 'xref' synonyms
 

@@ -295,7 +295,7 @@ public class Manager {
                 }
             }
             // cyclic relations in GO CC, that started appearing in June 2024
-            if( ontPrefix.equals("GO") ) {
+            else if( ontPrefix.equals("GO") ) {
                 try {
                     // verify if this is still a problem
                     dao.getAncestorCount("GO:0045258");
@@ -320,6 +320,19 @@ public class Manager {
 
                     dag.setParentTermAcc("GO:0045273");
                     dag.setChildTermAcc( "GO:0045281");
+                    dao.deleteDag(dag);
+                    cyclesDeleted++;
+                }
+            }
+            else if( ontPrefix.equals("EFO") ) {
+                try {
+                    // verify if this is still a problem
+                    dao.getAncestorCount("EFO:CHEBI:36080");
+                } catch(Exception e) {
+                    TermDagEdge dag = new TermDagEdge();
+                    dag.setParentTermAcc("EFO:CHEBI:36080");
+                    dag.setChildTermAcc("EFO:PR:000064867");
+                    dag.setRel(Relation.HAS_PART);
                     dao.deleteDag(dag);
                     cyclesDeleted++;
                 }
