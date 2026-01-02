@@ -1,3 +1,6 @@
+Jan 02, 2026
+  CL ontology: updated to release v2025-12-17
+
 Dec 02, 2025
   loader: EFO ontology: added exception to prevent loading of a cyclical relationship
 
