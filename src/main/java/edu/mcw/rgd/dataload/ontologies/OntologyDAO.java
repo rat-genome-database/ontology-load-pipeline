@@ -746,18 +746,28 @@ public class OntologyDAO {
 
 
     public void checkForCycles(String ontId) throws Exception {
-        System.out.println("START check for cycles for ontology "+ontId);
+
+        if( ontId.equals("*") ) {
+            logStatus.info("checking for cycles all public ontologies");
+
+            // run checks for every public ontology
+            for( Ontology o: this.dao.getOntologies() ) {
+                if( o.isPublic() ) {
+                    checkForCycles(o.getId());
+                }
+            }
+            logStatus.info("checking for cycles all public ontologies: done!");
+            logStatus.info("---");
+            return;
+        }
+
+        logStatus.info("START check for cycles for ontology "+ontId);
 
         List<String> accIds;
-        if( ontId==null ) {
-            String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0";
-            accIds = StringListQuery.execute(dao, sql);
-        } else {
-            String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0 AND ont_id=?";
-            accIds = StringListQuery.execute(dao, sql, ontId);
-        }
+        String sql = "SELECT term_acc FROM ont_terms WHERE is_obsolete=0 AND ont_id=?";
+        accIds = StringListQuery.execute(dao, sql, ontId);
         Collections.shuffle(accIds);
-        System.out.println("active terms loaded: "+accIds.size()+" progress interval 15sec");
+        logStatus.debug("active terms loaded: "+accIds.size()+" progress interval 15sec");
 
         long time0 = System.currentTimeMillis();
         final AtomicLong[] stats = {new AtomicLong(time0), new AtomicLong(0)};
@@ -773,15 +783,15 @@ public class OntologyDAO {
                 if( time2- time1 > 15000 ) {
                     stats[0].set(time2);
                     long percent = (100 * accIdsProcessed) / accIds.size();
-                    System.out.println(accIdsProcessed + " ("+ percent+"%),  threads=" + Thread.activeCount());
+                    logStatus.debug(accIdsProcessed + " ("+ percent+"%),  threads=" + Thread.activeCount());
                 }
             } catch(Exception e) {
-                System.out.println("WARNING: CYCLE found for "+accId);
+                logStatus.warn("   WARNING: CYCLE found for "+accId);
             }
         });
         long accIdsProcessed = stats[1].get();
-        System.out.println(accIdsProcessed + ". threads=" + Thread.activeCount());
-        System.out.println("===DONE=== "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+        logStatus.debug(accIdsProcessed + ". threads=" + Thread.activeCount());
+        logStatus.info("   DONE  time elapsed: "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     public boolean isMimIdInactive(String mimId) throws Exception {

@@ -87,31 +87,6 @@ public class QualityChecker {
         handleSynonyms(synonymsInRgd, rec, counters);
 
         rec.qcXRefs(dao);
-
-        checkForCycles(rec, counters);
-    }
-
-    void checkForCycles(Record rec, CounterPool counters) {
-        for( Map.Entry<String, Relation> entry: rec.getEdges().entrySet() ) {
-            String parentTermAcc = entry.getKey();
-            String childTermAcc = rec.getTerm().getAccId();
-            if( parentTermAcc==null || childTermAcc==null ) {
-                continue;
-            }
-
-            if( !parentTermAcc.equals(childTermAcc) ) {
-
-                // test if the newly inserted DAG does not form loops
-                try {
-                    dao.getAncestorCount(parentTermAcc);
-                } catch(Exception e) {
-                        // connect by loop detected: report it
-                    String relId = Relation.getRelIdFromRel(entry.getValue());
-                    System.out.println("WARNING: CYCLE found for "+parentTermAcc+" "+Relation.getRelFromRelId(relId)+" "+childTermAcc);
-                    counters.increment("TERMS_WITH_CYCLES");
-                }
-            }
-        }
     }
 
     private void termNameFixup(Term termInDb, List<TermSynonym> synonymsInRgd, Record rec) {

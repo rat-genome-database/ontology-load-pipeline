@@ -93,8 +93,12 @@ public class Manager {
                 if (filter.equals("")) {
                     filter=null;
                 }
-            } else if (arg.startsWith("-checkForCycles") || arg.startsWith("-check_for_cycles")) {
+            } else if( arg.startsWith("-checkForCycles=") ) {
                 checkForCycles = true;
+                singleOntologyId=arg.substring(16).toUpperCase();
+            } else if( arg.startsWith("-check_for_cycles=") ) {
+                checkForCycles = true;
+                singleOntologyId=arg.substring(18).toUpperCase();
             } else if (arg.startsWith("-omim_ps_custom_do_mapper")) {
                 omimPsCustomDoMapper = true;
             } else if (arg.startsWith("-sssom_generator")) {
@@ -111,15 +115,16 @@ public class Manager {
             }
         }
 
+        if( checkForCycles ) {
+            manager.dao.checkForCycles(singleOntologyId);
+            return;
+        }
+
         if( singleOntologyId==null ) {
             skipDownloads = true;
             skipStatsUpdate = true;
         } else {
             System.out.println("running " + singleOntologyId + " with filter " + filter);
-        }
-
-        if( checkForCycles ) {
-            manager.dao.checkForCycles(singleOntologyId);
         }
 
         FileParser parser = null;

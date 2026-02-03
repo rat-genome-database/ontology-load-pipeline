@@ -52,7 +52,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20251125_doid.obo";
+        String fileName = "h:/do/20251223_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -651,16 +651,7 @@ public class DoIdQC {
                 System.out.println("unknown type of synonym: "+line);
             }
 
-            // parse synonym xrefs
-            pos1 = buf.indexOf("[");
-            int pos2 = buf.lastIndexOf("]");
-            if( pos1>=0 && pos2>pos1 ) {
-                if( pos2==1+pos1 ) {
-                    // empty xref
-                } else {
-                    tsyn.setDbXrefs(buf.substring(pos1+1, pos2));
-                }
-            }
+            // ignore synonym db xrefs
 
             String synUniqueKey = getSynonymUniqueKey(tsyn.getName());
             synonyms.put(synUniqueKey, tsyn);

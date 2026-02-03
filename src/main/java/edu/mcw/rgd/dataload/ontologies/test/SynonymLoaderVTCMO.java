@@ -23,7 +23,7 @@ public class SynonymLoaderVTCMO {
         OntologyDAO dao = new OntologyDAO();
         System.out.println(dao.getConnectionInfo());
 
-        String fname = "/data/CMO-VTO term pairs for bulk reciprocal XREF assignment.txt";
+        String fname = "/Users/mtutaj/Downloads/CMO-VTO term pairs for bulk reciprocal XREF assignment.txt";
         List<String> lines = loadLines(fname);
 
         int linesWithIssues = 0;
@@ -32,8 +32,9 @@ public class SynonymLoaderVTCMO {
         int pairsHandled = 0;
 
         //example
-        // CMO term name | CMO term acc | VT term names | VT term acc(s)
-        // open section of an elevated zero maze during experiment	CMO:0004063	anxiety-related behavior trait/exploratory behavior trait	VT:0010716/VT:0010471
+        //CMO ID: 	CMO_TERM	VT ID: assign as XREF to CMO term on same line (NOTE: Some CMO terms will get two VT IDs as XREFs.)	VT TERM
+        //CMO:0000002	heart rate	VT:2000009	heart pumping trait
+
         for( String line: lines ) {
             System.out.println("LINE  "+line);
             String[] cols = line.split("[\\t]", -1);
@@ -41,10 +42,10 @@ public class SynonymLoaderVTCMO {
                 linesWithIssues++;
                 continue;
             }
-            String cmoTermName = getText(cols[0]);
-            String cmoAcc = getText(cols[1]);
-            String vtTermName = getText(cols[2]);
-            String vtAccs = getText(cols[3]);
+            String cmoTermName = getText(cols[1]);
+            String cmoAcc = getText(cols[0]);
+            String vtTermName = getText(cols[3]);
+            String vtAccs = getText(cols[2]);
             String[] vtAccArray = vtAccs.split("[/]");
 
             if( !cmoAcc.startsWith("CMO:") || cmoAcc.length()!=11 ) {

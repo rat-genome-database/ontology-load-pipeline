@@ -1,3 +1,6 @@
+Feb 03, 2026
+  checking for cycles refactored -- removed cycle checks during ontology load
+
 Jan 02, 2026
   CL ontology: updated to release v2025-12-17
 
