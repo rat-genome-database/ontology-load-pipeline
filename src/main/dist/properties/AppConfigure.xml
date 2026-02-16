@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 03, 2026" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 16, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -270,11 +270,25 @@
                 <entry key="primary:source" value="efo_ignored" />
                 <entry key="relatedMatch" value="xref" />
 
-                <entry key="skos:closeMatch" value="efo_ignored" /><!-- they are just duplicates in slightly different format, of other xrefs -->
-                <entry key="skos:exactMatch" value="efo_ignored" />
-                <entry key="skos:narrowMatch" value="efo_ignored" />
-                <entry key="skos:relatedMatch" value="efo_ignored" />
-                <entry key="skos:broadMatch" value="efo_ignored" />
+                <entry key="AfPO:0000089" value="efo_ignored" />
+                <entry key="AfPO:0000152" value="efo_ignored" />
+                <entry key="AfPO:0000221" value="efo_ignored" />
+                <entry key="AfPO:0000223" value="efo_ignored" />
+                <entry key="AfPO:0000226" value="efo_ignored" />
+                <entry key="AfPO:0000230" value="efo_ignored" />
+                <entry key="AfPO:0000233" value="efo_ignored" />
+                <entry key="AfPO:0000235" value="efo_ignored" />
+                <entry key="AfPO:0000267" value="efo_ignored" />
+                <entry key="AfPO:0000439" value="efo_ignored" />
+                <entry key="AfPO:0000452" value="efo_ignored" />
+                <entry key="AfPO:0000454" value="efo_ignored" />
+                <entry key="AfPO:0000455" value="efo_ignored" />
+                <entry key="AfPO:0000456" value="efo_ignored" />
+                <entry key="AfPO:0000457" value="efo_ignored" />
+                <entry key="AfPO:0000458" value="efo_ignored" />
+                <entry key="AfPO:0000459" value="efo_ignored" />
+                <entry key="AfPO:0000567" value="efo_ignored" />
+                <entry key="AfPO:0000568" value="efo_ignored" />
 
                 <entry key="RO:0002171" value="efo_ignored" /> <!-- mutually spatially disjoint with -->
                 <entry key="RO:0002175" value="present_in_taxon" />
