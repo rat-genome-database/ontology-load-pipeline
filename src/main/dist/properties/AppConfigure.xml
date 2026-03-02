@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Feb 16, 2026" />
+        <property name="version" value="ONTOLOGY LOAD pipeline  -- build  Mar 02, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -270,6 +270,12 @@
                 <entry key="primary:source" value="efo_ignored" />
                 <entry key="relatedMatch" value="xref" />
 
+                <entry key="skos:closeMatch" value="efo_ignored" /><!-- they are just duplicates in slightly different format, of other xrefs -->
+                <entry key="skos:exactMatch" value="efo_ignored" />
+                <entry key="skos:narrowMatch" value="efo_ignored" />
+                <entry key="skos:relatedMatch" value="efo_ignored" />
+                <entry key="skos:broadMatch" value="efo_ignored" />
+
                 <entry key="AfPO:0000089" value="efo_ignored" />
                 <entry key="AfPO:0000152" value="efo_ignored" />
                 <entry key="AfPO:0000221" value="efo_ignored" />
@@ -287,6 +293,7 @@
                 <entry key="AfPO:0000457" value="efo_ignored" />
                 <entry key="AfPO:0000458" value="efo_ignored" />
                 <entry key="AfPO:0000459" value="efo_ignored" />
+                <entry key="AfPO:0000565" value="efo_ignored" />
                 <entry key="AfPO:0000567" value="efo_ignored" />
                 <entry key="AfPO:0000568" value="efo_ignored" />
 
