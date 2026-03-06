@@ -1,3 +1,8 @@
+Mar 06, 2026
+  XRefManager: fixed duplicate TermXRefs caused by HashSet mutation during URL normalization;
+    different PubMed URLs normalizing to the same PMID were not deduplicated because
+    the HashSet was not rehashed after in-place xrefValue changes
+
 Mar 02, 2026
   parser: added more synonym types to be ignored during parsing
 

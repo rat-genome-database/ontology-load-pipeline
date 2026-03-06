@@ -49,7 +49,8 @@ public class XRefManager {
             xref.setTermAcc(termAcc);
         }
 
-        List<TermXRef> incomingXRefsList = new ArrayList<>(incomingXRefs);
+        // rebuild set to remove duplicates caused by normalization mutating xrefValue after insertion
+        List<TermXRef> incomingXRefsList = new ArrayList<>(new HashSet<>(incomingXRefs));
         forInsertXRefs = ListUtils.subtract(incomingXRefsList, inRgdXRefs);
         forDeleteXRefs = ListUtils.subtract(inRgdXRefs, incomingXRefsList);
         matchingXRefs = ListUtils.intersection(incomingXRefsList, inRgdXRefs);
