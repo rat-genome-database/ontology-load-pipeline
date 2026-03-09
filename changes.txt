@@ -1,6 +1,7 @@
 Mar 09, 2026
   parser: improved logic to parse property_value lines
   parser: fixed StringIndexOutOfBoundsException in splitListIntoXRefs when xref text ends with a backslash
+  updated NBO and ZFA ontology download URLs to replace defunct berkeleybop.org endpoints
 
 Mar 06, 2026
   XRefManager: fixed duplicate TermXRefs caused by HashSet mutation during URL normalization;
