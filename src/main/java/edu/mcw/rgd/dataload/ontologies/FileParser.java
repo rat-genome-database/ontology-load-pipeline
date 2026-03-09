@@ -1114,7 +1114,7 @@ public class FileParser {
             StringBuilder buf = new StringBuilder(txt.length());
             for( int i=0; i<txt.length(); i++ ) {
                 char c = txt.charAt(i);
-                if( c=='\\' ) {
+                if( c=='\\' && i+1 < txt.length() ) {
                     c = txt.charAt(++i);
                 }
                 buf.append(c);
