@@ -32,6 +32,8 @@ public class FileParser {
     // to parse creation_date: field in obo files:   '2011-01-04T12:01:33Z'
     static SimpleDateFormat sdtCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     static SimpleDateFormat sdtCreationDate2 = new SimpleDateFormat("yyyy-MM-dd");
+    // date format used in UBERON ontology
+    static SimpleDateFormat sdtCreationDate3 = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); // 25/03/2025 16:52:04
 
     protected final Logger logger = LogManager.getLogger("file_parser");
     private List<String> ontologiesWithExactMatchSynonyms;
@@ -404,7 +406,11 @@ public class FileParser {
                     try {
                         creationDate = sdtCreationDate.parse(dt);
                     } catch( ParseException e ) {
-                        creationDate = sdtCreationDate2.parse(dt);
+                        try {
+                            creationDate = sdtCreationDate2.parse(dt);
+                        } catch( ParseException e3 ) {
+                            creationDate = sdtCreationDate3.parse(dt);
+                        }
                     }
                     rec.getTerm().setCreationDate(creationDate);
                 }
@@ -705,11 +711,23 @@ public class FileParser {
         if( line.startsWith("property_value:") ) {
 
             // real contents
-            String contents;
-            if( line.endsWith("xsd:string") || line.endsWith("xsd:anyURI") )
-                contents = line.substring(15, line.length()-10).trim();
-            else
-                contents = line.substring(15).trim();
+            String contents = line.substring(15).trim();
+            int spacePos = contents.indexOf(' ');
+            if( spacePos<0 ) {
+                counters.increment("UNEXPECTED property_value: ");
+                return line;
+            }
+            String propertyName = contents.substring(0, spacePos);
+            String propertyValue = contents.substring(spacePos).trim();
+            if( propertyValue.startsWith("\"") ) {
+                int pos2 = propertyValue.indexOf('\"', 1);
+                if (pos2 > 1) {
+                    propertyValue = propertyValue.substring(1, pos2);
+                }
+                counters.increment("property_value has value in double quotes");
+            } else {
+                counters.increment("property_value does not have value in double quotes");
+            }
 
             // process ORCID ids: example
             //   property_value: http://purl.org/dc/terms/contributor https://orcid.org/0000-0003-3691-0324
@@ -725,10 +743,10 @@ public class FileParser {
             }
 
             for( String property: this.getPropertyValueSubstitutions().keySet() ) {
-                if( contents.startsWith(property) ) {
+                if( propertyName.startsWith(property) ) {
                     String newContents;
-                    newContents = this.getPropertyValueSubstitutions().get(property) + ": " + contents.substring(property.length()+1);
-                    if( property.equals("synonym") ) {
+                    newContents = this.getPropertyValueSubstitutions().get(property) + ": " + propertyValue;
+                    if (property.equals("synonym")) {
                         newContents += " RELATED []";
                     }
                     return newContents;

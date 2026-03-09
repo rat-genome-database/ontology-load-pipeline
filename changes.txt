@@ -1,3 +1,6 @@
+Mar 09, 2026
+  parser: improved logic to parse property_value lines
+
 Mar 06, 2026
   XRefManager: fixed duplicate TermXRefs caused by HashSet mutation during URL normalization;
     different PubMed URLs normalizing to the same PMID were not deduplicated because
