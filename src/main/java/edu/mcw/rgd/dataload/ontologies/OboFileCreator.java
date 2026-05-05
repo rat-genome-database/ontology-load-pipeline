@@ -4,6 +4,8 @@ import edu.mcw.rgd.dao.impl.OntologyXDAO;
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.process.FileDownloader;
 import edu.mcw.rgd.process.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -18,6 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class OboFileCreator {
 
+    protected final Logger logger = LogManager.getLogger("status");
+
     OntologyXDAO dao = new OntologyXDAO();
 
     // 2013-08-12T12:32:11Z
@@ -29,6 +33,7 @@ public class OboFileCreator {
     private String version;
     private Map<String,String> versionedFiles;
     private Set<String> emitObsoleteTermsFor;
+    private Map<String,String> curatorNames;
     private boolean versionStringWritten = false;
 
     private AtomicInteger spacesInDbXrefsReplaced = new AtomicInteger(0);
@@ -145,6 +150,16 @@ public class OboFileCreator {
         // write the header, body and trailer
         updateOboHeaderWithSynonymTypeDefs(oboHeader, subsetDefs, synonymTypeDefs);
 
+        // collect distinct created_by values from terms and append property_value lines (versionInfo, license, dc:creator)
+        Set<String> creators = new TreeSet<>();
+        for( Term t: terms ) {
+            String cb = t.getCreatedBy();
+            if( cb!=null && !cb.isEmpty() ) {
+                creators.add(cb);
+            }
+        }
+        appendHeaderPropertyValues(oboHeader, creators);
+
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(getOutFileName())));
         writer.println(oboHeader);
         writer.print(termsBuf);
@@ -223,12 +238,39 @@ public class OboFileCreator {
         pos = oboHeader.indexOf("#DATAVER#");
         if( pos >=0 ) {
             if( dataVersion==null ) {
-                oboHeader = oboHeader.replace(pos, pos+9, "1.0");
+                oboHeader = oboHeader.replace(pos, pos+9, "releases/" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
             } else {
                 oboHeader = oboHeader.replace(pos, pos+9, dataVersion);
             }
         }
         return oboHeader;
+    }
+
+    void appendHeaderPropertyValues(StringBuffer oboHeader, Collection<String> creators) {
+        if( oboHeader.length()>0 && oboHeader.charAt(oboHeader.length()-1)!='\n' ) {
+            oboHeader.append('\n');
+        }
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        oboHeader.append("property_value: owl:versionInfo \"").append(today).append("\" xsd:string\n");
+        oboHeader.append("property_value: terms:license https://creativecommons.org/licenses/by/4.0/\n");
+
+        Map<String,String> nameMap = getCuratorNames();
+        List<String> creatorLines = new ArrayList<>();
+        for( String createdBy: creators ) {
+            String fullName = nameMap!=null ? nameMap.get(createdBy) : null;
+            String displayName;
+            if( fullName!=null && !fullName.isEmpty() ) {
+                displayName = fullName;
+            } else {
+                logger.warn("created_by '"+createdBy+"' has no entry in curatorNames mapping; using raw value");
+                displayName = createdBy;
+            }
+            creatorLines.add("property_value: dc:creator \"" + displayName + "\" xsd:string");
+        }
+        Collections.sort(creatorLines);
+        for( String line: creatorLines ) {
+            oboHeader.append(line).append('\n');
+        }
     }
 
     String getDataVersion(String ontId, StringBuffer versionedFileTerms, StringBuffer fileTrailer, StringBuffer outFileName) throws Exception {
@@ -256,12 +298,10 @@ public class OboFileCreator {
                 break;
             }
             if( line.startsWith("data-version:") ) {
-                // data-version: 7.42
-                int dotPos = line.lastIndexOf('.') + 1;
-                int minorVer = 1 + Integer.parseInt(line.substring(dotPos));
+                // data-version: releases/yyyy-MM-dd
                 int verPos = line.indexOf(": ");
-                oldDataVersion = line.substring(verPos+2);
-                dataVersion = line.substring(verPos+2, dotPos) + minorVer;
+                oldDataVersion = line.substring(verPos+2).trim();
+                dataVersion = "releases/" + new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             }
             else if( line.startsWith("date:") ) {
                 // date: 05:04:2012 15:52      dd:mm:yyyy
@@ -293,8 +333,11 @@ public class OboFileCreator {
         String backupFileName = getOutDir()+versionedFile.substring(slashPos+1);
         outFileName.append(backupFileName);
 
-        // create backup file
-        backupFileName = backupFileName.replace(".obo", "_" + fileDate + "_v" + oldDataVersion + ".obo");
+        // create backup file (strip 'releases/' prefix from version so the filename has no slash)
+        String safeOldVersion = oldDataVersion.startsWith("releases/")
+                ? oldDataVersion.substring("releases/".length())
+                : oldDataVersion;
+        backupFileName = backupFileName.replace(".obo", "_" + fileDate + "_v" + safeOldVersion + ".obo");
 
         File backupFile = new File(backupFileName);
         if (!backupFile.exists()) {
@@ -621,5 +664,13 @@ public class OboFileCreator {
 
     public Set<String> getEmitObsoleteTermsFor() {
         return emitObsoleteTermsFor;
+    }
+
+    public void setCuratorNames(Map<String,String> curatorNames) {
+        this.curatorNames = curatorNames;
+    }
+
+    public Map<String,String> getCuratorNames() {
+        return curatorNames;
     }
 }

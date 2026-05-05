@@ -1,3 +1,6 @@
+May 05, 2026
+  obo file generator: enriched header (releases/-format data-version, license, versionInfo, dc:creator)
+
 Mar 09, 2026
   parser: improved logic to parse property_value lines
   parser: fixed StringIndexOutOfBoundsException in splitListIntoXRefs when xref text ends with a backslash
