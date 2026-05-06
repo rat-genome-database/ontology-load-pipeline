@@ -1,3 +1,6 @@
+May 06, 2026
+  obo file generator: tuned up generation of header lines
+
 May 05, 2026
   obo file generator: enriched header (releases/-format data-version, license, versionInfo, dc:creator)
 

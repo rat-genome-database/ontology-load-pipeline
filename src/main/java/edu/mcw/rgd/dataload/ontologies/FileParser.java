@@ -383,7 +383,7 @@ public class FileParser {
             // created_by
             else if( line.startsWith("created_by:") ) {
                 // per OBO spec, there could be only one 'created_by' field; merge incoming data into one field
-                String createdBy = line.substring(12);
+                String createdBy = line.substring(12).toLowerCase();
                 if( Utils.isStringEmpty(rec.getTerm().getCreatedBy()) ) {
                     rec.getTerm().setCreatedBy(createdBy);
                 } else if( !rec.getTerm().getCreatedBy().contains(createdBy) ) {

@@ -155,7 +155,7 @@ public class OboFileCreator {
         for( Term t: terms ) {
             String cb = t.getCreatedBy();
             if( cb!=null && !cb.isEmpty() ) {
-                creators.add(cb);
+                creators.add(cb.toLowerCase());
             }
         }
         appendHeaderPropertyValues(oboHeader, creators);
@@ -250,12 +250,9 @@ public class OboFileCreator {
         if( oboHeader.length()>0 && oboHeader.charAt(oboHeader.length()-1)!='\n' ) {
             oboHeader.append('\n');
         }
-        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        oboHeader.append("property_value: owl:versionInfo \"").append(today).append("\" xsd:string\n");
-        oboHeader.append("property_value: terms:license https://creativecommons.org/licenses/by/4.0/\n");
 
         Map<String,String> nameMap = getCuratorNames();
-        List<String> creatorLines = new ArrayList<>();
+        Set<String> headerLines = new TreeSet<>();
         for( String createdBy: creators ) {
             String fullName = nameMap!=null ? nameMap.get(createdBy) : null;
             String displayName;
@@ -263,12 +260,16 @@ public class OboFileCreator {
                 displayName = fullName;
             } else {
                 logger.warn("created_by '"+createdBy+"' has no entry in curatorNames mapping; using raw value");
-                displayName = createdBy;
+                continue;
             }
-            creatorLines.add("property_value: dc:creator \"" + displayName + "\" xsd:string");
+            headerLines.add("property_value: dc:creator \"" + displayName + "\" xsd:string");
         }
-        Collections.sort(creatorLines);
-        for( String line: creatorLines ) {
+
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        headerLines.add("property_value: owl:versionInfo \""+today+"\" xsd:string");
+        headerLines.add("property_value: terms:license https://creativecommons.org/licenses/by/4.0/");
+
+        for( String line: headerLines ) {
             oboHeader.append(line).append('\n');
         }
     }
@@ -461,7 +462,7 @@ public class OboFileCreator {
 
         // write out created_by and creation_date
         if( rec.getTerm().getCreatedBy()!=null ) {
-            buf.append("created_by: ").append(rec.getTerm().getCreatedBy());
+            buf.append("created_by: ").append(rec.getTerm().getCreatedBy().toLowerCase());
             buf.append("\n");
         }
         if( rec.getTerm().getCreationDate()!=null ) {

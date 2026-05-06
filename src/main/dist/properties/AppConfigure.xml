@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ontology-load-pipeline  -- build May 05, 2026" />
+        <property name="version" value="ontology-load-pipeline  -- build May 06, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -470,7 +470,21 @@
              unmapped values trigger a WARNING in the status log and fall back to the raw value -->
         <property name="curatorNames">
             <map>
-                <!-- <entry key="slaulederkind" value="Stan Laulederkind"/> -->
+                <entry key="caripark" value="Carissa A. Park"/>
+                <entry key="gthayman" value="G. Thomas Hayman"/>
+                <entry key="hsnalabolu" value="Harika S. Nalabolu"/>
+                <entry key="jesmith" value="Jennifer R. Smith"/>
+                <entry key="jrsjrs" value="Jennifer R. Smith"/>
+                <entry key="jrsmith" value="Jennifer R. Smith"/>
+                <entry key="jsmith" value="Jennifer R. Smith"/>
+                <entry key="mahimavedi" value="Mahima Vedi"/>
+                <entry key="mshimoyama" value="Mary Shimoyama"/>
+                <entry key="rnigam" value="Rajni Nigam"/>
+                <entry key="shurjenw" value="Shur-Jen Wang"/>
+                <entry key="sjwang" value="Shur-Jen Wang"/>
+                <entry key="slaulede" value="Stanley J. F. Laulederkind"/>
+                <entry key="slaulederkind" value="Stanley J. F. Laulederkind"/>
+                <entry key="vpetri" value="Victoria Petri"/>
             </map>
         </property>
         <property name="outDir" value="data/"/>
