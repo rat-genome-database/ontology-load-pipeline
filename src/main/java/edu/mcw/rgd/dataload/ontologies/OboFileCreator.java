@@ -334,11 +334,16 @@ public class OboFileCreator {
         String backupFileName = getOutDir()+versionedFile.substring(slashPos+1);
         outFileName.append(backupFileName);
 
-        // create backup file (strip 'releases/' prefix from version so the filename has no slash)
-        String safeOldVersion = oldDataVersion.startsWith("releases/")
-                ? oldDataVersion.substring("releases/".length())
-                : oldDataVersion;
-        backupFileName = backupFileName.replace(".obo", "_" + fileDate + "_v" + safeOldVersion + ".obo");
+        // create backup file. For releases/yyyy-MM-dd versions the date is already
+        // encoded in the version, so we drop the redundant fileDate prefix; legacy
+        // numeric versions keep the original 'pathway_<fileDate>_v<version>.obo' form.
+        String backupSuffix;
+        if( oldDataVersion.startsWith("releases/") ) {
+            backupSuffix = "_v" + oldDataVersion.substring("releases/".length()) + ".obo";
+        } else {
+            backupSuffix = "_" + fileDate + "_v" + oldDataVersion + ".obo";
+        }
+        backupFileName = backupFileName.replace(".obo", backupSuffix);
 
         File backupFile = new File(backupFileName);
         if (!backupFile.exists()) {
