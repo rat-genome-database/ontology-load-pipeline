@@ -17,6 +17,9 @@ public class TermStatsLoaderWithFilter {
 
     private OntologyDAO dao;
 
+    private static final Logger statsLog = LogManager.getLogger("stats");
+    private static final Logger statusLog = LogManager.getLogger("status");
+
     public static void main(String[] args) throws Exception {
 
         String ontPrefix = "DOID";
@@ -42,8 +45,7 @@ public class TermStatsLoaderWithFilter {
 
     void run(String ontPrefix, String filter) throws Exception {
 
-        final Logger log = LogManager.getLogger("stats");
-        log.info("processing "+ontPrefix+" with filter "+filter);
+        statsLog.info("processing "+ontPrefix+" with filter "+filter);
 
         long time0 = System.currentTimeMillis();
 
@@ -57,7 +59,7 @@ public class TermStatsLoaderWithFilter {
 
         // build dag
         Map<String, TermData> dag = new ConcurrentHashMap<>();
-        List<StringMapQuery.MapPair> dagRelations = loadDagRelations(ontPrefix, log);
+        List<StringMapQuery.MapPair> dagRelations = loadDagRelations(ontPrefix);
         for (StringMapQuery.MapPair pair : dagRelations) {
             TermData parent = dag.get(pair.keyValue);
             if (parent == null) {
@@ -73,25 +75,23 @@ public class TermStatsLoaderWithFilter {
 
             parent.addChild(child);
         }
-        System.out.println(ontPrefix+" term count "+dag.size());
-        log.info("  dag graph built");
+        statusLog.debug(ontPrefix+" term count "+dag.size());
+        statusLog.debug("  dag graph built");
 
         // compute stats for species and object
         for( int speciesTypeKey: speciesTypeKeys ) {
             for( int objectKey: TermStatsLoader.PROCESSED_OBJECT_KEYS ) {
-                run(filter, dag, dao, speciesTypeKey, objectKey, log);
+                run(filter, dag, dao, speciesTypeKey, objectKey);
             }
         }
 
         // dump non zero stats
-        qcAndLoadStats(dag, ontPrefix, filter, log);
+        qcAndLoadStats(dag, ontPrefix, filter);
 
-        String msg = "=== "+ontPrefix+" OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis());
-        log.info(msg);
-        System.out.println(msg);
+        statsLog.info("elapsed: "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
-    List<StringMapQuery.MapPair> loadDagRelations(String ontPrefix, Logger log) throws Exception {
+    List<StringMapQuery.MapPair> loadDagRelations(String ontPrefix) throws Exception {
 
         List<StringMapQuery.MapPair> dagRelations = null;
         Exception lastException = null;
@@ -101,21 +101,16 @@ public class TermStatsLoaderWithFilter {
                 dagRelations = dao.getDagForOntologyPrefix(ontPrefix);
                 break;
             } catch (Exception e) {
-                e.printStackTrace();
-                String m = "*** EXCEPTION *** attempt "+(attempt+1)+" to resume loading dag for " + ontPrefix;
-                log.warn(m);
-                System.out.println(m);
+                statusLog.warn("*** EXCEPTION *** attempt "+(attempt+1)+" to resume loading dag for "+ontPrefix, e);
                 lastException = e;
             }
         }
         if( attempt==10 ) {
-            String m = "*** EXCEPTION *** dag loading broken for "+ontPrefix;
-            log.error(m);
-            System.err.println(m);
+            statusLog.error("*** EXCEPTION *** dag loading broken for "+ontPrefix);
             throw lastException;
         }
 
-        log.info("  dag relations loaded for "+ontPrefix);
+        statusLog.debug("  dag relations loaded for "+ontPrefix);
         Collections.shuffle(dagRelations);
         return dagRelations;
     }
@@ -123,10 +118,10 @@ public class TermStatsLoaderWithFilter {
     final static int STATS_INSERTED = 0;
     final static int STATS_UPDATED = 1;
     final static int STATS_DELETED = 2;
-    final static int TERMS_WITH_UP_TO_DATE_STATS = 3;
+    final static int STATS_UNCHANGED = 3;
 
-    void qcAndLoadStats(Map<String, TermData> dag, String ontPrefix, String filter, Logger log) {
-        log.info("  qc and load the stats");
+    void qcAndLoadStats(Map<String, TermData> dag, String ontPrefix, String filter) {
+        statusLog.debug("  qc and load the stats");
         final AtomicInteger[] counters = new AtomicInteger[4];
         for( int i=0; i<4; i++ ) {
             counters[i] = new AtomicInteger(0);
@@ -136,9 +131,13 @@ public class TermStatsLoaderWithFilter {
             try {
                 TermStats tsInRgd = dao.getTermWithStats(td.getTermAcc(), filter);
                 //determine which stats match, which should be deleted, inserted and updated
-                if (td.stats.equals(tsInRgd)) {
-                    counters[TERMS_WITH_UP_TO_DATE_STATS].incrementAndGet();
-                } else {
+                boolean matched = td.stats.equals(tsInRgd);
+                int rowsInRgd = (tsInRgd.term.getStats() == null) ? 0 : tsInRgd.term.getStats().size();
+                int unchangedRows = rowsInRgd - td.stats.statsToBeDeleted.size() - td.stats.statsToBeUpdated.size();
+                if( unchangedRows > 0 ) {
+                    counters[STATS_UNCHANGED].getAndAdd(unchangedRows);
+                }
+                if (!matched) {
                     dao.updateTermStats(td.stats);
                     int count = td.stats.statsToBeAdded.size();
                     if( count!=0 ) {
@@ -154,35 +153,23 @@ public class TermStatsLoaderWithFilter {
                     }
                 }
             } catch(Exception e) {
-                e.printStackTrace();
-                String m = "*** EXCEPTION *** broken processing for "+ontPrefix+" with filter "+filter;
-                log.error(m);
-                System.out.println(m);
+                statusLog.error("*** EXCEPTION *** broken processing for "+ontPrefix+" with filter "+filter, e);
                 throw new RuntimeException(e);
             }
         });
-        int count = counters[STATS_INSERTED].get();
-        if( count!=0 ) {
-            System.out.println("    stats inserted: "+count);
-        }
-        count = counters[STATS_UPDATED].get();
-        if( count!=0 ) {
-            System.out.println("    stats updated: "+count);
-        }
-        count = counters[STATS_DELETED].get();
-        if( count!=0 ) {
-            System.out.println("    stats deleted: "+count);
-        }
-        System.out.println("    terms with up-to-date stats: "+counters[TERMS_WITH_UP_TO_DATE_STATS].get());
+        statsLog.info("stats inserted: "+counters[STATS_INSERTED].get()
+                +", updated: "+counters[STATS_UPDATED].get()
+                +", deleted: "+counters[STATS_DELETED].get()
+                +", unchanged: "+counters[STATS_UNCHANGED].get());
     }
 
-    void run(String filter, Map<String, TermData> dag, OntologyDAO dao, int speciesTypeKey, int objectKey, Logger log) throws Exception {
+    void run(String filter, Map<String, TermData> dag, OntologyDAO dao, int speciesTypeKey, int objectKey) throws Exception {
 
-        log.debug("  INIT species="+speciesTypeKey+" object="+objectKey);
+        statusLog.debug("  INIT species="+speciesTypeKey+" object="+objectKey);
 
         // rgd ids for given filter, species and object key
         Set<Integer> rgdIdsForFilter = new HashSet<>(dao.getAnnotatedObjectIds(filter, true, speciesTypeKey, objectKey));
-        log.debug("  rgd ids for filter loaded");
+        statusLog.debug("  rgd ids for filter loaded");
 
         // clean dag
         dag.values().parallelStream().forEach(td -> {
@@ -192,42 +179,37 @@ public class TermStatsLoaderWithFilter {
                     td.rgdIds = dao.getAnnotatedObjectIds(td.getTermAcc(), false, speciesTypeKey, objectKey);
                     break;
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    String m = "*** EXCEPTION *** attempt "+(attempt+1)+" to resume processing for species=" + speciesTypeKey + " object=" + objectKey;
-                    log.warn(m);
-                    System.out.println(m);
+                    statusLog.warn("*** EXCEPTION *** attempt "+(attempt+1)+" to resume processing for species="+speciesTypeKey+" object="+objectKey, e);
                 }
             }
             if( attempt==10 ) {
                 String m = "*** EXCEPTION *** processing broken for species=" + speciesTypeKey + " object=" + objectKey;
-                log.error(m);
-                System.err.println(m);
+                statusLog.error(m);
                 throw new RuntimeException(m);
             }
             td.rgdIds.retainAll(rgdIdsForFilter);
             td.rgdIdsWithChildren = null;
         });
-        log.debug("  rgd ids for ontology loaded");
+        statusLog.debug("  rgd ids for ontology loaded");
 
         // compute for-children stats
         int ll=0;
         for (TermData td : dag.values()) {
             ll++;
-            log.debug("## "+ll+" compute children stats for "+td.getTermAcc());
+            statusLog.debug("## "+ll+" compute children stats for "+td.getTermAcc());
             // collect data for children
             if (td.rgdIdsWithChildren == null) {
                 td.rgdIdsWithChildren = td.getRgdIdsWithChildren();
             }
-            log.debug("## "+ll+" compute children stats for "+td.getTermAcc()+" OK!");
+            statusLog.debug("## "+ll+" compute children stats for "+td.getTermAcc()+" OK!");
         }
-        log.debug("  rgd ids for term with children computed");
+        statusLog.debug("  rgd ids for term with children computed");
 
         dag.values().parallelStream().forEach(td -> {
             //td.stats.term.addStat("annotated_object_count", speciesTypeKey, objectKey, 0, td.rgdIds.size(), filter);
             td.stats.term.addStat("annotated_object_count", speciesTypeKey, objectKey, 1, td.rgdIdsWithChildren.size(), filter);
         });
-        log.debug("  DONE species="+speciesTypeKey+" object="+objectKey);
-        //System.out.println("  DONE species="+speciesTypeKey+" object="+objectKey);
+        statusLog.debug("  DONE species="+speciesTypeKey+" object="+objectKey);
     }
 
     class TermData {

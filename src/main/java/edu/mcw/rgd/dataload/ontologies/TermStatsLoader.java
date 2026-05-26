@@ -27,6 +27,7 @@ public class TermStatsLoader {
     static int[] phenoSpeciesTypeKeys = new int[]{SpeciesType.RAT, SpeciesType.CHINCHILLA};
 
     private final Logger logger = LogManager.getLogger("stats");
+    private final Logger statusLog = LogManager.getLogger("status");
 
     public static int[] PROCESSED_OBJECT_KEYS = { // processed objects
             RgdId.OBJECT_KEY_GENES,
@@ -63,15 +64,19 @@ public class TermStatsLoader {
         int maxLockAttempts = 60*5; // 5 hours -- gave up after 5 hours
         long lockSleepInMs = 1000*60; // 1 min interval to try acquire the lock
         try( FileSystemLock fileSystemLock = new FileSystemLock(maxLockAttempts, lockSleepInMs, lockName) ) {
-            fileSystemLock.acquire(logger);
+            fileSystemLock.acquire(statusLog);
 
             if (getFilter() != null) {
                 TermStatsLoaderWithFilter.run(ontPrefixes.values(), filter, getDao());
-                fileSystemLock.release(logger);
+                fileSystemLock.release(statusLog);
                 return;
             }
 
             long time0 = System.currentTimeMillis();
+
+            for( String ontPrefix: ontPrefixes.values() ) {
+                logger.info("processing "+ontPrefix);
+            }
 
             // load species type keys to process (exclude non-public species like yeast, zebrafish etc)
             List<Integer> speciesTypeKeys = new ArrayList<>();
@@ -108,14 +113,17 @@ public class TermStatsLoader {
                 customThreadPool.shutdown();
             }
 
-            // dump counter statistics
-            System.out.println(counters.dumpAlphabetically());
+            // dump full counter statistics to status (debug)
+            statusLog.debug(counters.dumpAlphabetically());
 
-            System.out.println("-- computing term stats -- DONE -- elapsed " + Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+            // brief one-liner summary to stats.log
+            logger.info("stats inserted: "+counters.get("STATS_INSERTED")
+                    +", updated: "+counters.get("STATS_UPDATED")
+                    +", deleted: "+counters.get("STATS_DELETED")
+                    +", unchanged: "+counters.get("STATS_UNCHANGED"));
+            logger.info("elapsed: "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
 
-            fileSystemLock.release(logger);
-
-            logger.info("DONE!");
+            fileSystemLock.release(statusLog);
         }
     }
 
@@ -126,7 +134,7 @@ public class TermStatsLoader {
         // for every ontology, load list of term acc ids
         for( String ontPrefix: ontPrefixes.values() ) {
             List<String> accIds = dao.getAllTermAccIds(ontPrefix);
-            System.out.println("TERM COUNT for "+ontPrefix+" is "+accIds.size());
+            statusLog.debug("TERM COUNT for "+ontPrefix+" is "+accIds.size());
 
             for( String accId: accIds ) {
                 PRecord rec = new PRecord();
@@ -140,7 +148,7 @@ public class TermStatsLoader {
         // randomize term order for more even load in multi-thread processing
         Collections.shuffle(results);
 
-        logger.debug("loaded ontologies, term count="+results.size());
+        statusLog.debug("loaded ontologies, term count="+results.size());
         return results;
     }
 
@@ -149,7 +157,7 @@ public class TermStatsLoader {
         String accId = rec.stats.getTermAccId();
 
         long time0 = System.currentTimeMillis();
-        logger.debug(Thread.currentThread().getName() + " " + accId + " START");
+        statusLog.debug(Thread.currentThread().getName() + " " + accId + " START");
 
         if (getFilter() == null) {
 
@@ -181,8 +189,15 @@ public class TermStatsLoader {
 
 
         TermStats statsInRgd = dao.getTermWithStats(accId, getFilter());
-        if (!rec.stats.equals(statsInRgd)) {
-            logger.debug(Thread.currentThread().getName()+"  "+rec.stats.getTermAccId()+" LOAD");
+        boolean matched = rec.stats.equals(statsInRgd);
+        int rowsInRgd = (statsInRgd.term.getStats() == null) ? 0 : statsInRgd.term.getStats().size();
+        int unchangedRows = rowsInRgd - rec.stats.statsToBeDeleted.size() - rec.stats.statsToBeUpdated.size();
+        if( unchangedRows > 0 ) {
+            counters.add("STATS_UNCHANGED", unchangedRows);
+        }
+
+        if (!matched) {
+            statusLog.debug(Thread.currentThread().getName()+"  "+rec.stats.getTermAccId()+" LOAD");
 
             dao.updateTermStats(rec.stats);
 
@@ -200,14 +215,14 @@ public class TermStatsLoader {
             }
         }
         else {
-            logger.debug(Thread.currentThread().getName()+"  "+rec.stats.getTermAccId()+" MATCH");
+            statusLog.debug(Thread.currentThread().getName()+"  "+rec.stats.getTermAccId()+" MATCH");
 
             counters.increment("TERMS_WITH_STATS_MATCHED");
         }
 
         int termsProcessed = counters.increment("TERMS_PROCESSED");
         long time1 = System.currentTimeMillis();
-        logger.debug(termsProcessed+". "+Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
+        statusLog.debug(termsProcessed+". "+Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
     }
 
     void computeAnnotatedObjectCount(TermStats stats, int speciesTypeKey) throws Exception {

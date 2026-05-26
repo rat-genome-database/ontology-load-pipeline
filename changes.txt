@@ -1,3 +1,6 @@
+May 26, 2026
+  term stats loader: stats.log slimmed down to brief per-ontology summaries; diagnostics routed to status logger
+
 May 12, 2026
   obo file generator: removed redundant date prefix from backup filenames when version is releases-form (pathway_v2026-05-06.obo)
 
