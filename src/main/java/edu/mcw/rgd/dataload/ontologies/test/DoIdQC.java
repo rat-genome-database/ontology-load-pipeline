@@ -52,7 +52,7 @@ public class DoIdQC {
     public static void main(String[] args) throws Exception {
 
         // https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/releases/2018-05-15/doid.obo
-        String fileName = "h:/do/20260430_doid.obo";
+        String fileName = "h:/do/20260530_doid.obo";
         String synQcFileName = "/tmp/do_synonym_qc.log";
 
         new DoIdQC().run(fileName, synQcFileName);
@@ -658,6 +658,13 @@ public class DoIdQC {
         }
 
         void parseXrefSynonym(String synName) {
+
+            // GARD ids sometimes come in with leading zeroes (e.g. GARD:0017983), which is wrong;
+            // strip the leading zeroes (GARD:17983) before loading the xref
+            if( synName.startsWith("GARD:") ) {
+                synName = "GARD:" + synName.substring(5).replaceFirst("^0+", "");
+            }
+
             TermSynonym tsyn = new TermSynonym();
             tsyn.setName(synName);
             tsyn.setType("xref");

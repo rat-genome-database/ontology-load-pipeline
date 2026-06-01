@@ -1,3 +1,6 @@
+Jun 1, 2026
+  DO QC: strip leading zeroes from GARD xref ids (GARD:0017983 -> GARD:17983) before loading
+
 May 26, 2026
   term stats loader: stats.log slimmed down to brief per-ontology summaries; diagnostics routed to status logger
 
