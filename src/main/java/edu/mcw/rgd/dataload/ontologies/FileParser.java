@@ -2,7 +2,7 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.datamodel.ontologyx.*;
 import edu.mcw.rgd.process.CounterPool;
-import edu.mcw.rgd.process.FileDownloader;
+import edu.mcw.rgd.process.FileDownloader2;
 import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +28,8 @@ public class FileParser {
     private Map<String, String> relationshipSubstitutions;
     private List<String> ignoredProperties;
     private List<String> propertyToSynonym;
+    // terms (e.g. GO:0005515) that must get a 'Not4Curation' synonym even if the incoming data does not provide one
+    private List<String> explicitNot4CurationTerms;
 
     // to parse creation_date: field in obo files:   '2011-01-04T12:01:33Z'
     static SimpleDateFormat sdtCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -66,7 +68,7 @@ public class FileParser {
             srcFile = srcFile.replace("##APIKEY##", apiKey);
         }
 
-        FileDownloader downloader = new FileDownloader();
+        FileDownloader2 downloader = new FileDownloader2();
         downloader.setExternalFile(srcFile);
         logger.info("input file: "+downloader.getExternalFile());
         downloader.setLocalFile("data/"+ontId+".obo");
@@ -692,12 +694,30 @@ public class FileParser {
         String termAcc = rec.getTerm().getAccId();
         if( termAcc!=null ) {
 
+            // for explicitly configured terms (e.g. GO:0005515 'protein binding'), force a
+            // 'Not4Curation' synonym unless the incoming data already provides one
+            if( explicitNot4CurationTerms!=null && explicitNot4CurationTerms.contains(termAcc)
+                    && !hasSynonymWithName(rec, "Not4Curation") ) {
+                rec.addSynonym("Not4Curation", "synonym");
+                counters.increment("SYNONYMS_EXPLICIT_NOT4CURATION");
+            }
+
             Record prevRec = records.put(termAcc, rec);
             if( prevRec!=null ) {
                 // merge the both incoming terms
                 throw new Exception("duplicate acc id for "+termAcc);
             }
         }
+    }
+
+    // true if the record already has an incoming synonym with the given name
+    boolean hasSynonymWithName( Record rec, String name ) {
+        for( TermSynonym syn: rec.getSynonyms() ) {
+            if( Utils.stringsAreEqual(syn.getName(), name) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1233,6 +1253,14 @@ public class FileParser {
 
     public List<String> getPropertyToSynonym() {
         return propertyToSynonym;
+    }
+
+    public void setExplicitNot4CurationTerms(List<String> explicitNot4CurationTerms) {
+        this.explicitNot4CurationTerms = explicitNot4CurationTerms;
+    }
+
+    public List<String> getExplicitNot4CurationTerms() {
+        return explicitNot4CurationTerms;
     }
 
     public void setSynonymPrefixSubstitutions(Map<String,String> synonymPrefixSubstitutions) {

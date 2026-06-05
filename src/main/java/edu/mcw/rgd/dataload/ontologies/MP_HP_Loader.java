@@ -3,7 +3,7 @@ package edu.mcw.rgd.dataload.ontologies;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.CounterPool;
-import edu.mcw.rgd.process.FileDownloader;
+import edu.mcw.rgd.process.FileDownloader2;
 import edu.mcw.rgd.process.Utils;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -31,7 +31,7 @@ public class MP_HP_Loader {
 
         String url = "https://raw.githubusercontent.com/mapping-commons/mh_mapping_initiative/master/mappings/mp_hp_mgi_all.sssom.tsv";
 
-        FileDownloader fd = new FileDownloader();
+        FileDownloader2 fd = new FileDownloader2();
         fd.setExternalFile(url);
         fd.setLocalFile("data/mp_hp_mgi_all.sssom.tsv");
         String localFile = fd.downloadNew();

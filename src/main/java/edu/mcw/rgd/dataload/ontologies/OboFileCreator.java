@@ -2,7 +2,7 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.dao.impl.OntologyXDAO;
 import edu.mcw.rgd.datamodel.ontologyx.*;
-import edu.mcw.rgd.process.FileDownloader;
+import edu.mcw.rgd.process.FileDownloader2;
 import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -281,7 +281,7 @@ public class OboFileCreator {
             return null;
         }
 
-        FileDownloader fd = new FileDownloader();
+        FileDownloader2 fd = new FileDownloader2();
         fd.setExternalFile(versionedFile);
         fd.setLocalFile("data/"+ontId+".obo");
         fd.setPrependDateStamp(true);

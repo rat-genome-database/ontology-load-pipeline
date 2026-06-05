@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ontology-load-pipeline  -- build Jun 1, 2026" />
+        <property name="version" value="ontology-load-pipeline  -- build Jun 5, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -22,7 +22,7 @@
                 <entry key="MP" value="http://www.informatics.jax.org/downloads/reports/MPheno_OBO.ontology"/>
                 <!--<entry key="MP" value="https://build.obolibrary.io/job/obofoundry/job/pipeline-mp/job/master/lastSuccessfulBuild/artifact/src/ontology/mp.obo"/>-->
 
-                <entry key="CS" value="ftp://ftp.rgd.mcw.edu/pub/ontology/chinchilla/CS.obo"/>
+                <entry key="CS" value="https://download.rgd.mcw.edu/data_release/ontology_obo_files/chinchilla/CS.obo"/>
 
                 <entry key="SO" value="https://github.com/The-Sequence-Ontology/SO-Ontologies/raw/master/Ontology_Files/so-simple.obo"/>
 
@@ -35,7 +35,7 @@
                 <entry key="NBO" value="https://raw.githubusercontent.com/obo-behavior/behavior-ontology/refs/heads/master/nbo-base.obo"/>
 
                 <entry key="HP" value="https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo"/>
-                <entry key="CHEBI" value="ftp://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.obo"/>
+                <entry key="CHEBI" value="https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.obo"/>
 
                 <!-- OLD source: http://data.bioontology.org/ontologies/VT/download/?apikey=##APIKEY## -->
                 <entry key="VT" value="https://raw.githubusercontent.com/AnimalGenome/vertebrate-trait-ontology/master/current_release/vt.obo" />
@@ -49,7 +49,7 @@
                 <entry key="MI" value="http://data.bioontology.org/ontologies/MI/download/?apikey=##APIKEY##"/>
                 <entry key="ZFA" value="http://purl.obolibrary.org/obo/zfa.obo"/>
                 <entry key="NCBITaxon" value="file:///tmp/ncbitaxon.obo"/>
-                <entry key="CVCL" value="ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo"/>
+                <entry key="CVCL" value="https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo"/>
                 <entry key="MONDO" value="http://purl.obolibrary.org/obo/mondo/mondo.obo"/>
                 <entry key="OBA" value="http://purl.obolibrary.org/obo/oba.obo"/>
 
@@ -345,6 +345,13 @@
             </list>
         </property>
 
+        <!-- terms that must get a 'Not4Curation' synonym even when the incoming obo data does not provide one -->
+        <property name="explicitNot4CurationTerms">
+            <list>
+                <value>GO:0005515</value><!-- protein binding -->
+            </list>
+        </property>
+
         <!-- these properties are parsed, but completely ignored in the further processing -->
         <property name="ignoredProperties">
             <list>
@@ -447,7 +454,7 @@
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
-        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2026-05-12 --" />
+        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2026-06-05 --" />
         <property name="versionedFiles">
             <map>
                 <entry key="PW" value="https://download.rgd.mcw.edu/ontology/pathway/pathway.obo"/>
@@ -491,7 +498,7 @@
     </bean>
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
-        <property name="version" value="--GO Taxon Constraints   -- build Feb 12, 2024 --" />
+        <property name="version" value="--GO Taxon Constraints   -- build Jun 5, 2026 --" />
 
         <property name="taxonUnionOboFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/ontology/imports/go-taxon-groupings.obo" />
         <property name="neverInTaxonFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/taxon_constraints/never_in_taxon.tsv" />

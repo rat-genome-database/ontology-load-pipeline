@@ -2,7 +2,7 @@ package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
-import edu.mcw.rgd.process.FileDownloader;
+import edu.mcw.rgd.process.FileDownloader2;
 import edu.mcw.rgd.process.Utils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.logging.log4j.LogManager;
@@ -73,7 +73,7 @@ public class TaxonConstraints {
 
     void loadTaxonUnionMap() throws Exception {
 
-        FileDownloader downloader = new FileDownloader();
+        FileDownloader2 downloader = new FileDownloader2();
         downloader.setExternalFile(taxonUnionOboFile);
         downloader.setLocalFile("data/taxon_union_terms.obo");
         downloader.setUseCompression(true);
@@ -128,7 +128,7 @@ public class TaxonConstraints {
 
         int loadedConstraints = 0;
 
-        FileDownloader downloader = new FileDownloader();
+        FileDownloader2 downloader = new FileDownloader2();
         downloader.setExternalFile(fileName);
         downloader.setLocalFile("data/"+prefix+".tsv");
         downloader.setUseCompression(true);
