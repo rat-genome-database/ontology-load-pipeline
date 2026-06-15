@@ -1,7 +1,7 @@
 #update OMIM_PS_CUSTOM_DO table
 . /etc/profile
 
-APPNAME=OntologyLoad
+APPNAME=ontology-load-pipeline
 APPDIR=/home/rgddata/pipelines/$APPNAME
 cd $APPDIR
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`

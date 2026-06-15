@@ -2,7 +2,7 @@
 # the files will be generated in subdirectory 'data/ontology/mappings'
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 SERVER=`hostname -s`
 
 cd $APPDIR

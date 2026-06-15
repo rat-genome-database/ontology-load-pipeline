@@ -1,7 +1,7 @@
 # check an ontology (given ontology id) for cycles
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 cd $APPDIR
 
 if [ "$1" == "" ]; then

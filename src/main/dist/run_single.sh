@@ -4,7 +4,7 @@
 #   ./run_single.sh MMO -skip_stats_update
 
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 
 # loading GO ontology will automatically load and process GO taxon constraints
 if [ "$1" == "GO" ]; then

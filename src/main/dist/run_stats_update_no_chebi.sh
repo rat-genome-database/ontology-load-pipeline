@@ -1,7 +1,7 @@
 # update stats for every ontology, except CHEBI (affects table ONT_TERM_STATS2)
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 cd $APPDIR
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 

@@ -2,7 +2,7 @@
 # for example:  ./generate_obo_file.sh RDO
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 SERVER=`hostname -s`
 
 cd $APPDIR

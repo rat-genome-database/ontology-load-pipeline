@@ -4,7 +4,7 @@
 # note: robot.jar should be available in pipeline directory
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 SERVER=`hostname -s`
 if [ "$SERVER" == "reed" ]; then
   ONT_DIR="rgdpub@${SERVER}.rgd.mcw.edu:/rgd/data/ontology"

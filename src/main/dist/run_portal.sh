@@ -1,5 +1,5 @@
 #
-APP=/home/rgddata/pipelines/OntologyLoad
+APP=/home/rgddata/pipelines/ontology-load-pipeline
 
 #ontologies=( "CHEBI" )
 #ontologies=( "MP" )

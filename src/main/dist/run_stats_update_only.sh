@@ -1,7 +1,7 @@
 # update stats for every ontology
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 cd $APPDIR
 
 #update stats for all ontologies (affected table ONT_TERM_STATS2)

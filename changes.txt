@@ -1,3 +1,6 @@
+Jun 15, 2026
+  renamed distro from 'OntologyLoad' to 'ontology-load-pipeline'
+
 Jun 5, 2026
   migrated downloads from FileDownloader to FileDownloader2 (ftp sources moved to https)
   GO parsing: explicitNot4CurationTerms config tags listed terms (e.g. GO:0005515) with a 'Not4Curation' synonym

@@ -1,4 +1,4 @@
-APP=/home/rgddata/pipelines/OntologyLoad
+APP=/home/rgddata/pipelines/ontology-load-pipeline
 $APP/run_all.sh
 #Aging & Age-Related Disease Portal
 $APP/run_portal.sh DOID:9007801

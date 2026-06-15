@@ -1,6 +1,6 @@
 # launch ontology loading sequentially for every ontology, except RDO
 #
-APP=/home/rgddata/pipelines/OntologyLoad
+APP=/home/rgddata/pipelines/ontology-load-pipeline
 
 ontologies=( "XCO" "MMO" "NBO" "MI" "SO" "CL" "PW" "ZFA" "EFO" "CMO" "VT" "MA" "RS" "MP" "HP" "UBERON" "GO" "CHEBI" )
 

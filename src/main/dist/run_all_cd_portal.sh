@@ -2,7 +2,7 @@
 # if loading of any ontology fails, it won't affect loading of other ontologies
 # that's why this script is preferred to run over run.sh script
 #
-APP=/home/rgddata/pipelines/OntologyLoad
+APP=/home/rgddata/pipelines/ontology-load-pipeline
 
 ontologies=( "RDO" "XCO" "PW" "CMO" "VT" "RS" "MP" "GO" "CHEBI" )
 

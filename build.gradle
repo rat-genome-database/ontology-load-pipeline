@@ -14,7 +14,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 mainClassName = 'edu.mcw.rgd.dataload.ontologies.Manager'
-String myAppName = 'OntologyLoad'
+String myAppName = 'ontology-load-pipeline'
 
 project.archivesBaseName = myAppName
 

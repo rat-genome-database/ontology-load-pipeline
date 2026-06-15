@@ -1,7 +1,7 @@
 # generate obo files for ontologies that are live-edited in RGD
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 SERVER=`hostname -s`
 ONT_RELEASE_DIR="rgdpub@${SERVER}.rgd.mcw.edu:/rgd/data/ontology"
 if [ "$SERVER" != "reed" ]; then

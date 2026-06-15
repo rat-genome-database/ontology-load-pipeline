@@ -1,7 +1,7 @@
 # generate reciprocate EFO xrefs for CMO, VT, MP, HP and RDO ontologies
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/OntologyLoad
+APPDIR=/home/rgddata/pipelines/ontology-load-pipeline
 SERVER=`hostname -s`
 
 cd $APPDIR
