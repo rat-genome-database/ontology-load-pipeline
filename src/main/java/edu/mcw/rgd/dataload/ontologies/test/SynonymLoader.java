@@ -15,17 +15,18 @@ public class SynonymLoader {
 
     public static void main(String[] args) throws Exception {
 
-        boolean dryRun = false;
+        boolean dryRun = true;
 
         OntologyDAO dao = new OntologyDAO();
         System.out.println(dao.getConnectionInfo());
 
-        String fname = "/tmp/ClinVar 8_21_25.txt";
+        String fname = "/Users/mtutaj/Documents/ClinVar synonyms 2026-06-19.txt";
         BufferedReader in = Utils.openReader(fname);
 
         int linesWithIssues = 0;
         int synonymsInserted = 0;
         int synonymsUpToDate = 0;
+        int termReplacements = 0;
 
         //example
         // Term	| Synonym type | RDO term | RDO Term ID
@@ -41,12 +42,18 @@ public class SynonymLoader {
                 continue;
             }
             String synonymName = getText(cols[0]);
-            String synonymType = getText(cols[1]);
+            String synonymType = qcSynonymType(getText(cols[1]));
             String termName = getText(cols[2]);
             String termAcc = getText(cols[3]);
 
             if( !termAcc.startsWith("DOID:")) {
                 System.out.println(lineNr+". ### not found DOID acc in line "+line);
+                linesWithIssues++;
+                continue;
+            }
+
+            if( synonymType==null) {
+                System.out.println(lineNr+". ### unknown/missing synonym type in line "+line);
                 linesWithIssues++;
                 continue;
             }
@@ -76,6 +83,7 @@ public class SynonymLoader {
 
                 System.out.println(lineNr+". ### "+termAcc+" has been replaced by "+replacedBy);
                 termAcc = replacedBy;
+                termReplacements++;
 
                 term = dao.getTerm(termAcc);
                 if( term==null ) {
@@ -89,7 +97,7 @@ public class SynonymLoader {
                 continue;
             }
 
-            if( synonymName!=null && synonymType!=null ) {
+            if( synonymName!=null ) {
 
                 List<TermSynonym> synonyms = dao.getTermSynonyms(termAcc);
                 boolean synonymAlreadyInRgd = false;
@@ -119,8 +127,28 @@ public class SynonymLoader {
         in.close();
 
         System.out.println("lines with issues: "+linesWithIssues);
+        System.out.println("term replacements: "+termReplacements);
         System.out.println("synonyms inserted: "+synonymsInserted);
         System.out.println("synonyms up-to-date: "+synonymsUpToDate);
+    }
+
+    static String qcSynonymType( String synonymType ) {
+
+        switch( synonymType ) {
+            case "broad", "broad_synonym": {
+                return "broad_synonym";
+            }
+            case "exact", "exact_synonym": {
+                return "exact_synonym";
+            }
+            case "narrow", "narrow_synonym": {
+                return "narrow_synonym";
+            }
+            case "related", "related_synonym": {
+                return "related_synonym";
+            }
+            default: return null;
+        }
     }
 
     static String getText(String s) {

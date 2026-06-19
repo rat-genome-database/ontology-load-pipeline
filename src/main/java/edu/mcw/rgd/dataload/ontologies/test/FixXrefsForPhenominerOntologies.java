@@ -3,7 +3,7 @@ package edu.mcw.rgd.dataload.ontologies.test;
 import edu.mcw.rgd.dao.impl.OntologyXDAO;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.datamodel.ontologyx.TermXRef;
-import edu.mcw.rgd.process.FileDownloader;
+import edu.mcw.rgd.process.FileDownloader2;
 import edu.mcw.rgd.process.Utils;
 
 import java.io.BufferedReader;
@@ -19,10 +19,10 @@ public class FixXrefsForPhenominerOntologies {
     public static void main(String[] args) throws Exception {
 
         // load the ontology file
-        String oboFile = "ftp://ftp.rgd.mcw.edu/pub/ontology/experimental_condition/experimental_condition.obo";
+        String oboFile = "https://download.rgd.mcw.edu/ontology/experimental_condition/experimental_condition.obo";
         String ontId = "XCO";
 
-        FileDownloader fd = new FileDownloader();
+        FileDownloader2 fd = new FileDownloader2();
         fd.setExternalFile(oboFile);
         fd.setLocalFile("/tmp/xco.obo");
         String localFile = fd.downloadNew();

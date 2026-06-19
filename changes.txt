@@ -1,3 +1,8 @@
+Jun 19, 2026
+  updated CL ontology source to release v2026-06-08
+  removed unused Apache HTTP/FTP dependencies; finished FileDownloader2 migration
+  SynonymLoader: display number of term replacements in the summary
+
 Jun 15, 2026
   renamed distro from 'OntologyLoad' to 'ontology-load-pipeline'
 
