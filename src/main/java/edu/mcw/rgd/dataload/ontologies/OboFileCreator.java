@@ -452,6 +452,9 @@ public class OboFileCreator {
 
             if( synonymType.equals("xref") ) {
                 buf.append("xref: ").append(synonymName).append("\n");
+            } else if( synonymType.equals("citation_id") ) {
+                // the Citation ID (RRID) is exported as a labeled cross-reference
+                buf.append("xref: ").append(synonymName).append(" \"Citation ID\"\n");
             }
         }
 

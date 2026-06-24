@@ -1,3 +1,6 @@
+Jun 23, 2026
+  OBO file generator: export each strain term's Citation ID as a labeled cross-reference (xref: RRID:... "Citation ID")
+
 Jun 19, 2026
   updated CL ontology source to release v2026-06-08
   removed unused Apache HTTP/FTP dependencies; finished FileDownloader2 migration
