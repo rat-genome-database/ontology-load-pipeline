@@ -1,3 +1,6 @@
+Jun 26, 2026
+  GO taxon constraints: read from go-edit.obo ('is_a: neverin:/onlyin:' relations) after GO removed the never_in_taxon.tsv / only_in_taxon.tsv source files
+
 Jun 23, 2026
   OBO file generator: export each strain term's Citation ID as a labeled cross-reference (xref: RRID:... "Citation ID")
 

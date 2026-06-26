@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ontology-load-pipeline  -- build Jun 19, 2026" />
+        <property name="version" value="ontology-load-pipeline  -- build Jun 26, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -498,11 +498,12 @@
     </bean>
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
-        <property name="version" value="--GO Taxon Constraints   -- build Jun 5, 2026 --" />
+        <property name="version" value="--GO Taxon Constraints   -- build Jun 26, 2026 --" />
 
         <property name="taxonUnionOboFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/ontology/imports/go-taxon-groupings.obo" />
-        <property name="neverInTaxonFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/taxon_constraints/never_in_taxon.tsv" />
-        <property name="onlyInTaxonFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/taxon_constraints/only_in_taxon.tsv" />
+        <!-- GO 'new taxon constraints system' (Jun 2026): never_in_taxon.tsv / only_in_taxon.tsv were
+             removed; constraints are now asserted as 'is_a: neverin:/onlyin:' relations in go-edit.obo -->
+        <property name="goEditOboFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/ontology/go-edit.obo" />
 
         <property name="ratLineage">
             <list>

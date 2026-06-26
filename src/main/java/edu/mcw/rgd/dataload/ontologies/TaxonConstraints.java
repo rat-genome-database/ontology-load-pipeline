@@ -54,8 +54,7 @@ public class TaxonConstraints {
 
     private String version;
     private String taxonUnionOboFile;
-    private String onlyInTaxonFile;
-    private String neverInTaxonFile;
+    private String goEditOboFile;
 
 
     public void run() throws Exception {
@@ -116,21 +115,19 @@ public class TaxonConstraints {
 
     void loadTaxonConstraints() throws Exception {
 
-        int neverInTaxonConstraints = loadConstraints("never_in_taxon", getNeverInTaxonFile());
-        int onlyInTaxonConstraints = loadConstraints("only_in_taxon", getOnlyInTaxonFile());
-
-        logger.info("loaded "+taxonConstraintMap.size()+ " taxon constraints");
-        logger.info("    never_in_taxon constraints: "+neverInTaxonConstraints);
-        logger.info("    only_in_taxon constraints : "+onlyInTaxonConstraints);
-    }
-
-    int loadConstraints(String prefix, String fileName) throws Exception {
-
-        int loadedConstraints = 0;
+        // As of the GO 'new taxon constraints system' (June 2026), the standalone
+        // never_in_taxon.tsv / only_in_taxon.tsv files were removed. Taxon constraints are
+        // now asserted directly in go-edit.obo as 'is_a' relations to materialized classes:
+        //    is_a: neverin:4896                -> never_in_taxon NCBITaxon:4896
+        //    is_a: onlyin:2759                 -> only_in_taxon  NCBITaxon:2759
+        //    is_a: onlyin:Union_0000022        -> only_in_taxon  NCBITaxon_Union:0000022 (expanded later)
+        //    is_a: onlyin:4952 {source="..."}  -> evidence annotation is ignored
+        // The local id is the NCBITaxon id with its prefix dropped; these idspaces are internal
+        // to GO and are not published in the released go.obo, so we read them from go-edit.obo.
 
         FileDownloader2 downloader = new FileDownloader2();
-        downloader.setExternalFile(fileName);
-        downloader.setLocalFile("data/"+prefix+".tsv");
+        downloader.setExternalFile(getGoEditOboFile());
+        downloader.setLocalFile("data/go-edit.obo");
         downloader.setUseCompression(true);
         downloader.setPrependDateStamp(true);
         String localFileName = downloader.downloadNew();
@@ -138,38 +135,64 @@ public class TaxonConstraints {
         BufferedReader reader = Utils.openReader(localFileName);
 
         String line;
+        String goId = null;
+        int neverInTaxonConstraints = 0;
+        int onlyInTaxonConstraints = 0;
 
         while( (line=reader.readLine())!=null ) {
 
-            String[] cols = line.split("[\\t]", -1);
-            if( cols.length<4 ) {
-                continue;
+            if( line.startsWith("[") ) {
+                // start of a new stanza ([Term], [Typedef], [Instance]); reset current term
+                goId = null;
             }
-            String goId = cols[0].trim();
-            String taxon = cols[2];
-            String taxonLabel = cols[3];
-            if( !(goId.startsWith("GO:") && taxon.startsWith("NCBITaxon")) ) {
-                continue;
+            else if( line.startsWith("id: ") ) {
+                goId = line.substring(4).trim();
             }
+            else if( goId!=null && goId.startsWith("GO:") && line.startsWith("is_a: ") ) {
 
-            // format of taxon union ids in obo file and tsv file differs; we must unify them
-            if( taxon.startsWith("NCBITaxon:Union_") ) {
-                taxon = taxon.replace("NCBITaxon:Union_", "NCBITaxon_Union:");
-            }
+                String body = line.substring(6).trim();
 
-            List<String> taxonList = taxonConstraintMap.get(goId);
-            if( taxonList==null ) {
-                taxonList = new ArrayList<>();
-                taxonConstraintMap.put(goId, taxonList);
-            }
+                String prefix;
+                String localId;
+                if( body.startsWith("neverin:") ) {
+                    prefix = "never_in_taxon";
+                    localId = body.substring(8);
+                } else if( body.startsWith("onlyin:") ) {
+                    prefix = "only_in_taxon";
+                    localId = body.substring(7);
+                } else {
+                    continue; // ordinary is_a to a parent GO term
+                }
 
-            String taxonLine = prefix+" "+taxon+" ! "+taxonLabel;
-            taxonList.add(taxonLine);
-            loadedConstraints++;
+                // keep only the id token: drop evidence annotations '{...}' and any obo '! comment'
+                int cut = localId.length();
+                for( int i=0; i<localId.length(); i++ ) {
+                    char c = localId.charAt(i);
+                    if( c==' ' || c=='\t' || c=='{' || c=='!' ) {
+                        cut = i;
+                        break;
+                    }
+                }
+                localId = localId.substring(0, cut).trim();
+
+                String taxon = localId.startsWith("Union_")
+                        ? "NCBITaxon_Union:" + localId.substring(6)
+                        : "NCBITaxon:" + localId;
+
+                List<String> taxonList = taxonConstraintMap.computeIfAbsent(goId, k -> new ArrayList<>());
+                taxonList.add(prefix + " " + taxon);
+                if( prefix.equals("never_in_taxon") ) {
+                    neverInTaxonConstraints++;
+                } else {
+                    onlyInTaxonConstraints++;
+                }
+            }
         }
         reader.close();
 
-        return loadedConstraints;
+        logger.info("loaded taxon constraints for "+taxonConstraintMap.size()+ " GO terms");
+        logger.info("    never_in_taxon constraints: "+neverInTaxonConstraints);
+        logger.info("    only_in_taxon constraints : "+onlyInTaxonConstraints);
     }
 
     void expandTaxonUnions() {
@@ -189,16 +212,17 @@ public class TaxonConstraints {
                             : taxon.startsWith("never_in_taxon") ? "never_in_taxon "
                             : "? ";
 
-                    // extract id of taxon-union
+                    // extract id of taxon-union (the id may run to end-of-line, no trailing label)
                     int pos = taxon.indexOf("NCBITaxon_Union:");
                     int pos2 = taxon.indexOf(" ", pos+16); // 16=strlen("NCBITaxon_Union:")
-                    String taxonUnionId = taxon.substring(pos, pos2);
+                    String taxonUnionId = pos2<0 ? taxon.substring(pos) : taxon.substring(pos, pos2);
+                    String suffix = pos2<0 ? "" : taxon.substring(pos2);
 
                     // expand the union with list of taxons
                     for( String taxonFromUnion: taxonUnionMap.get(taxonUnionId) ) {
                         if( taxonsFromUnions==null )
                             taxonsFromUnions = new ArrayList<>();
-                        taxonsFromUnions.add(relationship + taxonFromUnion + taxon.substring(pos2));
+                        taxonsFromUnions.add(relationship + taxonFromUnion + suffix);
                     }
 
                     // remove union from the GO results
@@ -400,20 +424,12 @@ public class TaxonConstraints {
         return ratLineage;
     }
 
-    public String getOnlyInTaxonFile() {
-        return onlyInTaxonFile;
+    public String getGoEditOboFile() {
+        return goEditOboFile;
     }
 
-    public void setOnlyInTaxonFile(String onlyInTaxonFile) {
-        this.onlyInTaxonFile = onlyInTaxonFile;
-    }
-
-    public String getNeverInTaxonFile() {
-        return neverInTaxonFile;
-    }
-
-    public void setNeverInTaxonFile(String neverInTaxonFile) {
-        this.neverInTaxonFile = neverInTaxonFile;
+    public void setGoEditOboFile(String goEditOboFile) {
+        this.goEditOboFile = goEditOboFile;
     }
 
     public String getTaxonUnionOboFile() {
@@ -466,6 +482,9 @@ public class TaxonConstraints {
             return true;
         pos1 += 10; // go to right after 'NCBITaxon:'
         int pos2 = taxon.indexOf(' ', pos1);
+        if( pos2<0 ) {
+            pos2 = taxon.length(); // taxon id runs to end-of-line (no trailing label)
+        }
         int taxonId = Integer.parseInt(taxon.substring(pos1, pos2));
 
         pos1 = taxon.indexOf(' ');
