@@ -1,4 +1,5 @@
 Jun 26, 2026
+  term stats: compute annotated-object counts with a single grouped query per term instead of one per species/object pair, greatly speeding up the stats step
   GO taxon constraints: read from go-edit.obo ('is_a: neverin:/onlyin:' relations) after GO removed the never_in_taxon.tsv / only_in_taxon.tsv source files
 
 Jun 23, 2026

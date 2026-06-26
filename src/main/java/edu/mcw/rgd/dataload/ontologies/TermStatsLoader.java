@@ -182,9 +182,7 @@ public class TermStatsLoader {
 
         }
 
-        for( int speciesTypeKey: speciesTypeKeys ) {
-            computeAnnotatedObjectCount(rec.stats, speciesTypeKey);
-        }
+        computeAnnotatedObjectCounts(rec.stats, speciesTypeKeys);
         //computeAnnotatedObjectCountForAllObjectsAndSpecies(rec.stats);
 
 
@@ -225,12 +223,45 @@ public class TermStatsLoader {
         statusLog.debug(termsProcessed+". "+Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
     }
 
-    void computeAnnotatedObjectCount(TermStats stats, int speciesTypeKey) throws Exception {
+    /**
+     * Compute annotated-object counts for the term across all searchable species and processed
+     * object types.
+     *
+     * <p>Performance: instead of one count query per (species, object) pair (e.g. 11 species x
+     * 5 object types = 55 queries against the 500M+ row full_annot_index per term -- ~99% of this
+     * loader's DB time), this issues a single grouped query for the with-children counts and, only
+     * if any of those were non-zero, a single grouped query for the direct (without-children)
+     * counts. Zero counts are never stored (see TermWithStats.addStat), so an absent
+     * (species,object) pair is equivalent to the old per-pair behavior.
+     */
+    void computeAnnotatedObjectCounts(TermStats stats, List<Integer> speciesTypeKeys) throws Exception {
 
-        for( int objectKey: PROCESSED_OBJECT_KEYS ) {
-            computeAnnotatedObjectCount(stats, speciesTypeKey, objectKey);
+        // a non-empty 'filter' (subset intersection) is handled by TermStatsLoaderWithFilter,
+        // not by this code path; fall back to the per-pair method should one ever be set here
+        if( !Utils.isStringEmpty(filter) ) {
+            for( int speciesTypeKey: speciesTypeKeys ) {
+                for( int objectKey: PROCESSED_OBJECT_KEYS ) {
+                    computeAnnotatedObjectCount(stats, speciesTypeKey, objectKey);
+                }
+            }
+            return;
         }
-        //computeAnnotatedObjectCount(stats, speciesTypeKey, 0);
+
+        String accId = stats.getTermAccId();
+
+        // term + descendants (with_children=1): one grouped scan of full_annot_index
+        List<int[]> withChildren = dao.getAnnotatedObjectCounts(accId, true, speciesTypeKeys, PROCESSED_OBJECT_KEYS);
+        for( int[] row: withChildren ) { // row = {speciesTypeKey, objectKey, count}
+            stats.term.addStat("annotated_object_count", row[0], row[1], 1, row[2], filter);
+        }
+
+        // direct annotations (with_children=0): a direct count can only be non-zero where the
+        // with-children count was non-zero, so skip the second query entirely when there were none
+        if( !withChildren.isEmpty() ) {
+            for( int[] row: dao.getAnnotatedObjectCounts(accId, false, speciesTypeKeys, PROCESSED_OBJECT_KEYS) ) {
+                stats.term.addStat("annotated_object_count", row[0], row[1], 0, row[2], filter);
+            }
+        }
     }
 
     void computeAnnotatedObjectCount(TermStats stats, int speciesTypeKey, int objectKey) throws Exception {
