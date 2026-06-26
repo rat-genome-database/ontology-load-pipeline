@@ -15,7 +15,7 @@ public class SynonymLoader {
 
     public static void main(String[] args) throws Exception {
 
-        boolean dryRun = true;
+        boolean dryRun = false;
 
         OntologyDAO dao = new OntologyDAO();
         System.out.println(dao.getConnectionInfo());
