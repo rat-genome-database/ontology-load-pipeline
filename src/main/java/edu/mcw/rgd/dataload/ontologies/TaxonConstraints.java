@@ -302,18 +302,13 @@ public class TaxonConstraints {
         List<TermSynonym> synonymsForInsert = ListUtils.subtract(incomingSynonyms, inRgdSynonyms);
         List<TermSynonym> synonymsForDelete = ListUtils.subtract(inRgdSynonyms, incomingSynonyms);
 
-        List<TermSynonym> synonymsMatching = ListUtils.intersection(incomingSynonyms, inRgdSynonyms);
+        // matching synonyms must come from the in-RGD list so they carry SYN_KEY:
+        // updateTermSynonymLastModifiedDate() keys off SYN_KEY, and ListUtils.intersection() returns
+        // elements from whichever input list is larger -- so it cannot be relied on to yield RGD-side
+        // objects. retainAll() keeps the in-RGD objects (with keys) that also occur in the incoming set.
+        List<TermSynonym> synonymsMatching = new ArrayList<>(inRgdSynonyms);
+        synonymsMatching.retainAll(incomingSynonyms);
 
-        // check if matching synonyms have syn_key set
-        int synKeySet = 0;
-        for( TermSynonym tsyn: synonymsMatching ) {
-            if( tsyn.getKey()!=0 ) {
-                synKeySet++;
-            }
-        }
-        if( synKeySet < synonymsMatching.size() ) {
-            throw new Exception("unexpected: matching synonyms in RGD without SYN_KEY set");
-        }
         dao.updateTermSynonymLastModifiedDate(synonymsMatching);
 
         // insert synonyms

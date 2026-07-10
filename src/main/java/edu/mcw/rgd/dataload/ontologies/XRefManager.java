@@ -53,7 +53,12 @@ public class XRefManager {
         List<TermXRef> incomingXRefsList = new ArrayList<>(new HashSet<>(incomingXRefs));
         forInsertXRefs = ListUtils.subtract(incomingXRefsList, inRgdXRefs);
         forDeleteXRefs = ListUtils.subtract(inRgdXRefs, incomingXRefsList);
-        matchingXRefs = ListUtils.intersection(incomingXRefsList, inRgdXRefs);
+        // matchingXRefs must come from the in-RGD list so they carry the DB key and description that
+        // the loop below reads/updates. ListUtils.intersection() returns elements from whichever list
+        // is larger, so it cannot be relied on to yield RGD-side objects. retainAll() keeps the in-RGD
+        // objects that also occur in the incoming set.
+        matchingXRefs = new ArrayList<>(inRgdXRefs);
+        matchingXRefs.retainAll(incomingXRefsList);
 
         // find any xrefs with changed definitions
         for( TermXRef inRgdXRef: matchingXRefs ) {
