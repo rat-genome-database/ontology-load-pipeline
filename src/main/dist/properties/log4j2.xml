@@ -29,6 +29,15 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
         </RollingFile>
+        <RollingFile name="not4curation" append="true" fileName="logs/not4curation.log" filePattern="logs/not4curation.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <File name="not4curation_summary" append="false" fileName="logs/not4curation_summary.log">
+            <PatternLayout pattern="%m%n"/>
+        </File>
         <RollingFile name="malformedRsSynonyms" append="true" fileName="logs/malformedRsSynonyms.log" filePattern="logs/malformedRsSynonyms.log.%d{yyyy-MM}">
             <PatternLayout pattern="[%d] - %m%n"/>
             <Policies>
@@ -143,6 +152,13 @@
         <Logger name="goTaxonConstraints" level="debug" additivity="false">
             <AppenderRef ref="goTaxonConstraints"/>
             <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="not4curation" level="debug" additivity="false">
+            <AppenderRef ref="not4curation"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="not4curation_summary" level="info" additivity="false">
+            <AppenderRef ref="not4curation_summary"/>
         </Logger>
         <Logger name="malformedRsSynonyms" level="debug" additivity="false">
             <AppenderRef ref="malformedRsSynonyms"/>

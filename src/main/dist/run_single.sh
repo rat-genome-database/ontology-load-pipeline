@@ -16,3 +16,15 @@ fi
 cd $APPDIR
 $APPDIR/_run.sh $GO_TAXON_CONSTRAINTS \
   -single_ontology=$1 $2 $3 $4 $5 $6 $7 $8 $9
+
+# email the Not4Curation summary produced by the GO taxon-constraints step;
+# on the production server 'reed' notify both curators, elsewhere notify mtutaj only
+if [ "$1" == "GO" ] && [ -f "$APPDIR/logs/not4curation_summary.log" ]; then
+  SERVER=`hostname -s`
+  if [ "$SERVER" == "reed" ]; then
+    RECIPIENTS="mtutaj@mcw.edu mlkal@mcw.edu"
+  else
+    RECIPIENTS="mtutaj@mcw.edu"
+  fi
+  mailx -s "[$SERVER] GO Not4Curation summary" $RECIPIENTS < $APPDIR/logs/not4curation_summary.log
+fi

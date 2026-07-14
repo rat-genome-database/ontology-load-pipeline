@@ -498,7 +498,7 @@
     </bean>
 
     <bean id="goTaxonConstraints" class="edu.mcw.rgd.dataload.ontologies.TaxonConstraints">
-        <property name="version" value="--GO Taxon Constraints   -- build Jul 10, 2026 --" />
+        <property name="version" value="--GO Taxon Constraints   -- build Jul 14, 2026 --" />
 
         <property name="taxonUnionOboFile" value="https://raw.githubusercontent.com/geneontology/go-ontology/master/src/ontology/imports/go-taxon-groupings.obo" />
         <!-- GO 'new taxon constraints system' (Jun 2026): never_in_taxon.tsv / only_in_taxon.tsv were

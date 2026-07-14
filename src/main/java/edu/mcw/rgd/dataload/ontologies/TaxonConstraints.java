@@ -31,6 +31,8 @@ public class TaxonConstraints {
 
     protected final Logger logger = LogManager.getLogger("goTaxonConstraints");
     protected final Logger logStatus = LogManager.getLogger("status");
+    protected final Logger logNot4Curation = LogManager.getLogger("not4curation");
+    protected final Logger logNot4CurationSummary = LogManager.getLogger("not4curation_summary");
 
     // definitions of taxon unions; example entry
     //[Term]
@@ -51,6 +53,9 @@ public class TaxonConstraints {
     // f.e.
     //  "GO:0007159" ==> { "never_in_taxon NCBITaxon:2 ! Bacteria", "only_in_taxon NCBITaxon:32525"}
     private Map<String, List<String>> taxonConstraintMap = new HashMap<>();
+
+    // GO terms carrying the 'subset: gocheck_obsoletion_candidate' line in go-edit.obo
+    private final Set<String> obsoletionCandidateTerms = new HashSet<>();
 
     private String version;
     private String taxonUnionOboFile;
@@ -148,6 +153,9 @@ public class TaxonConstraints {
             else if( line.startsWith("id: ") ) {
                 goId = line.substring(4).trim();
             }
+            else if( goId!=null && goId.startsWith("GO:") && line.equals("subset: gocheck_obsoletion_candidate") ) {
+                obsoletionCandidateTerms.add(goId);
+            }
             else if( goId!=null && goId.startsWith("GO:") && line.startsWith("is_a: ") ) {
 
                 String body = line.substring(6).trim();
@@ -193,6 +201,7 @@ public class TaxonConstraints {
         logger.info("loaded taxon constraints for "+taxonConstraintMap.size()+ " GO terms");
         logger.info("    never_in_taxon constraints: "+neverInTaxonConstraints);
         logger.info("    only_in_taxon constraints : "+onlyInTaxonConstraints);
+        logger.info("terms with gocheck_obsoletion_candidate subset: "+obsoletionCandidateTerms.size());
     }
 
     void expandTaxonUnions() {
@@ -245,50 +254,66 @@ public class TaxonConstraints {
 
         List<TermSynonym> incomingSynonyms = new ArrayList<>();
 
+        // term acc -> reasons it is tagged Not4Curation ('taxon constraint' and/or 'obsoletion candidate')
+        Map<String, Set<String>> not4CurationReasons = new TreeMap<>();
+
+        // GO terms that violate at least one taxon constraint (their descendants inherit Not4Curation too)
+        Set<String> taxonViolatingGoIds = new HashSet<>();
+
         for( Map.Entry<String, List<String>> entry: this.taxonConstraintMap.entrySet() ) {
 
             String goId = entry.getKey();
             List<String> taxons = entry.getValue();
 
-            // create list of incoming synonyms
+            // create list of incoming only_in_taxon / never_in_taxon synonyms
             for( String taxon: taxons ) {
                 int spacePos = taxon.indexOf(' ');
 
-                // handle only_in_taxon, never_in_taxon synonyms
                 TermSynonym syn = new TermSynonym();
                 syn.setTermAcc(goId);
                 syn.setType(taxon.substring(0, spacePos).trim());
                 syn.setName(taxon.substring(spacePos + 1).trim());
                 addSynonym(incomingSynonyms, syn);
 
-                // handle Not4Curation synonyms
                 if( satisfiesTaxonConstraints(goId, taxon) ) {
                     logStatus.debug("OK: satisfies taxon constraint "+goId+" "+ taxon);
                 } else {
                     logStatus.debug("BAD: not satisfies taxon constraint "+goId+" "+ taxon);
-
-                    syn = new TermSynonym();
-                    syn.setTermAcc(goId);
-                    syn.setType("synonym");
-                    syn.setName("Not4Curation");
-                    addSynonym(incomingSynonyms, syn);
-
-                    List<Term> childTerms = dao.getAllActiveTermDescendants(goId);
-                    for( Term term: childTerms ) {
-                        syn = new TermSynonym();
-                        syn.setTermAcc(term.getAccId());
-                        syn.setType("synonym");
-                        syn.setName("Not4Curation");
-                        addSynonym(incomingSynonyms, syn);
-                    }
+                    taxonViolatingGoIds.add(goId);
                 }
             }
         }
 
-        syncSynonymsWithRgd(incomingSynonyms);
+        // Not4Curation reason 1: a taxon-constraint violation tags the term AND all of its descendants
+        for( String goId: taxonViolatingGoIds ) {
+            addNot4CurationReason(not4CurationReasons, goId, "taxon constraint");
+            for( Term child: dao.getAllActiveTermDescendants(goId) ) {
+                addNot4CurationReason(not4CurationReasons, child.getAccId(), "taxon constraint");
+            }
+        }
+
+        // Not4Curation reason 2: terms flagged 'gocheck_obsoletion_candidate' in go-edit.obo (term only)
+        for( String goId: obsoletionCandidateTerms ) {
+            addNot4CurationReason(not4CurationReasons, goId, "obsoletion candidate");
+        }
+
+        // build a single Not4Curation synonym per tagged term
+        for( String termAcc: not4CurationReasons.keySet() ) {
+            TermSynonym syn = new TermSynonym();
+            syn.setTermAcc(termAcc);
+            syn.setType("synonym");
+            syn.setName("Not4Curation");
+            addSynonym(incomingSynonyms, syn);
+        }
+
+        syncSynonymsWithRgd(incomingSynonyms, not4CurationReasons);
     }
 
-    void syncSynonymsWithRgd(List<TermSynonym> incomingSynonyms) throws Exception {
+    private void addNot4CurationReason(Map<String, Set<String>> reasons, String termAcc, String reason) {
+        reasons.computeIfAbsent(termAcc, k -> new TreeSet<>()).add(reason);
+    }
+
+    void syncSynonymsWithRgd(List<TermSynonym> incomingSynonyms, Map<String, Set<String>> not4CurationReasons) throws Exception {
 
         // load synonyms in RGD
         List<TermSynonym> inRgdSynonyms = new ArrayList<>();
@@ -345,6 +370,88 @@ public class TaxonConstraints {
         printStats("inserted", synonymsInserted);
         printStats("deleted", obsoleteSynonyms);
         printStats("matching", synonymsMatching);
+
+        // report Not4Curation acquisitions / drops (with reasons): detail log + summary email
+        List<TermSynonym> acquiredNot4Curation = filterNot4Curation(synonymsInserted);
+        List<TermSynonym> droppedNot4Curation = filterNot4Curation(obsoleteSynonyms);
+        acquiredNot4Curation.sort(Comparator.comparing(TermSynonym::getTermAcc));
+        droppedNot4Curation.sort(Comparator.comparing(TermSynonym::getTermAcc));
+        logNot4CurationChanges(acquiredNot4Curation, droppedNot4Curation, not4CurationReasons);
+        writeSummaryFile(acquiredNot4Curation, droppedNot4Curation, not4CurationReasons);
+    }
+
+    // append each added/removed Not4Curation xref to not4curation.log (additive, monthly rollover)
+    void logNot4CurationChanges(List<TermSynonym> acquired, List<TermSynonym> dropped,
+                                Map<String, Set<String>> not4CurationReasons) throws Exception {
+        for( TermSynonym syn: acquired ) {
+            logNot4CurationChange("ADDED", syn.getTermAcc(), not4CurationReasons.get(syn.getTermAcc()));
+        }
+        for( TermSynonym syn: dropped ) {
+            // a removed term is no longer tagged, so it carries no current reason
+            logNot4CurationChange("REMOVED", syn.getTermAcc(), not4CurationReasons.get(syn.getTermAcc()));
+        }
+    }
+
+    private void logNot4CurationChange(String action, String termAcc, Set<String> reasons) throws Exception {
+        Term t = dao.getTerm(termAcc);
+        // logged at debug so it lands in not4curation.log only (the Console ref filters at info)
+        logNot4Curation.debug(action + "\t" + termAcc + "\t"
+                + (t!=null ? t.getTerm() : "") + "\t"
+                + (t!=null ? t.getOntologyId() : "") + "\t"
+                + (reasons!=null ? Utils.concatenate(reasons, " + ") : ""));
+    }
+
+    private List<TermSynonym> filterNot4Curation(List<TermSynonym> synonyms) {
+        List<TermSynonym> result = new ArrayList<>();
+        for( TermSynonym syn: synonyms ) {
+            if( "Not4Curation".equals(syn.getName()) ) {
+                result.add(syn);
+            }
+        }
+        return result;
+    }
+
+    // count of distinct GO terms (BP/CC/MF) currently carrying a Not4Curation synonym
+    int countNot4CurationTerms() throws Exception {
+        Set<String> terms = new HashSet<>();
+        for( String ontId: new String[]{"BP", "CC", "MF"} ) {
+            for( TermSynonym syn: dao.getActiveSynonymsByName(ontId, "Not4Curation") ) {
+                terms.add(syn.getTermAcc());
+            }
+        }
+        return terms.size();
+    }
+
+    // write the run summary to logs/not4curation_summary.log (overwritten each run); the run script
+    // mails this file to recipients chosen by server name (both curators on 'reed', else mtutaj only)
+    void writeSummaryFile(List<TermSynonym> acquired, List<TermSynonym> dropped,
+                          Map<String, Set<String>> not4CurationReasons) throws Exception {
+
+        int currentNot4CurationTerms = countNot4CurationTerms();
+
+        // short line to console / status.log
+        logStatus.info("Not4Curation terms: current="+currentNot4CurationTerms
+                +", acquired="+acquired.size()+", dropped="+dropped.size());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("GO Not4Curation summary (taxon constraints + obsoletion candidates)\n");
+        sb.append("=================================================================\n\n");
+        sb.append("Current number of Not4Curation GO terms : ").append(currentNot4CurationTerms).append("\n");
+        sb.append("Newly acquired Not4Curation terms       : ").append(acquired.size()).append("\n");
+        sb.append("Dropped Not4Curation terms              : ").append(dropped.size()).append("\n\n");
+
+        sb.append("Terms that acquired the Not4Curation xref:\n");
+        sb.append("TERM_ACC\tTERM_NAME\tONTOLOGY\tREASON\n");
+        for( TermSynonym syn: acquired ) {
+            Term t = dao.getTerm(syn.getTermAcc());
+            Set<String> reasons = not4CurationReasons.get(syn.getTermAcc());
+            sb.append(syn.getTermAcc()).append('\t')
+              .append(t!=null ? t.getTerm() : "").append('\t')
+              .append(t!=null ? t.getOntologyId() : "").append('\t')
+              .append(reasons!=null ? Utils.concatenate(reasons, " + ") : "").append('\n');
+        }
+
+        logNot4CurationSummary.info(sb.toString());
     }
 
     void printStats(String title, List<TermSynonym> synonyms) {
