@@ -1,5 +1,5 @@
 Jul 14, 2026
-  GO taxon constraints: also tag terms with the gocheck_obsoletion_candidate subset as Not4Curation; log every added/removed Not4Curation xref (with reason) to not4curation.log and write a per-run summary to not4curation_summary.log, mailed by run_single.sh (both curators on 'reed', else mtutaj)
+  GO taxon constraints: also tag terms with the gocheck_obsoletion_candidate subset as Not4Curation; log every added/removed Not4Curation xref (with reason) to not4curation.log and write a per-run summary to not4curation_summary.log, mailed by run_single.sh only when terms were acquired (both curators on 'reed', else mtutaj)
 
 Jul 10, 2026
   fixed size-dependent matching bug in taxon-constraint and xref sync (matched objects could lack their DB key, causing a crash or missed updates)

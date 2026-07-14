@@ -433,6 +433,12 @@ public class TaxonConstraints {
         logStatus.info("Not4Curation terms: current="+currentNot4CurationTerms
                 +", acquired="+acquired.size()+", dropped="+dropped.size());
 
+        // no report unless at least one term acquired the Not4Curation xref; the summary file was
+        // truncated at startup (append=false), so leaving it empty makes run_single.sh skip mailing it
+        if( acquired.isEmpty() ) {
+            return;
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("GO Not4Curation summary (taxon constraints + obsoletion candidates)\n");
         sb.append("=================================================================\n\n");
