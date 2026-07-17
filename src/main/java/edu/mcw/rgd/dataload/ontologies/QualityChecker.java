@@ -76,7 +76,9 @@ public class QualityChecker {
         if( !rec.getTerm().equals(term) ) {
 
             // see if term name has been changed
-            if( !Utils.stringsAreEqual(term.getTerm(), rec.getTerm().getTerm()) ) {
+            //   skip for obsolete terms: they legitimately may have no name, so a blank-vs-null
+            //   difference is not a meaningful change worth reporting
+            if( !rec.getTerm().isObsolete() && !Utils.stringsAreEqual(term.getTerm(), rec.getTerm().getTerm()) ) {
                 logTermNameChanged.info("TERM NAME CHANGED for "+rec.getTerm().getAccId()+" old=["+term.getTerm()+"] new=["+rec.getTerm().getTerm()+"]");
             }
 

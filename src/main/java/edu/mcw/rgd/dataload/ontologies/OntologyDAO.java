@@ -109,10 +109,13 @@ public class OntologyDAO {
     }
 
     private void fixTermName(Term term) {
+        String termName = term.getTerm();
+
         // sometimes terms with null term names are found in database (due to a logic flaw in the pipeline?)
         // so we fix that here: if term name is not given, it will be set to a single space
-        String termName = term.getTerm();
-        if( termName==null || termName.trim().isEmpty() ) {
+        //   obsolete terms are exempt: they legitimately may have no name, so we leave it as-is and
+        //   do not report it (otherwise every run flags a spurious blank-vs-null term name change)
+        if( !term.isObsolete() && (termName==null || termName.trim().isEmpty()) ) {
             term.setTerm(" ");
 
             // log all occurrences of fixed term names to error log
