@@ -283,7 +283,9 @@ public class FileParser {
                         counters.increment(counter);
 
                         String msg = "term "+accId+" skipped, because it does not match ontology prefix "+defaultOntId;
-                        logger.info(msg);
+                        // debug (not info): these are thousands of per-term lines -- keep them in file_parser.log
+                        // but out of the console/summary email; the per-prefix skip count is reported via counters
+                        logger.debug(msg);
                         rec = null; // to skip this term
                         continue;
                     }
