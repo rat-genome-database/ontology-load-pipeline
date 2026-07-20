@@ -382,6 +382,30 @@ public class OntologyDAO {
         return uniqueEfoIds;
     }
 
+    /**
+     * distinct OBA ids used as trait ids in the GWAS catalog (column GWAS_CATALOG.efo_ids).
+     * OBA:VT... ids are excluded on purpose: they carry a VT id directly (OBA:VT0001253 -> VT:0001253)
+     * and so need no name-based mapping.
+     * @return set of OBA accession ids (e.g. OBA:2040171), never the OBA:VT... ones
+     */
+    public Collection<String> getObaIdsFromGWAS() throws Exception {
+        String sql = "SELECT DISTINCT efo_ids FROM GWAS_CATALOG";
+        List<String> rows = StringListQuery.execute(dao, sql);
+        Set<String> obaIds = new HashSet<>();
+        for( String s: rows ) {
+            if( s==null ) {
+                continue;
+            }
+            for( String id: s.split("[,]") ) {
+                String id2 = id.trim().replace("_", ":");
+                if( id2.startsWith("OBA:") && !id2.startsWith("OBA:VT") ) {
+                    obaIds.add(id2);
+                }
+            }
+        }
+        return obaIds;
+    }
+
     public List<Integer> getAnnotatedObjectIds(String accId, boolean withChildren, int speciesTypeKey, int objectKey) throws Exception {
         return annotDAO.getAnnotatedObjectIds(accId, withChildren, speciesTypeKey, objectKey);
     }

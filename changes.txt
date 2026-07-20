@@ -1,3 +1,6 @@
+Jul 20, 2026
+  added OBAMapper (test utility): maps OBA terms used in the GWAS catalog to VT/CMO by exact/partial term-name matching, writing a curator-review report
+
 Jul 17, 2026
   obsolete terms with no name: stopped reporting spurious blank-vs-null term name changes and 'has no term name' warnings
   added OBA to list of ontologies processed weekly
