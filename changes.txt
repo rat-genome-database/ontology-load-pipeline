@@ -1,3 +1,6 @@
+Jul 28, 2026
+  GO ontology source: changed to https://current.geneontology.org/ontology/go-basic.obo
+
 Jul 20, 2026
   file parser: moved the per-term 'skipped, does not match ontology prefix' message from the summary email to file_parser.log (the per-prefix count is still summarized)
   added OBAMapper (test utility): maps OBA terms used in the GWAS catalog to VT/CMO by exact/partial term-name matching, writing a curator-review report

@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ontology-load-pipeline  -- build Jul 20, 2026" />
+        <property name="version" value="ontology-load-pipeline  -- build Jul 28, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -16,8 +16,8 @@
                      points to a monthly stable release of go.obo
                 <entry key="GO" value="http://purl.obolibrary.org/obo/go/go-basic.obo"/>
                 -->
-                <!-- daily snapshot release of go.obo, go-basic.obo -->
-                <entry key="GO" value="http://purl.obolibrary.org/obo/go/snapshot/go-basic.obo"/>
+                <!-- current release of go.obo, go-basic.obo -->
+                <entry key="GO" value="https://current.geneontology.org/ontology/go-basic.obo"/>
 
                 <entry key="MP" value="http://www.informatics.jax.org/downloads/reports/MPheno_OBO.ontology"/>
                 <!--<entry key="MP" value="https://build.obolibrary.io/job/obofoundry/job/pipeline-mp/job/master/lastSuccessfulBuild/artifact/src/ontology/mp.obo"/>-->
