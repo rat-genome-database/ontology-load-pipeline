@@ -1,5 +1,7 @@
 Jul 28, 2026
   GO ontology source: changed to https://current.geneontology.org/ontology/go-basic.obo
+  stats loader: added flag useFineGrainedDebug, by default set to false, to prevent generation of massive dbg output
+                in details.log
 
 Jul 20, 2026
   file parser: moved the per-term 'skipped, does not match ontology prefix' message from the summary email to file_parser.log (the per-prefix count is still summarized)

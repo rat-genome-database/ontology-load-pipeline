@@ -22,6 +22,8 @@ public class TermStatsLoader {
     private PhenominerDAO phenominerDAO = new PhenominerDAO();
     private String filter = "";
 
+    private boolean useFineGrainedDebug = false;
+
     private int maxThreadCount;
 
     static int[] phenoSpeciesTypeKeys = new int[]{SpeciesType.RAT, SpeciesType.CHINCHILLA};
@@ -157,7 +159,9 @@ public class TermStatsLoader {
         String accId = rec.stats.getTermAccId();
 
         long time0 = System.currentTimeMillis();
-        statusLog.debug(Thread.currentThread().getName() + " " + accId + " START");
+        if( useFineGrainedDebug ) {
+            statusLog.debug(Thread.currentThread().getName() + " " + accId + " START");
+        }
 
         if (getFilter() == null) {
 
@@ -195,7 +199,9 @@ public class TermStatsLoader {
         }
 
         if (!matched) {
-            statusLog.debug(Thread.currentThread().getName()+"  "+rec.stats.getTermAccId()+" LOAD");
+            if( useFineGrainedDebug ) {
+                statusLog.debug(Thread.currentThread().getName() + "  " + rec.stats.getTermAccId() + " LOAD");
+            }
 
             dao.updateTermStats(rec.stats);
 
@@ -213,14 +219,18 @@ public class TermStatsLoader {
             }
         }
         else {
-            statusLog.debug(Thread.currentThread().getName()+"  "+rec.stats.getTermAccId()+" MATCH");
+            if( useFineGrainedDebug ) {
+                statusLog.debug(Thread.currentThread().getName() + "  " + rec.stats.getTermAccId() + " MATCH");
+            }
 
             counters.increment("TERMS_WITH_STATS_MATCHED");
         }
 
         int termsProcessed = counters.increment("TERMS_PROCESSED");
-        long time1 = System.currentTimeMillis();
-        statusLog.debug(termsProcessed+". "+Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
+        if( useFineGrainedDebug ) {
+            long time1 = System.currentTimeMillis();
+            statusLog.debug(termsProcessed + ". " + Thread.currentThread().getName() + "  " + accId + " STOP " + (time1 - time0) + " ms");
+        }
     }
 
     /**
