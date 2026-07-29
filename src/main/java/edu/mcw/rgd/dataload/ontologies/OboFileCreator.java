@@ -17,6 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * read data from given ontology and create a obo file
  * Note: If an ontology has synonyms of type 'display_synonym', OBO file header
  *   will contain a line 'synonymtypedef: DISPLAY_SYNONYM ...'
+ * Note: the [Typedef] stanzas closing the file come from the 'typedefs' property.
+ *   They used to be copied verbatim out of the previously published file, which made
+ *   them impossible to correct: a bad value simply propagated into every later release.
  */
 public class OboFileCreator {
 
@@ -32,6 +35,7 @@ public class OboFileCreator {
     private String outDir;
     private String version;
     private Map<String,String> versionedFiles;
+    private Map<String,String> typedefs;
     private Set<String> emitObsoleteTermsFor;
     private Map<String,String> curatorNames;
     private boolean versionStringWritten = false;
@@ -72,10 +76,11 @@ public class OboFileCreator {
         spacesInDbXrefsReplaced.set(0);
 
         StringBuffer versionedTerms = new StringBuffer();
-        StringBuffer fileTrailer = new StringBuffer();
+        StringBuffer publishedTypedefs = new StringBuffer();
         StringBuffer outFileName = new StringBuffer();
 
-        String dataVersion = getDataVersion(ontId, versionedTerms, fileTrailer, outFileName);
+        String typedefsBlock = getTypedefsFor(ontId);
+        String dataVersion = getDataVersion(ontId, versionedTerms, publishedTypedefs, outFileName);
         StringBuffer oboHeader = initOboHeader(dataVersion);
 
         StringBuffer subsetDefs = new StringBuffer();
@@ -134,8 +139,9 @@ public class OboFileCreator {
             termsBuf.append(rec.oboText);
         }
 
-        // see if generated terms are the same as in the versioned file
-        if( termsBuf.toString().equals(versionedTerms.toString()) ) {
+        // see if generated terms and typedefs are the same as in the versioned file
+        if( termsBuf.toString().equals(versionedTerms.toString())
+                && typedefsBlock.equals(publishedTypedefs.toString()) ) {
             System.out.println(getOntId()+": "+terms.size()+" terms the same -- nothing written");
             return;
         }
@@ -163,7 +169,7 @@ public class OboFileCreator {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(getOutFileName())));
         writer.println(oboHeader);
         writer.print(termsBuf);
-        writer.print(fileTrailer);
+        writer.print(typedefsBlock);
 
         writer.close();
 
@@ -274,7 +280,7 @@ public class OboFileCreator {
         }
     }
 
-    String getDataVersion(String ontId, StringBuffer versionedFileTerms, StringBuffer fileTrailer, StringBuffer outFileName) throws Exception {
+    String getDataVersion(String ontId, StringBuffer versionedFileTerms, StringBuffer publishedTypedefs, StringBuffer outFileName) throws Exception {
 
         String versionedFile = getVersionedFiles().get(ontId);
         if( versionedFile==null ) {
@@ -318,10 +324,11 @@ public class OboFileCreator {
             versionedFileTerms.append(line).append('\n');
         }
 
-        // load file trailer
+        // load the [Typedef] stanzas of the published file; they are read only to detect
+        // changes -- what gets written out always comes from the 'typedefs' property
         if( line!=null )
         do {
-            fileTrailer.append(line).append("\n");
+            publishedTypedefs.append(line).append("\n");
             line = in.readLine();
         } while( line!=null );
         in.close();
@@ -665,6 +672,29 @@ public class OboFileCreator {
 
     public Map<String,String> getVersionedFiles() {
         return versionedFiles;
+    }
+
+    public void setTypedefs(Map<String,String> typedefs) {
+        this.typedefs = typedefs;
+    }
+
+    public Map<String,String> getTypedefs() {
+        return typedefs;
+    }
+
+    /**
+     * the [Typedef] stanzas to be appended to the generated file, as configured for this ontology;
+     * an ontology without any typedefs must still be configured, with an empty value -- a missing
+     * entry is a configuration error and aborts generation rather than silently publishing a file
+     * that has lost its typedefs
+     */
+    String getTypedefsFor(String ontId) throws Exception {
+        String block = typedefs==null ? null : typedefs.get(ontId);
+        if( block==null ) {
+            throw new Exception("no 'typedefs' entry configured for ontology "+ontId
+                    +"; add one to the oboFileGenerator bean (empty value if it has no typedefs)");
+        }
+        return block;
     }
 
     public void setEmitObsoleteTermsFor(Set<String> emitObsoleteTermsFor) {

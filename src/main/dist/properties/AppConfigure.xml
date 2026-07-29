@@ -2,7 +2,7 @@
 <beans>
 
 	<bean id="manager" class="edu.mcw.rgd.dataload.ontologies.Manager">
-        <property name="version" value="ontology-load-pipeline  -- build Jul 28, 2026" />
+        <property name="version" value="ontology-load-pipeline  -- build Jul 29, 2026" />
 
         <!-- for security reasons, actual value of the API KEY should not be stored in public github code -->
         <property name="apiKeyFile" value="properties/api.key"/>
@@ -454,7 +454,7 @@
     </bean>
 
     <bean id="oboFileGenerator" class="edu.mcw.rgd.dataload.ontologies.OboFileCreator">
-        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2026-06-23 --" />
+        <property name="version" value="--RGD OBO FILE GENERATOR -- build 2026-07-29 --" />
         <property name="versionedFiles">
             <map>
                 <entry key="PW" value="https://download.rgd.mcw.edu/ontology/pathway/pathway.obo"/>
@@ -463,6 +463,64 @@
                 <entry key="XCO" value="https://download.rgd.mcw.edu/ontology/experimental_condition/experimental_condition.obo"/>
                 <entry key="RDO" value="https://download.rgd.mcw.edu/ontology/disease/RDO.obo"/>
                 <entry key="RS" value="https://download.rgd.mcw.edu/ontology/rat_strain/rat_strain.obo"/>
+            </map>
+        </property>
+        <!-- [Typedef] stanzas appended to each generated obo file. Every ontology listed in
+             'versionedFiles' must appear here; an ontology with no typedefs (RDO) gets an empty
+             value, while a missing entry aborts generation. The text is written out verbatim,
+             so the stanzas below must stay flush against the left margin.
+             NOTE: these used to be carried over from the previously published file, which meant
+             a wrong value could never be corrected: it just kept being copied forward. -->
+        <property name="typedefs">
+            <map>
+                <entry key="PW"><value>[Typedef]
+id: part_of
+name: part_of
+
+</value></entry>
+                <entry key="CMO"><value>[Typedef]
+id: part_of
+name: part_of
+is_transitive: true
+
+</value></entry>
+                <entry key="MMO"><value>[Typedef]
+id: OBO_REL:part_of
+name: part_of
+created_by: mshimoyama
+creation_date: 2010-08-05T01:45:43Z
+
+</value></entry>
+                <entry key="XCO"><value>[Typedef]
+id: has_component
+name: has_component
+xref: RO:0002180
+created_by: JSmith
+creation_date: 2014-03-07T11:34:22Z
+
+[Typedef]
+id: has_part
+name: has_part
+xref: BFO:0000051
+is_transitive: true
+created_by: JSmith
+creation_date: 2014-03-07T11:32:23Z
+
+[Typedef]
+id: part_of
+name: part_of
+xref: BFO:0000050
+is_transitive: true
+
+</value></entry>
+                <entry key="RDO" value=""/>
+                <entry key="RS"><value>[Typedef]
+id: part_of
+name: part_of
+created_by: RNigam
+creation_date: 2009-12-10T01:06:32Z
+
+</value></entry>
             </map>
         </property>
         <property name="emitObsoleteTermsFor">

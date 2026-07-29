@@ -1,3 +1,7 @@
+Jul 29, 2026
+  OBO file generator: [Typedef] stanzas are now taken from the new 'typedefs' property instead of being carried
+    over from the previously published file; fixed the XCO has_component xref (RO:0002211 -> RO:0002180)
+
 Jul 28, 2026
   GO ontology source: changed to https://current.geneontology.org/ontology/go-basic.obo
   stats loader: added flag useFineGrainedDebug, by default set to false, to prevent generation of massive dbg output
