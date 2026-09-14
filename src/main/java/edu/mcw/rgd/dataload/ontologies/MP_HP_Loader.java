@@ -112,7 +112,7 @@ public class MP_HP_Loader {
             TermSynonym synIncoming = new TermSynonym();
             synIncoming.setTermAcc( mpTermAcc );
             synIncoming.setCreatedDate(mappingDate);
-            synIncoming.setType( getSynonymType(cols[col_predicate_id]) );
+            synIncoming.setType( getSynonymType(cols[col_predicate_id], counters) );
             synIncoming.setSource(getSource());
             synIncoming.setName( cols[col_object_label] );
             synIncoming.setDbXrefs( hpTermAcc );
@@ -219,9 +219,16 @@ public class MP_HP_Loader {
         }
     }
 
-    String getSynonymType( String predicateId ) {
+    /// map an SSSOM predicate to an RGD synonym type, per the 'synonymTypes' bean property;
+    /// a predicate missing from the map falls back to the scopeless type 'synonym' -- and is reported,
+    /// so that new upstream predicates (f.e. the semapv cross-species family) do not degrade silently
+    String getSynonymType( String predicateId, CounterPool counters ) {
         String synonymType = getSynonymTypes().get(predicateId);
-        return synonymType!=null ? synonymType : "synonym";
+        if( synonymType==null ) {
+            counters.increment("WARNING! UNEXPECTED PREDICATE (mapped to scopeless 'synonym'): "+predicateId);
+            return "synonym";
+        }
+        return synonymType;
     }
 
     public String getSource() {

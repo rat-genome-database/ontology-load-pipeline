@@ -3,7 +3,8 @@ Sep 14, 2026
     with the MP accession (source MP2HP), so the Ontology Browser links the mapping from either side
   MP_HP_Loader converted to a spring module: properties (source, sssom file url, synonym-type mappings)
     moved to the 'mpHpLoader' bean in AppConfigure.xml; runnable via '-mp_hp_mappings' cmdline arg
-    and the new load_mp_hp_mappings.sh script, same as the efo_xrefs module
+    and the new load_mp_hp_mappings.sh script, same as the efo_xrefs module; unexpected SSSOM predicates
+    are reported in the counters instead of silently degrading; semapv cross-species predicates supported
 
 Jul 29, 2026
   OBO file generator: [Typedef] stanzas are now taken from the new 'typedefs' property instead of being carried

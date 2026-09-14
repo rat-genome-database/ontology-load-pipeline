@@ -621,13 +621,22 @@ creation_date: 2009-12-10T01:06:32Z
         <property name="source" value="MP2HP"/><!-- ONT_SYNONYMS.SOURCE for all synonyms managed by this module -->
         <property name="sssomFileUrl" value="https://raw.githubusercontent.com/mapping-commons/mh_mapping_initiative/master/mappings/mp_hp_mgi_all.sssom.tsv"/>
         <property name="localFile" value="data/mp_hp_mgi_all.sssom.tsv"/>
-        <property name="synonymTypes"><!-- SSSOM predicate id -> RGD synonym type; unlisted predicates map to 'synonym' -->
+        <property name="synonymTypes"><!-- SSSOM predicate id -> RGD synonym type;
+             unlisted predicates map to scopeless 'synonym' and are reported in the counters.
+             note: SKOS/semapv broad/narrow scopes apply as-is because the file is MP-subject/HP-object
+             and the synonyms are created on the MP term -->
             <map>
                 <entry key="skos:exactMatch" value="exact_synonym"/>
                 <entry key="skos:narrowMatch" value="narrow_synonym"/>
                 <entry key="skos:broadMatch" value="broad_synonym"/>
                 <entry key="skos:relatedMatch" value="related_synonym"/>
                 <entry key="skos:closeMatch" value="related_synonym"/>
+                <!-- semapv cross-species mapping predicates, recommended for MP-HP mappings -->
+                <entry key="semapv:crossSpeciesExactMatch" value="exact_synonym"/>
+                <entry key="semapv:crossSpeciesNarrowMatch" value="narrow_synonym"/>
+                <entry key="semapv:crossSpeciesBroadMatch" value="broad_synonym"/>
+                <entry key="semapv:crossSpeciesRelatedMatch" value="related_synonym"/>
+                <entry key="semapv:crossSpeciesCloseMatch" value="related_synonym"/>
             </map>
         </property>
     </bean>
