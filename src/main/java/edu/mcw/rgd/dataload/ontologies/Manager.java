@@ -65,6 +65,7 @@ public class Manager {
         boolean sssomGenerator = false;
         String sssomFile = null;
         boolean generateEfoXrefs = false;
+        boolean loadMpHpMappings = false;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -107,6 +108,8 @@ public class Manager {
                 sssomFile = arg.substring(12);
             } else if (arg.startsWith("-efo_xrefs")) {
                 generateEfoXrefs = true;
+            } else if (arg.startsWith("-mp_hp_mappings")) {
+                loadMpHpMappings = true;
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -184,6 +187,11 @@ public class Manager {
             EfoXrefCreator efoXrefCreator = (EfoXrefCreator) bf.getBean("efoXrefGenerator");
             efoXrefCreator.run();
         }
+
+        if( loadMpHpMappings ) {
+            MP_HP_Loader mpHpLoader = (MP_HP_Loader) bf.getBean("mpHpLoader");
+            mpHpLoader.run();
+        }
     }
 
     /**
@@ -208,6 +216,8 @@ public class Manager {
                -qc_thread_count=?    specify count of qc threads; default is 5
                                      f.e. '-qc_thread_count=2'
                -update_ps_do_custom_mappings update OMIM_PS_DO_CUSTOM table
+               -mp_hp_mappings       load MP-HP mappings from the MGI SSSOM mapping file:
+                                     xref + typed synonyms on MP terms, reciprocal xrefs on HP terms
                -?                    print usage and exit
                -help                 print usage and exit
                --help                print usage and exit

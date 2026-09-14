@@ -11,11 +11,19 @@ import java.io.BufferedReader;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * loads MP-HP mappings from the MGI SSSOM mapping file: every mapping gets an 'xref' synonym and a typed
+ * label synonym on the MP term, and a reciprocal 'xref' synonym on the HP term, so the Ontology Browser
+ * links the mapping from either side; properties are configured in the 'mpHpLoader' bean in AppConfigure.xml
+ */
 public class MP_HP_Loader {
 
-    public static String SOURCE = "MP2HP";
+    private String source;
+    private String sssomFileUrl;
+    private String localFile;
+    private Map<String,String> synonymTypes;
 
-    public static void main( String[] args ) throws Exception {
+    public void run() throws Exception {
 
         int col_object_id = -1;
         int col_object_label = -1;
@@ -29,19 +37,17 @@ public class MP_HP_Loader {
         int col_comment = -1;
         int col_other = -1;
 
-        String url = "https://raw.githubusercontent.com/mapping-commons/mh_mapping_initiative/master/mappings/mp_hp_mgi_all.sssom.tsv";
-
         FileDownloader2 fd = new FileDownloader2();
-        fd.setExternalFile(url);
-        fd.setLocalFile("data/mp_hp_mgi_all.sssom.tsv");
-        String localFile = fd.downloadNew();
+        fd.setExternalFile(getSssomFileUrl());
+        fd.setLocalFile(getLocalFile());
+        String downloadedFile = fd.downloadNew();
 
         // 1st two data lines
         //object_id	object_label	predicate_id	confidence	subject_id	subject_label	mapping_justification	author_id	mapping_date	comment	other
         //HP:0000016	Urinary retention	skos:exactMatch	1	MP:0003622	ischuria	semapv:ManualMappingCuration	orcid:0000-0003-4606-0597	2022-08-02	scoliosis
 
         String[] fields = null;
-        BufferedReader in = Utils.openReader(localFile);
+        BufferedReader in = Utils.openReader(downloadedFile);
         String line;
         while( (line=in.readLine())!=null ) {
             // skip lines starting with '#'
@@ -99,7 +105,7 @@ public class MP_HP_Loader {
             xrefIncoming.setTermAcc( mpTermAcc );
             xrefIncoming.setCreatedDate(mappingDate);
             xrefIncoming.setType("xref");
-            xrefIncoming.setSource(SOURCE);
+            xrefIncoming.setSource(getSource());
             xrefIncoming.setName( hpTermAcc );
             incomingList.add(xrefIncoming);
 
@@ -107,7 +113,7 @@ public class MP_HP_Loader {
             synIncoming.setTermAcc( mpTermAcc );
             synIncoming.setCreatedDate(mappingDate);
             synIncoming.setType( getSynonymType(cols[col_predicate_id]) );
-            synIncoming.setSource(SOURCE);
+            synIncoming.setSource(getSource());
             synIncoming.setName( cols[col_object_label] );
             synIncoming.setDbXrefs( hpTermAcc );
             incomingList.add(synIncoming);
@@ -123,7 +129,7 @@ public class MP_HP_Loader {
             xrefReciprocal.setTermAcc( hpTermAcc );
             xrefReciprocal.setCreatedDate(mappingDate);
             xrefReciprocal.setType("xref");
-            xrefReciprocal.setSource(SOURCE);
+            xrefReciprocal.setSource(getSource());
             xrefReciprocal.setName( mpTermAcc );
             incomingHpList.add(xrefReciprocal);
         }
@@ -136,7 +142,7 @@ public class MP_HP_Loader {
         System.out.println(counters.dumpAlphabetically());
     }
 
-    static void qcAndLoad( CounterPool counters, Map<String, Set<TermSynonym>> incomingSynonyms, String ontId ) throws Exception {
+    void qcAndLoad( CounterPool counters, Map<String, Set<TermSynonym>> incomingSynonyms, String ontId ) throws Exception {
 
         Date dateStart = new Date();
 
@@ -184,18 +190,18 @@ public class MP_HP_Loader {
                 if( !matchingSynonyms.isEmpty() ) {
 
                     List<TermSynonym> matchingSynonyms2 = new ArrayList<>(matchingSynonyms);
-                    matchingSynonyms2.removeIf( tsyn -> !tsyn.getSource().equals(SOURCE) );
+                    matchingSynonyms2.removeIf( tsyn -> !tsyn.getSource().equals(getSource()) );
 
                     if( !matchingSynonyms2.isEmpty() ) {
                         dao.updateTermSynonymLastModifiedDate(matchingSynonyms2);
                         counters.add(ontId+"_SYNONYMS_LASTMODIFIEDDATE_UPDATED", matchingSynonyms2.size());
                     }
 
-                    counters.add(ontId+"_SYNONYMS_MATCHING_SOURCE_OTHER_THAN_"+SOURCE, matchingSynonyms.size() - matchingSynonyms2.size());
+                    counters.add(ontId+"_SYNONYMS_MATCHING_SOURCE_OTHER_THAN_"+getSource(), matchingSynonyms.size() - matchingSynonyms2.size());
                 }
 
                 for( TermSynonym tsyn: toBeInsertedSynonyms ) {
-                    dao.insertTermSynonym(tsyn, SOURCE);
+                    dao.insertTermSynonym(tsyn, getSource());
                     counters.increment(ontId+"_SYNONYMS_INSERTED");
                 }
 
@@ -206,35 +212,47 @@ public class MP_HP_Loader {
         });
 
 
-        List<TermSynonym> obsoleteTermSynonyms = dao.getTermSynonymsModifiedBefore(ontId, SOURCE, dateStart );
+        List<TermSynonym> obsoleteTermSynonyms = dao.getTermSynonymsModifiedBefore(ontId, getSource(), dateStart );
         if( !obsoleteTermSynonyms.isEmpty() ) {
             dao.deleteTermSynonyms(obsoleteTermSynonyms);
             counters.add(ontId+"_SYNONYMS_DELETED", obsoleteTermSynonyms.size());
         }
     }
 
-    static String getSynonymType( String predicateId ) {
-        return switch (predicateId) {
-            case "skos:exactMatch" -> "exact_synonym";
-            case "skos:narrowMatch" -> "narrow_synonym";
-            case "skos:broadMatch" -> "broad_synonym";
-            case "skos:relatedMatch" -> "related_synonym";
-            case "skos:closeMatch" -> "related_synonym";
-            default -> "synonym";
-        };
+    String getSynonymType( String predicateId ) {
+        String synonymType = getSynonymTypes().get(predicateId);
+        return synonymType!=null ? synonymType : "synonym";
     }
 
-    class SssomInfo {
-        public String object_id;
-        public String object_label;
-        public String predicate_id;
-        public String confidence;
-        public String subject_id;
-        public String subject_label;
-        public String mapping_justification;
-        public String author_id;
-        public String mapping_date;
-        public String comment;
-        public String other;
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSssomFileUrl() {
+        return sssomFileUrl;
+    }
+
+    public void setSssomFileUrl(String sssomFileUrl) {
+        this.sssomFileUrl = sssomFileUrl;
+    }
+
+    public String getLocalFile() {
+        return localFile;
+    }
+
+    public void setLocalFile(String localFile) {
+        this.localFile = localFile;
+    }
+
+    public Map<String,String> getSynonymTypes() {
+        return synonymTypes;
+    }
+
+    public void setSynonymTypes(Map<String,String> synonymTypes) {
+        this.synonymTypes = synonymTypes;
     }
 }
