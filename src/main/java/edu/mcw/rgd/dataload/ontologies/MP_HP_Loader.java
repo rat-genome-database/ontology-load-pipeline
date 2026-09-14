@@ -77,7 +77,8 @@ public class MP_HP_Loader {
 
         // process data lines
 
-        Map<String, Set<TermSynonym>> incomingSynonyms = new HashMap<>();
+        Map<String, Set<TermSynonym>> incomingMpSynonyms = new HashMap<>();
+        Map<String, Set<TermSynonym>> incomingHpSynonyms = new HashMap<>();
 
         while( (line=in.readLine())!=null ) {
 
@@ -88,10 +89,10 @@ public class MP_HP_Loader {
             String hpTermAcc = cols[col_object_id];
             Date mappingDate = sdf.parse( cols[col_mapping_date] );
 
-            Set<TermSynonym> incomingList = incomingSynonyms.get(mpTermAcc);
+            Set<TermSynonym> incomingList = incomingMpSynonyms.get(mpTermAcc);
             if( incomingList==null ) {
                 incomingList = new HashSet<>();
-                incomingSynonyms.put(mpTermAcc, incomingList);
+                incomingMpSynonyms.put(mpTermAcc, incomingList);
             }
 
             TermSynonym xrefIncoming = new TermSynonym();
@@ -110,14 +111,32 @@ public class MP_HP_Loader {
             synIncoming.setName( cols[col_object_label] );
             synIncoming.setDbXrefs( hpTermAcc );
             incomingList.add(synIncoming);
+
+            // reciprocal xref on the HP term, so users can navigate the mapping from either side
+            Set<TermSynonym> incomingHpList = incomingHpSynonyms.get(hpTermAcc);
+            if( incomingHpList==null ) {
+                incomingHpList = new HashSet<>();
+                incomingHpSynonyms.put(hpTermAcc, incomingHpList);
+            }
+
+            TermSynonym xrefReciprocal = new TermSynonym();
+            xrefReciprocal.setTermAcc( hpTermAcc );
+            xrefReciprocal.setCreatedDate(mappingDate);
+            xrefReciprocal.setType("xref");
+            xrefReciprocal.setSource(SOURCE);
+            xrefReciprocal.setName( mpTermAcc );
+            incomingHpList.add(xrefReciprocal);
         }
 
         in.close();
 
-        qcAndLoad( counters, incomingSynonyms );
+        qcAndLoad( counters, incomingMpSynonyms, "MP" );
+        qcAndLoad( counters, incomingHpSynonyms, "HP" );
+
+        System.out.println(counters.dumpAlphabetically());
     }
 
-    static void qcAndLoad( CounterPool counters, Map<String, Set<TermSynonym>> incomingSynonyms ) throws Exception {
+    static void qcAndLoad( CounterPool counters, Map<String, Set<TermSynonym>> incomingSynonyms, String ontId ) throws Exception {
 
         Date dateStart = new Date();
 
@@ -125,7 +144,7 @@ public class MP_HP_Loader {
 
         incomingSynonyms.entrySet().stream().forEach( entry -> {
 
-            String mpTermAcc = entry.getKey();
+            String termAcc = entry.getKey();
             Set<TermSynonym> synonyms = entry.getValue();
             List<TermSynonym> synonymsInRgd = null;
 
@@ -134,29 +153,29 @@ public class MP_HP_Loader {
 
             try {
                 // some terms could be obsolete: replace them with equivalents
-                Term mpTerm = dao.getTerm(mpTermAcc);
-                if( mpTerm==null || mpTerm.isObsolete() ) {
-                    List<Term> terms = dao.getTermsBySynonym("MP", mpTermAcc);
+                Term term = dao.getTerm(termAcc);
+                if( term==null || term.isObsolete() ) {
+                    List<Term> terms = dao.getTermsBySynonym(ontId, termAcc);
                     terms.removeIf( t -> t.isObsolete() );
                     if( terms.isEmpty() ) {
-                        counters.increment("WARNING! TERM NOT IN RGD: "+mpTermAcc);
+                        counters.increment("WARNING! TERM NOT IN RGD: "+termAcc);
                         return;
                     }
                     if( terms.size()>1 ) {
-                        counters.increment("WARNING! MULTIPLE TERMS MATCHING OBSOLETE TERM: "+mpTermAcc);
+                        counters.increment("WARNING! MULTIPLE TERMS MATCHING OBSOLETE TERM: "+termAcc);
                         return;
                     }
 
                     Term newTerm = terms.get(0);
-                    counters.increment("WARNING! OBSOLETE TERM ["+mpTermAcc+"] replaced with active term ["+newTerm.getAccId()+"]");
+                    counters.increment("WARNING! OBSOLETE TERM ["+termAcc+"] replaced with active term ["+newTerm.getAccId()+"]");
 
-                    mpTermAcc = newTerm.getAccId();
+                    termAcc = newTerm.getAccId();
                     for( TermSynonym tsyn: synonyms ) {
-                        tsyn.setTermAcc(mpTermAcc);
+                        tsyn.setTermAcc(termAcc);
                     }
                 }
 
-                synonymsInRgd = dao.getTermSynonyms(mpTermAcc);
+                synonymsInRgd = dao.getTermSynonyms(termAcc);
 
                 matchingSynonyms = CollectionUtils.intersection(synonymsInRgd, synonyms);
                 toBeInsertedSynonyms = CollectionUtils.subtract(synonyms, synonymsInRgd);
@@ -169,15 +188,15 @@ public class MP_HP_Loader {
 
                     if( !matchingSynonyms2.isEmpty() ) {
                         dao.updateTermSynonymLastModifiedDate(matchingSynonyms2);
-                        counters.add("SYNONYMS_LASTMODIFIEDDATE_UPDATED", matchingSynonyms2.size());
+                        counters.add(ontId+"_SYNONYMS_LASTMODIFIEDDATE_UPDATED", matchingSynonyms2.size());
                     }
 
-                    counters.add("SYNONYMS_MATCHING_SOURCE_OTHER_THAN_"+SOURCE, matchingSynonyms.size() - matchingSynonyms2.size());
+                    counters.add(ontId+"_SYNONYMS_MATCHING_SOURCE_OTHER_THAN_"+SOURCE, matchingSynonyms.size() - matchingSynonyms2.size());
                 }
 
                 for( TermSynonym tsyn: toBeInsertedSynonyms ) {
                     dao.insertTermSynonym(tsyn, SOURCE);
-                    counters.increment("SYNONYMS_INSERTED");
+                    counters.increment(ontId+"_SYNONYMS_INSERTED");
                 }
 
             } catch( Exception e ) {
@@ -187,13 +206,11 @@ public class MP_HP_Loader {
         });
 
 
-        List<TermSynonym> obsoleteTermSynonyms = dao.getTermSynonymsModifiedBefore("MP", SOURCE, dateStart );
+        List<TermSynonym> obsoleteTermSynonyms = dao.getTermSynonymsModifiedBefore(ontId, SOURCE, dateStart );
         if( !obsoleteTermSynonyms.isEmpty() ) {
             dao.deleteTermSynonyms(obsoleteTermSynonyms);
-            counters.add("SYNONYMS_DELETED", obsoleteTermSynonyms.size());
+            counters.add(ontId+"_SYNONYMS_DELETED", obsoleteTermSynonyms.size());
         }
-
-        System.out.println(counters.dumpAlphabetically());
     }
 
     static String getSynonymType( String predicateId ) {
