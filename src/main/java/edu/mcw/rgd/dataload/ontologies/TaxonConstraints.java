@@ -21,6 +21,10 @@ import java.util.*;
  * and a number of GO terms is tagged with 'Not4Curation' synonyms.
  * (f.e. if a GO term is tagged as 'only_in_taxon Bacteria', this term and all of its child terms are
  *     tagged as 'Not4Curation', because we do not curate bacteria, only Mammals lineage)
+ * <p>
+ * The same pass over go-edit.obo also tags with 'Not4Curation' the terms flagged as obsoletion candidates
+ * and the terms already obsolete in go-edit.obo: RGD loads GO terms from the released go-basic.obo, so a term
+ * obsoleted after the release stays active in RGD until the next release, while go-edit.obo tells right away.
  *
  */
 public class TaxonConstraints {
@@ -56,6 +60,12 @@ public class TaxonConstraints {
 
     // GO terms carrying the 'subset: gocheck_obsoletion_candidate' line in go-edit.obo
     private final Set<String> obsoletionCandidateTerms = new HashSet<>();
+
+    // GO terms carrying the 'is_obsolete: true' line in go-edit.obo
+    private final Set<String> obsoleteTerms = new HashSet<>();
+
+    // GO sub-ontologies as loaded in RGD
+    static final String[] GO_ONT_IDS = {"BP", "CC", "MF"};
 
     private String version;
     private String taxonUnionOboFile;
@@ -156,6 +166,9 @@ public class TaxonConstraints {
             else if( goId!=null && goId.startsWith("GO:") && line.equals("subset: gocheck_obsoletion_candidate") ) {
                 obsoletionCandidateTerms.add(goId);
             }
+            else if( goId!=null && goId.startsWith("GO:") && line.equals("is_obsolete: true") ) {
+                obsoleteTerms.add(goId);
+            }
             else if( goId!=null && goId.startsWith("GO:") && line.startsWith("is_a: ") ) {
 
                 String body = line.substring(6).trim();
@@ -202,6 +215,7 @@ public class TaxonConstraints {
         logger.info("    never_in_taxon constraints: "+neverInTaxonConstraints);
         logger.info("    only_in_taxon constraints : "+onlyInTaxonConstraints);
         logger.info("terms with gocheck_obsoletion_candidate subset: "+obsoletionCandidateTerms.size());
+        logger.info("terms obsolete in go-edit.obo: "+obsoleteTerms.size());
     }
 
     void expandTaxonUnions() {
@@ -254,7 +268,8 @@ public class TaxonConstraints {
 
         List<TermSynonym> incomingSynonyms = new ArrayList<>();
 
-        // term acc -> reasons it is tagged Not4Curation ('taxon constraint' and/or 'obsoletion candidate')
+        // term acc -> reasons it is tagged Not4Curation
+        //   ('taxon constraint', 'obsoletion candidate' and/or 'obsolete in go-edit.obo')
         Map<String, Set<String>> not4CurationReasons = new TreeMap<>();
 
         // GO terms that violate at least one taxon constraint (their descendants inherit Not4Curation too)
@@ -297,6 +312,22 @@ public class TaxonConstraints {
             addNot4CurationReason(not4CurationReasons, goId, "obsoletion candidate");
         }
 
+        // Not4Curation reason 3: terms obsolete in go-edit.obo but still active in RGD (term only);
+        //   terms already obsolete in RGD are left alone: they are invisible to curation anyway,
+        //   and the synonym sync below sees only the synonyms of active terms
+        Set<String> activeTermAccIds = new HashSet<>();
+        for( String goOntId: GO_ONT_IDS ) {
+            activeTermAccIds.addAll(dao.getActiveTermAccIds(goOntId));
+        }
+        int obsoleteInGoEditActiveInRgd = 0;
+        for( String goId: obsoleteTerms ) {
+            if( activeTermAccIds.contains(goId) ) {
+                addNot4CurationReason(not4CurationReasons, goId, "obsolete in go-edit.obo");
+                obsoleteInGoEditActiveInRgd++;
+            }
+        }
+        logger.info("terms obsolete in go-edit.obo but still active in RGD: "+obsoleteInGoEditActiveInRgd);
+
         // build a single Not4Curation synonym per tagged term
         for( String termAcc: not4CurationReasons.keySet() ) {
             TermSynonym syn = new TermSynonym();
@@ -317,8 +348,7 @@ public class TaxonConstraints {
 
         // load synonyms in RGD
         List<TermSynonym> inRgdSynonyms = new ArrayList<>();
-        String[] goOntIds = {"BP", "CC", "MF"};
-        for( String goOntId: goOntIds ) {
+        for( String goOntId: GO_ONT_IDS ) {
             inRgdSynonyms.addAll(dao.getActiveSynonymsByType(goOntId, "never_in_taxon"));
             inRgdSynonyms.addAll(dao.getActiveSynonymsByType(goOntId, "only_in_taxon"));
             inRgdSynonyms.addAll(dao.getActiveSynonymsByName(goOntId, "Not4Curation"));
@@ -414,7 +444,7 @@ public class TaxonConstraints {
     // count of distinct GO terms (BP/CC/MF) currently carrying a Not4Curation synonym
     int countNot4CurationTerms() throws Exception {
         Set<String> terms = new HashSet<>();
-        for( String ontId: new String[]{"BP", "CC", "MF"} ) {
+        for( String ontId: GO_ONT_IDS ) {
             for( TermSynonym syn: dao.getActiveSynonymsByName(ontId, "Not4Curation") ) {
                 terms.add(syn.getTermAcc());
             }
@@ -440,8 +470,8 @@ public class TaxonConstraints {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("GO Not4Curation summary (taxon constraints + obsoletion candidates)\n");
-        sb.append("=================================================================\n\n");
+        sb.append("GO Not4Curation summary (taxon constraints + obsoletion candidates + terms obsolete in go-edit.obo)\n");
+        sb.append("====================================================================================================\n\n");
         sb.append("Current number of Not4Curation GO terms : ").append(currentNot4CurationTerms).append("\n");
         sb.append("Newly acquired Not4Curation terms       : ").append(acquired.size()).append("\n");
         sb.append("Dropped Not4Curation terms              : ").append(dropped.size()).append("\n\n");

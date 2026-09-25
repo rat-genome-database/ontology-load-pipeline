@@ -264,6 +264,17 @@ public class OntologyDAO {
         return dao.getActiveSynonymsByName(ontologyId, synonymName);
     }
 
+    /**
+     * get accession ids of all active (non-obsolete) terms in given ontology
+     * @param ontId ontology id
+     * @return set of term accession ids
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public Set<String> getActiveTermAccIds(String ontId) throws Exception {
+        String sql = "SELECT term_acc FROM ont_terms WHERE ont_id=? AND is_obsolete=0";
+        return new HashSet<>(StringListQuery.execute(dao, sql, ontId));
+    }
+
     public List<TermSynonym> getActiveSynonymsByNamePattern(String ontId, String pattern) throws Exception {
         return dao.getActiveSynonymsByNamePattern(ontId, pattern);
     }
