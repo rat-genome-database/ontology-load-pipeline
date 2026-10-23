@@ -17,7 +17,7 @@ public class ObsoleteEfoHandler {
         OntologyDAO dao = new OntologyDAO();
 
         for(;;) {
-            String sql = "select term_acc from ont_terms where is_obsolete<>0 and ont_id='EFO' order by dbms_random.random";
+            String sql = "select term_acc from ont_terms where is_obsolete<>0 and ont_id='EFO' ORDER BY RANDOM()";
             List<String> list = StringListQuery.execute(adao, sql);
             String termAcc = null;
             int it = 0;
@@ -59,7 +59,7 @@ public class ObsoleteEfoHandler {
                     and exists(select 1 from ont_terms t2 where s1.synonym_name=t2.term_acc)
                     and exists(select 1 from ont_terms et where et.term_acc=synonym_name and et.is_obsolete<>0)
                   ) and ont_id not in('EFO','UBERON')
-                order by dbms_random.random
+                ORDER BY RANDOM()
                 """;
         List<String> termAccessions = StringListQuery.execute(adao, sql);
         System.out.println("processing "+termAccessions.size()+" terms with obsolete EFO accessions ...");

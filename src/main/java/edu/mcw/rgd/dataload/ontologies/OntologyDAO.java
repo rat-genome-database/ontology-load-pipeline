@@ -447,7 +447,14 @@ public class OntologyDAO {
     }
 
     public List<String> getAllActiveTermDescendantAccIds(String termAcc) throws Exception {
-        String sql = "SELECT DISTINCT child_term_acc FROM ont_dag START WITH parent_term_acc=? CONNECT BY PRIOR child_term_acc=parent_term_acc";
+        String sql = """
+            WITH RECURSIVE d AS (
+              SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?
+              UNION
+              SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.child_term_acc
+            )
+            SELECT DISTINCT child_term_acc FROM d
+            """;
         return StringListQuery.execute(dao, sql, termAcc);
     }
 
@@ -598,7 +605,7 @@ public class OntologyDAO {
             """
                 INSERT INTO ont_term_stats2
                 (term_acc,last_modified_date,species_type_key,object_key,with_children,stat_name,stat_value,filter)
-                VALUES(?,SYSDATE,?,?,?,?,?,NULL)
+                VALUES(?,LOCALTIMESTAMP(0),?,?,?,?,?,NULL)
                 """,
                 new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER});
             bsu.compile();
@@ -628,7 +635,7 @@ public class OntologyDAO {
         if( !stats.statsToBeUpdated.isEmpty() ) {
             BatchSqlUpdate bsu = new BatchSqlUpdate(annotDAO.getDataSource(),
                 "UPDATE ont_term_stats2 "+
-                "SET stat_value=?,last_modified_date=SYSDATE "+
+                "SET stat_value=?,last_modified_date=LOCALTIMESTAMP(0) "+
                 "WHERE term_acc=? AND species_type_key=? AND object_key=? AND with_children=? AND stat_name=? AND filter IS NULL",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR});
             bsu.compile();
@@ -646,7 +653,7 @@ public class OntologyDAO {
             BatchSqlUpdate bsu = new BatchSqlUpdate(annotDAO.getDataSource(),
                 "INSERT INTO ont_term_stats2 "+
                 "(term_acc,last_modified_date,species_type_key,object_key,with_children,stat_name,stat_value,filter) "+
-                "VALUES(?,SYSDATE,?,?,?,?,?,?)",
+                "VALUES(?,LOCALTIMESTAMP(0),?,?,?,?,?,?)",
                 new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.VARCHAR});
             bsu.compile();
             for( TermStat ts: stats.statsToBeAdded ) {
@@ -675,7 +682,7 @@ public class OntologyDAO {
         if( !stats.statsToBeUpdated.isEmpty() ) {
             BatchSqlUpdate bsu = new BatchSqlUpdate(annotDAO.getDataSource(),
                 "UPDATE ont_term_stats2 "+
-                "SET stat_value=?,last_modified_date=SYSDATE "+
+                "SET stat_value=?,last_modified_date=LOCALTIMESTAMP(0) "+
                 "WHERE term_acc=? AND species_type_key=? AND object_key=? AND with_children=? AND stat_name=? AND filter=?",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
             bsu.compile();
@@ -939,7 +946,7 @@ public class OntologyDAO {
     }
 
     public List<String> getChildParentDoMappings() throws Exception {
-        String sql = "SELECT child_term_acc||'|'||parent_term_acc FROM omim_ps_custom_do";
+        String sql = "SELECT CONCAT(child_term_acc,'|',parent_term_acc) FROM omim_ps_custom_do";
         return StringListQuery.execute(dao, sql);
     }
 

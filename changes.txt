@@ -1,3 +1,6 @@
+Oct 23, 2026
+  migrated to postgres; updated dependencies
+
 Sep 25, 2026
   GO taxon constraints: terms obsolete in go-edit.obo but still active in RGD get the Not4Curation flag; updated dependencies
 
