@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dataload.ontologies;
 
 import edu.mcw.rgd.dataload.ontologies.test.EfoXrefCreator;
+import edu.mcw.rgd.dataload.ontologies.test.SynonymLoader;
 import edu.mcw.rgd.dataload.ontologies.test.SSSOMValidator;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.TermDagEdge;
@@ -66,6 +67,7 @@ public class Manager {
         String sssomFile = null;
         boolean generateEfoXrefs = false;
         boolean loadMpHpMappings = false;
+        String synonymFile = null;
 
         for( String arg: args ) {
             if( arg.startsWith("-skip_download") ) {
@@ -110,6 +112,8 @@ public class Manager {
                 generateEfoXrefs = true;
             } else if (arg.startsWith("-mp_hp_mappings")) {
                 loadMpHpMappings = true;
+            } else if (arg.startsWith("-load_synonyms=")) {
+                synonymFile = arg.substring(15);
             }
 
             if( arg.equals("-?") || arg.equals("-help") || arg.equals("--help") ) {
@@ -192,6 +196,10 @@ public class Manager {
             MP_HP_Loader mpHpLoader = (MP_HP_Loader) bf.getBean("mpHpLoader");
             mpHpLoader.run();
         }
+
+        if( synonymFile!=null ) {
+            SynonymLoader.run(synonymFile);
+        }
     }
 
     /**
@@ -218,6 +226,9 @@ public class Manager {
                -update_ps_do_custom_mappings update OMIM_PS_DO_CUSTOM table
                -mp_hp_mappings       load MP-HP mappings from the MGI SSSOM mapping file:
                                      xref + typed synonyms on MP terms, reciprocal xrefs on HP terms
+               -load_synonyms=?      load RDO term synonyms from a tab-separated file
+                                     (synonym, synonym type, term name, term acc)
+                                     f.e. '-load_synonyms=data/synonyms.txt'
                -?                    print usage and exit
                -help                 print usage and exit
                --help                print usage and exit

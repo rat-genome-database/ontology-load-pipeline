@@ -1,3 +1,6 @@
+Oct 23, 2026
+  new option -load_synonyms=<file> (and script load_synonyms.sh) to bulk-load RDO term synonyms from a tab-separated file
+
 Sep 25, 2026
   GO taxon constraints: terms obsolete in go-edit.obo but still active in RGD get the Not4Curation flag; updated dependencies
 
