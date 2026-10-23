@@ -15,12 +15,19 @@ public class SynonymLoader {
 
     public static void main(String[] args) throws Exception {
 
+        // file name can be passed as the first cmdline argument
+        String fname = args.length>0 ? args[0] : "/Users/mtutaj/Documents/ClinVar synonyms 2026-10-23.txt";
+        run(fname);
+    }
+
+    public static void run(String fname) throws Exception {
+
         boolean dryRun = false;
 
         OntologyDAO dao = new OntologyDAO();
         System.out.println(dao.getConnectionInfo());
+        System.out.println("loading synonyms from file: "+fname);
 
-        String fname = "/Users/mtutaj/Documents/ClinVar synonyms 2026-06-19.txt";
         BufferedReader in = Utils.openReader(fname);
 
         int linesWithIssues = 0;
