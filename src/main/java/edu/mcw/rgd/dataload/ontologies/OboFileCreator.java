@@ -23,7 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class OboFileCreator {
 
-    protected final Logger logger = LogManager.getLogger("status");
+    // 'oboFiles' logger: INFO goes to logs/oboFiles_summary.log (one line per ontology, overwritten every run),
+    //   DEBUG details go to logs/oboFiles.log (monthly rolling)
+    protected final Logger logger = LogManager.getLogger("oboFiles");
 
     OntologyXDAO dao = new OntologyXDAO();
 
@@ -38,9 +40,13 @@ public class OboFileCreator {
     private Map<String,String> typedefs;
     private Set<String> emitObsoleteTermsFor;
     private Map<String,String> curatorNames;
-    private boolean versionStringWritten = false;
 
     private AtomicInteger spacesInDbXrefsReplaced = new AtomicInteger(0);
+    private AtomicInteger synonymsSkipped = new AtomicInteger(0);
+
+    // data-version of the currently published file, f.e. 'releases/2026-10-19'
+    private String publishedDataVersion;
+    private int newVersionCount = 0;
 
     /**
      * dump all terms (with definitions and synonyms) from given ontology into a obo file
@@ -51,29 +57,27 @@ public class OboFileCreator {
 
         long time0 = System.currentTimeMillis();
 
-        if( Utils.isStringEmpty(ontId) ) {
-            for( String ontId2: getVersionedFiles().keySet() ) {
-                runImpl(ontId2);
-            }
-        } else {
-            runImpl(ontId);
+        logger.info(getVersion());
+        logger.info("");
+
+        Collection<String> ontIds = Utils.isStringEmpty(ontId) ? getVersionedFiles().keySet() : List.of(ontId);
+        for( String ontId2: ontIds ) {
+            runImpl(ontId2);
         }
 
-        System.out.println("=== OK ===     elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+        logger.info("");
+        logger.info("OBO files with a new version: "+newVersionCount+" of "+ontIds.size());
+        logger.info("=== OK ===     elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     void runImpl(String ontId) throws Exception {
 
         boolean processObsoleteTerms = getEmitObsoleteTermsFor().contains(ontId);
 
-        // write version string only once
-        if( !versionStringWritten ) {
-            System.out.println(getVersion());
-            versionStringWritten = true;
-        }
-
         setOntId(ontId);
         spacesInDbXrefsReplaced.set(0);
+        synonymsSkipped.set(0);
+        publishedDataVersion = null;
 
         StringBuffer versionedTerms = new StringBuffer();
         StringBuffer publishedTypedefs = new StringBuffer();
@@ -113,7 +117,8 @@ public class OboFileCreator {
                     // synonyms of type 'alt_id' and 'xref' must be a valid accession (curie)
                     if( synonym.getType().equals("xref") || synonym.getType().equals("alt_id") ) {
                         if( !isStringACurie(synonym.getName()) ) {
-                            System.out.println("  WARNING! synonym skipped for "+synonym.getTermAcc()+": ["+synonym.getName()+"] is not a valid accession!");
+                            logger.debug("  WARNING! synonym skipped for "+synonym.getTermAcc()+": ["+synonym.getName()+"] is not a valid accession!");
+                            synonymsSkipped.incrementAndGet();
                             continue;
                         }
                     }
@@ -140,18 +145,32 @@ public class OboFileCreator {
         }
 
         // see if generated terms and typedefs are the same as in the versioned file
-        if( termsBuf.toString().equals(versionedTerms.toString())
-                && typedefsBlock.equals(publishedTypedefs.toString()) ) {
-            System.out.println(getOntId()+": "+terms.size()+" terms the same -- nothing written");
+        boolean termsChanged = !termsBuf.toString().equals(versionedTerms.toString());
+        boolean typedefsChanged = !typedefsBlock.equals(publishedTypedefs.toString());
+        String termCounts = "terms: "+Utils.formatThousands(terms.size());
+        int publishedTermCount = countTerms(versionedTerms);
+        if( publishedTermCount!=terms.size() ) {
+            termCounts += " (published: "+Utils.formatThousands(publishedTermCount)+")";
+        }
+
+        if( !termsChanged && !typedefsChanged ) {
+            logger.info(String.format("%-4s no changes -- file not written;  %s;  data-version: %s",
+                    ontId, termCounts, publishedDataVersion));
+            logSkippedSynonyms();
             return;
         }
 
         Utils.writeStringToFile(termsBuf.toString(), "/tmp/new_"+ontId.toLowerCase()+".obo");
         Utils.writeStringToFile(versionedTerms.toString(), "/tmp/old_"+ontId.toLowerCase()+".obo");
+        logger.debug("  "+ontId+": term diff files: /tmp/old_"+ontId.toLowerCase()+".obo  /tmp/new_"+ontId.toLowerCase()+".obo");
 
         // generate output file name
         setOutFileName(outFileName.toString());
-        System.out.println(getOntId()+" output file: "+getOutFileName());
+        newVersionCount++;
+        String changed = termsChanged && typedefsChanged ? "terms+typedefs changed"
+                : termsChanged ? "terms changed" : "typedefs changed";
+        logger.info(String.format("%-4s NEW VERSION (%s): %s;  %s;  data-version: %s -> %s",
+                ontId, changed, getOutFileName(), termCounts, publishedDataVersion, dataVersion));
 
         // write the header, body and trailer
         updateOboHeaderWithSynonymTypeDefs(oboHeader, subsetDefs, synonymTypeDefs);
@@ -173,10 +192,28 @@ public class OboFileCreator {
 
         writer.close();
 
-        System.out.println("   "+terms.size()+" terms written");
+        logger.debug("  "+ontId+": "+Utils.formatThousands(terms.size())+" terms written to "+getOutFileName());
         if( spacesInDbXrefsReplaced.get() != 0 ) {
-            System.out.println("   "+spacesInDbXrefsReplaced.get()+" spaces in db xrefs replaced");
+            logger.debug("  "+ontId+": "+Utils.formatThousands(spacesInDbXrefsReplaced.get())+" spaces in db xrefs replaced");
         }
+        logSkippedSynonyms();
+    }
+
+    void logSkippedSynonyms() {
+        if( synonymsSkipped.get() != 0 ) {
+            logger.info("     "+Utils.formatThousands(synonymsSkipped.get())+" synonyms skipped (not a valid accession); see oboFiles.log");
+        }
+    }
+
+    // number of [Term] stanzas in the given obo text
+    int countTerms(CharSequence oboText) {
+        int count = 0;
+        for( String line: oboText.toString().split("\n") ) {
+            if( line.equals("[Term]") ) {
+                count++;
+            }
+        }
+        return count;
     }
 
     // f.e. 'OMIM:PS123456', 'CHEBI:1234'
@@ -220,7 +257,7 @@ public class OboFileCreator {
         Ontology ont = dao.getOntology(ontId);
         String header = Utils.defaultString(ont.getOboHeader()).replace("\r\n","\n");
         if( header.isEmpty() ) {
-            System.out.println("OBO_HEADER for "+ontId+" ontology is not set in ONTOLOGY table! Generating default header.");
+            logger.warn("OBO_HEADER for "+ontId+" ontology is not set in ONTOLOGY table! Generating default header.");
             oboHeader.append("format-version: 1.2.2\n")
                     .append("date: #DATE#\n")
                     .append("auto-generated-by: ").append(getVersion()).append("\n")
@@ -308,6 +345,7 @@ public class OboFileCreator {
                 // data-version: releases/yyyy-MM-dd
                 int verPos = line.indexOf(": ");
                 oldDataVersion = line.substring(verPos+2).trim();
+                publishedDataVersion = oldDataVersion;
                 dataVersion = "releases/" + new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             }
             else if( line.startsWith("date:") ) {
@@ -357,6 +395,7 @@ public class OboFileCreator {
             String fileContent = Utils.readFileAsString(localFile);
             backupFile.getParentFile().mkdirs();
             Utils.writeStringToFile(fileContent, backupFileName);
+            logger.debug("  "+ontId+": published file backed up as "+backupFileName);
         }
 
         return dataVersion;
