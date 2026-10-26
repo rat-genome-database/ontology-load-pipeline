@@ -66,9 +66,14 @@ ofn_tmp_files+=("/tmp/RS.ofn")
 
 
 error_file="$APPDIR/robot.errors"
-echo " " > $error_file
+: > $error_file
 
 cd $APPDIR
+
+# robot results are appended to the summary written by extract_obo_files.sh
+summary_file="$APPDIR/logs/oboFiles_summary.log"
+echo "" >> $summary_file
+echo "robot validation, `date '+%Y-%m-%d %H:%M'` (exit status of obo -> owl and obo -> ofn conversions):" >> $summary_file
 
 for i in ${!obo_files[@]}; do
   infile=${obo_tmp_files[$i]}
@@ -77,11 +82,13 @@ for i in ${!obo_files[@]}; do
 
   scp -p "${obo_files[$i]}" $infile
 
-  java -jar robot.jar convert --input $infile --output $outfile >> $error_file
+  if java -jar robot.jar convert --input $infile --output $outfile >> $error_file 2>&1; then owl_status="OK"; else owl_status="FAILED"; fi
   scp -p $outfile "${owl_files[$i]}"
 
-  java -jar robot.jar convert --input $infile --output $ofnfile >> $error_file
+  if java -jar robot.jar convert --input $infile --output $ofnfile >> $error_file 2>&1; then ofn_status="OK"; else ofn_status="FAILED"; fi
   scp -p $ofnfile "${ofn_files[$i]}"
+
+  printf "  %-24s owl: %-6s  ofn: %s\n" "${obo_files[$i]##*/}" $owl_status $ofn_status >> $summary_file
 done
 
 if [ -s $error_file ]; then

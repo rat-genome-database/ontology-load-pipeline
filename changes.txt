@@ -1,3 +1,6 @@
+Oct 26, 2026
+  OBO files: new 'oboFiles' logger with weekly summary email, incl. robot validation results
+
 Oct 23, 2026
   new option -load_synonyms=<file> (and script load_synonyms.sh) to bulk-load RDO term synonyms from a tab-separated file
 
