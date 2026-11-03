@@ -209,6 +209,7 @@ public class FileParser {
         String line, val;
         Record rec = null;
         while( (line=reader.readLine())!=null ) {
+            line = line.replace('\u00A0', ' ').replaceAll(" {2,}", " "); // replace non-breaking spaces with regular spaces, then multiple spaces with one
 
             // detect term boundary
             if( line.startsWith("[") ) {
@@ -681,7 +682,7 @@ public class FileParser {
         if( term.getDefinition()==null || term.getDefinition().isEmpty() )
             term.setDefinition(text);
         else if( !term.getDefinition().contains(text) ) {
-            String newDef = term.getDefinition()+" "+text;
+            String newDef = term.getDefinition().trim()+" "+text.trim();
             if( newDef.length()<4000 )
                 term.setDefinition(newDef);
         }

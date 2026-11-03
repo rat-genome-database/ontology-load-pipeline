@@ -1,3 +1,6 @@
+Nov 03, 2026
+  OBO parser: non-breaking spaces replaced with regular spaces, and multiple spaces with one
+
 Oct 26, 2026
   OBO files: new 'oboFiles' logger with weekly summary email, incl. robot validation results
 
