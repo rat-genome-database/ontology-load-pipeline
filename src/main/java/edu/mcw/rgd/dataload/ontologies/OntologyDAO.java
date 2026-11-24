@@ -461,6 +461,64 @@ public class OntologyDAO {
         return dao.getCountOfAncestors(termAcc);
     }
 
+    /**
+     * check if given term is part of a cycle in ont_dag, i.e. if the term is its own descendant;
+     * note: CONNECT BY NOCYCLE does not throw an exception on cycles, it returns the row closing the cycle
+     * @param termAcc term accession id
+     * @return true if the term is its own descendant
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public boolean isInCycle(String termAcc) throws Exception {
+        String sql = """
+            SELECT child_term_acc FROM ont_dag
+            WHERE child_term_acc=?
+            START WITH parent_term_acc=?
+            CONNECT BY NOCYCLE PRIOR child_term_acc=parent_term_acc
+            FETCH FIRST 1 ROWS ONLY
+            """;
+        return !StringListQuery.execute(dao, sql, termAcc, termAcc).isEmpty();
+    }
+
+    /**
+     * find cycles in ont_dag that go through given term (up to 5 cycles, each at most 10 terms long)
+     * @param termAcc term accession id
+     * @return list of cycles, each one in format 'TERM1 -[REL]-> TERM2 -[REL]-> TERM1',
+     *   rotated so it starts at its alphabetically lowest term (the same cycle is reported the same way from every term)
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getCycles(String termAcc) throws Exception {
+        String sql = """
+            SELECT TRIM(SYS_CONNECT_BY_PATH(parent_term_acc,' '))||' '||child_term_acc||'|'||TRIM(SYS_CONNECT_BY_PATH(ont_rel_id,' '))
+            FROM ont_dag
+            WHERE child_term_acc=?
+            START WITH parent_term_acc=?
+            CONNECT BY NOCYCLE PRIOR child_term_acc=parent_term_acc AND LEVEL<10
+            FETCH FIRST 5 ROWS ONLY
+            """;
+        List<String> cycles = new ArrayList<>();
+        for( String row: StringListQuery.execute(dao, sql, termAcc, termAcc) ) {
+            String[] parts = row.split("\\|");
+            String[] terms = parts[0].split(" "); // first and last term are the same
+            String[] rels = parts[1].split(" ");
+            int n = rels.length;
+
+            // rotate the cycle to start at the lowest term
+            int start = 0;
+            for( int i=1; i<n; i++ ) {
+                if( terms[i].compareTo(terms[start]) < 0 ) {
+                    start = i;
+                }
+            }
+            StringBuilder buf = new StringBuilder(terms[start]);
+            for( int i=0; i<n; i++ ) {
+                int j = (start+i) % n;
+                buf.append(" -[").append(rels[j]).append("]-> ").append(terms[(j+1) % n]);
+            }
+            cycles.add(buf.toString());
+        }
+        return cycles;
+    }
+
     public int getAnnotatedObjectCount(String accId, int objectKey, int speciesTypeKey, boolean withChildren) throws Exception {
         return annotDAO.getAnnotatedObjectCount(accId, withChildren, speciesTypeKey, objectKey);
     }
@@ -877,22 +935,31 @@ public class OntologyDAO {
 
         long time0 = System.currentTimeMillis();
         final AtomicLong[] stats = {new AtomicLong(time0), new AtomicLong(0)};
+        final Set<String> cyclesReported = ConcurrentHashMap.newKeySet();
         accIds.parallelStream().forEach(accId -> {
             // test if the newly inserted DAG does not form loops
             try {
-                getDescendantCount(accId);
-
-                // every 10sec print out progress
-                long accIdsProcessed = stats[1].incrementAndGet();
-                long time2 = System.currentTimeMillis();
-                long time1 = stats[0].get();
-                if( time2- time1 > 15000 ) {
-                    stats[0].set(time2);
-                    long percent = (100 * accIdsProcessed) / accIds.size();
-                    logStatus.debug(accIdsProcessed + " ("+ percent+"%),  threads=" + Thread.activeCount());
+                if( isInCycle(accId) ) {
+                    logStatus.warn("   WARNING: CYCLE found for "+accId);
+                    // report every cycle only once, even if it is found from several of its terms
+                    for( String cycle: getCycles(accId) ) {
+                        if( cyclesReported.add(cycle) ) {
+                            logStatus.warn("      CYCLE: "+cycle);
+                        }
+                    }
                 }
             } catch(Exception e) {
-                logStatus.warn("   WARNING: CYCLE found for "+accId);
+                logStatus.warn("   ERROR: cycle check failed for "+accId+": "+e.getMessage());
+            }
+
+            // every 15sec print out progress
+            long accIdsProcessed = stats[1].incrementAndGet();
+            long time2 = System.currentTimeMillis();
+            long time1 = stats[0].get();
+            if( time2- time1 > 15000 ) {
+                stats[0].set(time2);
+                long percent = (100 * accIdsProcessed) / accIds.size();
+                logStatus.debug(accIdsProcessed + " ("+ percent+"%),  threads=" + Thread.activeCount());
             }
         });
         long accIdsProcessed = stats[1].get();

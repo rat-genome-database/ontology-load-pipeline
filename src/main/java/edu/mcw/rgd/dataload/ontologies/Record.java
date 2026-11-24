@@ -147,12 +147,18 @@ public class Record {
         synonym.setType(type);
         synonym.setTermAcc(term.getAccId());
 
-        // strip comments from synonym name
+        // strip trailing qualifiers {...} that follow the dbxref list
         // f.e.: synonym: "babesiosis" EXACT [] {comment="preferred label from MONDO"}
+        //       synonym: "MALS" EXACT [DOID:9892] {OMO:0002001="https://w3id.org/information-resource-registry/nord"}
+        //   become
         //       synonym: "babesiosis" EXACT []
-        int commentPos = synonym.getName().lastIndexOf("{comment=");
-        if( commentPos>0 ) {
-            synonym.setName(synonym.getName().substring(0, commentPos).trim());
+        //       synonym: "MALS" EXACT [DOID:9892]
+        String synName = synonym.getName();
+        if( synName.endsWith("}") ) {
+            int qualifierPos = synName.lastIndexOf(" {");
+            if( qualifierPos>0 && synName.substring(0, qualifierPos).trim().endsWith("]") ) {
+                synonym.setName(synName.substring(0, qualifierPos).trim());
+            }
         }
 
         // CTD.obo could have suffix ", INCLUDED" in the last part of synonym --
