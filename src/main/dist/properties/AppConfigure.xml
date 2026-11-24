@@ -87,7 +87,7 @@
                 <entry key="ZFA" value="ZFA:"/>
                 <entry key="CS" value="CS:"/>
                 <entry key="CVCL" value="CVCL_"/>
-                <entry key="MONDO" value="MONDO"/>
+                <entry key="MONDO" value="MONDO:"/>
                 <entry key="OBA" value="OBA"/>
             </map>
         </property>
@@ -105,7 +105,7 @@
                 <entry key="NBO" value="NBO:0000000,NBO:0000243,NBO:0000313"/>
                 <entry key="ORDO" value="Orphanet:0,Orphanet:C001,Orphanet:C005,Orphanet:C010,Orphanet:C012,Orphanet:C023"/>
                 <entry key="UBERON" value="UBERON:9999999,UBERON:0000000,UBERON:0001062"/>
-                <entry key="MONDO" value="MONDO:0000000,MONDO:0000001,MONDO:0021125,MONDO:0042489"/>
+                <entry key="MONDO" value="MONDO:0000000,MONDO:0000001,MONDO:0021125,MONDO:0042489,MONDO:0021178"/>
             </map>
         </property>
 
