@@ -468,6 +468,26 @@ public class OntologyDAO {
         return dao.getCountOfAncestors(termAcc);
     }
 
+    /**
+     * check if given term is part of a cycle in ont_dag, i.e. if the term is its own descendant;
+     * note: the recursive query terminates on cycles (UNION drops already seen rows), it does not throw an exception
+     * as Oracle's CONNECT BY did
+     * @param termAcc term accession id
+     * @return true if the term is its own descendant
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public boolean isInCycle(String termAcc) throws Exception {
+        String sql = """
+            WITH RECURSIVE d AS (
+              SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?
+              UNION
+              SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.child_term_acc
+            )
+            SELECT child_term_acc FROM d WHERE child_term_acc=?
+            """;
+        return !StringListQuery.execute(dao, sql, termAcc, termAcc).isEmpty();
+    }
+
     public int getAnnotatedObjectCount(String accId, int objectKey, int speciesTypeKey, boolean withChildren) throws Exception {
         return annotDAO.getAnnotatedObjectCount(accId, withChildren, speciesTypeKey, objectKey);
     }
@@ -887,19 +907,21 @@ public class OntologyDAO {
         accIds.parallelStream().forEach(accId -> {
             // test if the newly inserted DAG does not form loops
             try {
-                getDescendantCount(accId);
-
-                // every 10sec print out progress
-                long accIdsProcessed = stats[1].incrementAndGet();
-                long time2 = System.currentTimeMillis();
-                long time1 = stats[0].get();
-                if( time2- time1 > 15000 ) {
-                    stats[0].set(time2);
-                    long percent = (100 * accIdsProcessed) / accIds.size();
-                    logStatus.debug(accIdsProcessed + " ("+ percent+"%),  threads=" + Thread.activeCount());
+                if( isInCycle(accId) ) {
+                    logStatus.warn("   WARNING: CYCLE found for "+accId);
                 }
             } catch(Exception e) {
-                logStatus.warn("   WARNING: CYCLE found for "+accId);
+                logStatus.warn("   ERROR: cycle check failed for "+accId+": "+e.getMessage());
+            }
+
+            // every 15sec print out progress
+            long accIdsProcessed = stats[1].incrementAndGet();
+            long time2 = System.currentTimeMillis();
+            long time1 = stats[0].get();
+            if( time2- time1 > 15000 ) {
+                stats[0].set(time2);
+                long percent = (100 * accIdsProcessed) / accIds.size();
+                logStatus.debug(accIdsProcessed + " ("+ percent+"%),  threads=" + Thread.activeCount());
             }
         });
         long accIdsProcessed = stats[1].get();
