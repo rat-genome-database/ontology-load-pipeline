@@ -488,6 +488,50 @@ public class OntologyDAO {
         return !StringListQuery.execute(dao, sql, termAcc, termAcc).isEmpty();
     }
 
+    /**
+     * find cycles in ont_dag that go through given term (up to 5 cycles, each at most 10 terms long)
+     * @param termAcc term accession id
+     * @return list of cycles, each one in format 'TERM1 -[REL]-> TERM2 -[REL]-> TERM1',
+     *   rotated so it starts at its alphabetically lowest term (the same cycle is reported the same way from every term)
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getCycles(String termAcc) throws Exception {
+        String sql = """
+            WITH RECURSIVE p AS (
+              SELECT d.child_term_acc AS acc, ARRAY[d.parent_term_acc::TEXT, d.child_term_acc::TEXT] AS terms,
+                ARRAY[d.ont_rel_id::TEXT] AS rels
+              FROM ont_dag d WHERE d.parent_term_acc=?
+              UNION ALL
+              SELECT d.child_term_acc, p.terms||d.child_term_acc::TEXT, p.rels||d.ont_rel_id::TEXT
+              FROM p JOIN ont_dag d ON d.parent_term_acc=p.acc
+              WHERE NOT d.child_term_acc = ANY(p.terms[2:]) AND CARDINALITY(p.terms)<10
+            )
+            SELECT ARRAY_TO_STRING(terms,' ')||'|'||ARRAY_TO_STRING(rels,' ') FROM p WHERE acc=? LIMIT 5
+            """;
+        List<String> cycles = new ArrayList<>();
+        for( String row: StringListQuery.execute(dao, sql, termAcc, termAcc) ) {
+            String[] parts = row.split("\\|");
+            String[] terms = parts[0].split(" "); // first and last term are the same
+            String[] rels = parts[1].split(" ");
+            int n = rels.length;
+
+            // rotate the cycle to start at the lowest term
+            int start = 0;
+            for( int i=1; i<n; i++ ) {
+                if( terms[i].compareTo(terms[start]) < 0 ) {
+                    start = i;
+                }
+            }
+            StringBuilder buf = new StringBuilder(terms[start]);
+            for( int i=0; i<n; i++ ) {
+                int j = (start+i) % n;
+                buf.append(" -[").append(rels[j]).append("]-> ").append(terms[(j+1) % n]);
+            }
+            cycles.add(buf.toString());
+        }
+        return cycles;
+    }
+
     public int getAnnotatedObjectCount(String accId, int objectKey, int speciesTypeKey, boolean withChildren) throws Exception {
         return annotDAO.getAnnotatedObjectCount(accId, withChildren, speciesTypeKey, objectKey);
     }
@@ -904,11 +948,18 @@ public class OntologyDAO {
 
         long time0 = System.currentTimeMillis();
         final AtomicLong[] stats = {new AtomicLong(time0), new AtomicLong(0)};
+        final Set<String> cyclesReported = ConcurrentHashMap.newKeySet();
         accIds.parallelStream().forEach(accId -> {
             // test if the newly inserted DAG does not form loops
             try {
                 if( isInCycle(accId) ) {
                     logStatus.warn("   WARNING: CYCLE found for "+accId);
+                    // report every cycle only once, even if it is found from several of its terms
+                    for( String cycle: getCycles(accId) ) {
+                        if( cyclesReported.add(cycle) ) {
+                            logStatus.warn("      CYCLE: "+cycle);
+                        }
+                    }
                 }
             } catch(Exception e) {
                 logStatus.warn("   ERROR: cycle check failed for "+accId+": "+e.getMessage());
